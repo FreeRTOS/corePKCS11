@@ -1,5 +1,5 @@
 /**
-@mainpage 
+@mainpage
 @brief PKCS #11 Crypto Abstraction Library.
 
 > PKCS #11 is a standard maintained by OASIS for interacting with cryptographic hardware.
@@ -17,9 +17,9 @@ This PKCS #11 library implements a subset of the PKCS #11 API required to establ
 @page pkcs11_design Design
 @section PKCS11_Wrapper PKCS #11 Wrapper Dependencies
 Currently, the PKCS #11 wrapper library has a dependency on:
-- FreeRTOS 
+- FreeRTOS
 - The C standard library stdint
-- PKCS #11. 
+- PKCS #11.
 
 Note: "iot_pkcs11.h" should always be included first as it defines the macros that are needed by the standard PKCS #11 header files.
 
@@ -47,7 +47,7 @@ digraph pkcs11_wrapper_dependencies
 
 @section PKCS11_implementation PKCS #11 Software Implementation Dependencies
 
-PKCS #11 is a flexible library, and can easily be swapped out for other implementations. The PKCS #11 library documented here 
+PKCS #11 is a flexible library, and can easily be swapped out for other implementations. The PKCS #11 library documented here
 is a software based implementation, to allow for writing libraries and code that can easily interface with Hardware Security Modules (HSM).
 
 Currently, the software based PKCS #11 library has the following dependencies:
@@ -169,7 +169,7 @@ PKCS #11 uses labels to map human readable strings to a PKCS #11 object. This de
 <b>Default value (if undefined): </b> `6`
 
 
-@section pkcs11configMAX_SESSIONS                           
+@section pkcs11configMAX_SESSIONS
 @brief Maximum number of sessions that can be stored by the PKCS #11 module.<br>
 The more sessions created, the higher RAM used by the PKCS #11 module.<br>
 <b>Possible values:</b> Any positive integer.<br>
@@ -226,7 +226,7 @@ Device certificate corresponding to pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS
 <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
 <b>Default value (if undefined): </b> `Device Cert`
 
-@section pkcs11configLABEL_ROOT_CERTIFICATE 
+@section pkcs11configLABEL_ROOT_CERTIFICATE
 @brief The PKCS #11 label for the AWS Trusted Root Certificate.
 
 The PKCS #11 label for the AWS Trusted Root Certificate.
@@ -420,7 +420,7 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 
 @page pkcs11_utils_pkimbedtlssignaturetopkcs11signature PKI_pkcs11SignatureTombedTLSSignature
 @snippet iot_pki_utils.h declare_pkcs11_utils_pkimbedtlssignaturetopkcs11signature
-@copydoc PKI_pkcs11SignatureTombedTLSSignature 
+@copydoc PKI_pkcs11SignatureTombedTLSSignature
 */
 
 

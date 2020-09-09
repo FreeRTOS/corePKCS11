@@ -924,6 +924,7 @@ EXCLUDE_SYMBOLS        =
 # command).
 
 EXAMPLE_PATH           = source/include \
+                         source/portable/mbedtls \
                          source
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
