@@ -47,7 +47,7 @@ jobs:
         run: sudo apt-get install complexity
       - name: Complexity
         run: |
-          find source/ -iname '*.c' -not -path './source/portable*' |\
+          find source/ -iname '*.c' -not -path './source/portable/windows/*' -not -path './source/portable/mbedtls/* '|\
           xargs complexity --scores --threshold=0 --horrid-threshold=8
   doxygen:
     runs-on: ubuntu-20.04
