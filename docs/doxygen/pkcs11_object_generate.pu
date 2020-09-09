@@ -25,7 +25,7 @@ pkcs -> app: Return a CK_SESSION_HANDLE
 app -> pkcs: Log in to current session with C_Login
 
 app -> pkcs: Pass CK_ATTRIBUTEs template to C_CreateKeyPair
-pkcs -> app: Return CK_OBJECT_HANDLE for public key and for private key 
+pkcs -> app: Return CK_OBJECT_HANDLE for public key and for private key
 
 app -> pkcs: Close session with C_CloseSession
 app -> pkcs: Uninitialize with C_Finalize

@@ -68,37 +68,39 @@
  */
 
 #ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
-    /* @ingroup pkcs11_macros
-     * @brief Suppress EC operations.
-     */
+
+/* @ingroup pkcs11_macros
+ * @brief Suppress EC operations.
+ */
     #define pkcs11configSUPPRESS_ECDSA_MECHANISM    0
 #endif
 
 #ifndef DISABLE_LOGGING
-    /**
-     * @brief Represents string to be logged when mbedTLS returned error
-     * does not contain a high-level code.
-     */
+
+/**
+ * @brief Represents string to be logged when mbedTLS returned error
+ * does not contain a high-level code.
+ */
     static const char * pNoHighLevelMbedTlsCodeStr = "<No-High-Level-Code>";
 
-    /**
-     * @brief Represents string to be logged when mbedTLS returned error
-     * does not contain a low-level code.
-     */
+/**
+ * @brief Represents string to be logged when mbedTLS returned error
+ * does not contain a low-level code.
+ */
     static const char * pNoLowLevelMbedTlsCodeStr = "<No-Low-Level-Code>";
 
-    /**
-     * @brief Utility for converting the high-level code in an mbedTLS error to string,
-     * if the code-contains a high-level code; otherwise, using a default string.
-     */
+/**
+ * @brief Utility for converting the high-level code in an mbedTLS error to string,
+ * if the code-contains a high-level code; otherwise, using a default string.
+ */
     #define mbedtlsHighLevelCodeOrDefault( mbedTlsCode )    \
     ( mbedtls_strerror_highlevel( mbedTlsCode ) != NULL ) ? \
     mbedtls_strerror_highlevel( mbedTlsCode ) : pNoHighLevelMbedTlsCodeStr
 
-    /**
-     * @brief Utility for converting the level-level code in an mbedTLS error to string,
-     * if the code-contains a level-level code; otherwise, using a default string.
-     */
+/**
+ * @brief Utility for converting the level-level code in an mbedTLS error to string,
+ * if the code-contains a level-level code; otherwise, using a default string.
+ */
     #define mbedtlsLowLevelCodeOrDefault( mbedTlsCode )    \
     ( mbedtls_strerror_lowlevel( mbedTlsCode ) != NULL ) ? \
     mbedtls_strerror_lowlevel( mbedTlsCode ) : pNoLowLevelMbedTlsCodeStr
@@ -1275,7 +1277,7 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
         return xResult;
     }
 
-    /* @[declare_pkcs11_pal_destroyobject] */
+/* @[declare_pkcs11_pal_destroyobject] */
     CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
     {
         CK_BYTE_PTR pcLabel = NULL;

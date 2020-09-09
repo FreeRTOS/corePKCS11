@@ -27,7 +27,7 @@ app -> pkcs: Log in to current session with C_Login
 app -> pkcs: Query for supported mechanisms with C_GetMechanismInfo
 pkcs -> app: Return CK_MECHANISM_INFO
 
-app -> pkcs: Start a digest operation using SHA-256 by passing CKM_SHA256 to C_DigestInit 
+app -> pkcs: Start a digest operation using SHA-256 by passing CKM_SHA256 to C_DigestInit
 app -> pkcs: Pass bytes buffer of message to C_DigestUpdate
 app -> pkcs: Pass bytes buffer for storing the digest to C_DigestFinal
 pkcs -> app: Fill buffer with digest bytes
