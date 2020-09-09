@@ -31,6 +31,7 @@ typedef struct MPU_SETTINGS
     uint32_t ulNotUsed;
     uint32_t array[ 10 ];
 } xMPU_SETTINGS;
+
 /*-----------------------------------------------------------
 * Application specific definitions.
 *

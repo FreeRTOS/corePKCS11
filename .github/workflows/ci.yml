@@ -47,7 +47,7 @@ jobs:
         run: sudo apt-get install complexity
       - name: Complexity
         run: |
-          find source/ -iname '*.c' -not -iname '*portable*' |\
+          find source/ -iname '*.c' -not -path './source/portable*' |\
           xargs complexity --scores --threshold=0 --horrid-threshold=8
   doxygen:
     runs-on: ubuntu-20.04
@@ -56,7 +56,7 @@ jobs:
       - name: Install Doxygen
         run: |
           wget -qO- "http://doxygen.nl/files/doxygen-1.8.20.linux.bin.tar.gz" | sudo tar --strip-components=1 -xz -C /usr/local
-          sudo apt-get install -y libclang-9-dev
+          sudo apt-get install -y libclang-9-dev graphviz
       - name: Run Doxygen And Verify Stdout Is Empty
         run: |
           doxygen docs/doxygen/config.doxyfile 2>&1 | tee doxyoutput.txt
@@ -80,7 +80,7 @@ jobs:
       - name: Install Uncrustify
         run: sudo apt-get install uncrustify
       - name: Run Uncrustify
-        run: find . -iname "*.[hc]" -not -iname "*portable*" -exec uncrustify --check -c tools/uncrustify.cfg {} +
+        run: find . -iname "*.[hc]" -exec uncrustify --check -c tools/uncrustify.cfg {} +
       - name: Check For Trailing Whitespace
         run: |
           set +e
