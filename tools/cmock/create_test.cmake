@@ -147,7 +147,6 @@ function(create_real_library target
                              src_file
                              real_include_list
                              mock_name)
-    message(${src_file})
     add_library(${target} STATIC
             ${src_file}
         )

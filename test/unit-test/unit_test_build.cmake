@@ -26,23 +26,20 @@ set(preprocess_commands
 # list the files to mock here
 list(APPEND mock_list
         "${MODULE_ROOT_DIR}/3rdparty/pkcs11/pkcs11.h"
-        "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include/portable.h"
+        "${MODULE_ROOT_DIR}/test/unit-test/config/mock_osal.h"
     )
 
 # list the directories your mocks need
 list(APPEND mock_include_list
         config
         "${PKCS_INCLUDE_PUBLIC_DIRS}"
-        "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include"
         "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls"
         "${MODULE_ROOT_DIR}/test/unit-test/config"
     )
 
 #list the definitions of your mocks to control what to be included
 list(APPEND mock_define_list
-        portHAS_STACK_OVERFLOW_CHECKING=1
-        portUSING_MPU_WRAPPERS=1
-        MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+    ""
     )
 
 # ================= Create the library under test here (edit) ==================
@@ -57,7 +54,6 @@ list(APPEND real_source_files
 # list the directories the module under test includes
 list(APPEND real_include_directories
     "config"
-    ${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include
     ${MODULE_ROOT_DIR}/source/include
     ${MODULE_ROOT_DIR}/3rdparty/pkcs11
     )
@@ -143,9 +139,8 @@ set( mock_dir "mbedtls_mocks" )
 
 # list the files to mock here
 list(APPEND mock_list
+            "${MODULE_ROOT_DIR}/test/unit-test/config/mock_osal.h"
             "${MODULE_ROOT_DIR}/source/include/iot_pkcs11_pal.h"
-            "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include/queue.h"
-            "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include/portable.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/ctr_drbg.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/sha256.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/base64.h"
@@ -163,19 +158,15 @@ list(APPEND mock_list
 
 # list the directories your mocks need
 list(APPEND mock_include_list
-            config
-            "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls"
             "${MODULE_ROOT_DIR}/3rdparty"
-            "${MODULE_ROOT_DIR}/test/unit_test/config"
+            "${MODULE_ROOT_DIR}/test/unit-test/config"
             "${MODULE_ROOT_DIR}/source/include/"
     )
 
 #list the definitions of your mocks to control what to be included
 list(APPEND mock_define_list
-            portHAS_STACK_OVERFLOW_CHECKING=1
-            portUSING_MPU_WRAPPERS=1
-            MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+    ""
     )
 
 # ================= Create the library under test here (edit) ==================
@@ -184,16 +175,15 @@ list(APPEND mock_define_list
 list(APPEND real_source_files
             ${MODULE_ROOT_DIR}/3rdparty/mbedtls/library/pk_wrap.c
             ${MODULE_ROOT_DIR}/source/portable/mbedtls/iot_pkcs11_mbedtls.c
+            ${MODULE_ROOT_DIR}/test/unit-test/config/iot_pkcs11_config.h
     )
 
 # list the directories the module under test includes
 list(APPEND real_include_directories
-            config
             "${MODULE_ROOT_DIR}/3rdparty/pkcs11"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include"
             "${MODULE_ROOT_DIR}/3rdparty"
-            "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include"
-            "${MODULE_ROOT_DIR}/test/unit_test/config"
+            "${MODULE_ROOT_DIR}/test/unit-test/config"
             "${MODULE_ROOT_DIR}/source/include/"
             "${CMAKE_CURRENT_BINARY_DIR}/${mock_dir}"
     )
@@ -201,12 +191,10 @@ list(APPEND real_include_directories
 
 # list the directories your test needs to include
 list(APPEND test_include_directories
-            config
             "${MODULE_ROOT_DIR}/3rdparty/pkcs11"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls"
             "${MODULE_ROOT_DIR}/3rdparty"
-            "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include"
-            "${MODULE_ROOT_DIR}/test/unit_test/config"
+            "${MODULE_ROOT_DIR}/test/unit-test/config"
             "${MODULE_ROOT_DIR}/source/include/"
             "${CMAKE_CURRENT_BINARY_DIR}/${mock_dir}"
     )
@@ -271,21 +259,19 @@ set( utest_dep_list "" )
 set(mock_dir "wrapper_mocks")
 
 # list the files to mock here
+# Can't have an empty mock list.
 list(APPEND mock_list
-        "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include/portable.h"
+    "${MODULE_ROOT_DIR}/3rdparty/mbedtls_error.h"
 )
 
 # list the directories your mocks need
 list(APPEND mock_include_list
-        config
-        "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include"
+         config
     )
 
 #list the definitions of your mocks to control what to be included
 list(APPEND mock_define_list
-            portHAS_STACK_OVERFLOW_CHECKING=1
-            portUSING_MPU_WRAPPERS=1
-            MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+    ""
     )
 
 # ================= Create the library under test here (edit) ==================
@@ -298,7 +284,6 @@ list(APPEND real_source_files
 # list the directories the module under test includes
 list(APPEND real_include_directories
             config
-            "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include"
             "${MODULE_ROOT_DIR}/source/include/"
             "${CMAKE_CURRENT_BINARY_DIR}/${mock_dir}"
     )
@@ -307,7 +292,6 @@ list(APPEND real_include_directories
 # list the directories your test needs to include
 list(APPEND test_include_directories
             config
-            "${MODULE_ROOT_DIR}/FreeRTOS-Kernel/include"
             "${MODULE_ROOT_DIR}/source/include/"
             "${CMAKE_CURRENT_BINARY_DIR}/${mock_dir}"
     )

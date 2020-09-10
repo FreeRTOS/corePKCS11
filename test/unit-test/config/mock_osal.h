@@ -1,5 +1,5 @@
 /*
- * FreeRTOS PKCS #11 V2.1.0
+ * FreeRTOS PKCS #11 V1.1.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -12,7 +12,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF NY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
@@ -23,27 +23,24 @@
  * http://www.FreeRTOS.org
  */
 
-#ifndef __THREADING_ALT_H__
-#define __THREADING_ALT_H__
-
-
-#include "FreeRTOS.h"
-#include "semphr.h"
-
-/**
- * @brief Mutex struct used to synchronize mbed TLS operations.
- *
+/* This is a dummy file that contains OS layer stubs. This is needed in order to use
+ * CMock to generate the necessary mocks for the mutex and memory function used 
+ * by the PKCS #11 mbed TLS implementation.
  */
-typedef struct
-{
-    SemaphoreHandle_t mutex; /**< @brief FreeRTOS semaphore. */
-    char is_valid;           /**< @brief Flag used by mbedTLS to track wether a mutex is valid. */
-} mbedtls_threading_mutex_t;
+#ifndef MOCK_OSAL_H_
+#define MOCK_OSAL_H_
 
-extern void mbedtls_threading_set_alt( void ( * mutex_init )( mbedtls_threading_mutex_t * ),
-                                       void ( * mutex_free )( mbedtls_threading_mutex_t * ),
-                                       int ( * mutex_lock )( mbedtls_threading_mutex_t * ),
-                                       int ( * mutex_unlock )( mbedtls_threading_mutex_t * ) );
+#include <stddef.h>
+#include "threading_alt.h"
 
+void *mock_osal_malloc(size_t size);
+void *mock_osal_calloc(size_t nitems, size_t size);
+void mock_osal_free(void *ptr);
 
-#endif /* ifndef __THREADING_ALT_H__ */
+void mock_osal_mutex_init( mbedtls_threading_mutex_t * );
+void mock_osal_mutex_free( mbedtls_threading_mutex_t * );
+int mock_osal_mutex_lock( mbedtls_threading_mutex_t * );
+int mock_osal_mutex_unlock( mbedtls_threading_mutex_t * );
+
+#endif
+
