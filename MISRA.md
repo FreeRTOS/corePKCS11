@@ -25,6 +25,6 @@ Deviations from the MISRA standard are listed below:
 ### Suppressed with Coverity Comments
 | Deviation | Category | Justification |
 | :-: | :-: | :-: |
-| Rule 10.5 | Advisory | The value of an expression should not be cast to an inappropriate essential type. The boolean type of the PKCS #11 standard is an unsigned char, which is an acceptable base type for a boolean type. 
+| Rule 10.5 | Advisory | The value of an expression should not be cast to an inappropriate essential type. The boolean type of the PKCS #11 standard is an unsigned char, which is an acceptable base type for a boolean type.
 
 
