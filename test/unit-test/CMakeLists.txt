@@ -52,7 +52,7 @@ endif()
 # defining test targets with add_test()
 enable_testing()
 
-# We do this to swap out the default mbed TLS config for one geared towards the 
+# We do this to swap out the default mbed TLS config for one geared towards the
 # unit tests.
 add_compile_definitions( MBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" )
 
