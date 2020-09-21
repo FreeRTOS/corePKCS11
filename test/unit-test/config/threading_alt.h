@@ -1,5 +1,5 @@
 /*
- * FreeRTOS V202007.00
+ * FreeRTOS PKCS #11 V2.1.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -12,7 +12,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF NY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
@@ -23,20 +23,18 @@
  * http://www.FreeRTOS.org
  */
 
-#ifndef PORTABLE_DEFS_H_
-#define PORTABLE_DEFS_H_
+#ifndef __THREADING_ALT_H__
+#define __THREADING_ALT_H__
 
-#include </usr/include/errno.h>
+typedef struct
+{
+    int dummy_val;
+} mbedtls_threading_mutex_t;
 
-/* redefine EWOULDBLOCK to be different than EAGAIN to broaden the test coverage
- * and cover more cases
- */
-#undef EWOULDBLOCK
-#define EWOULDBLOCK    300
-
-#include "FreeRTOSConfig.h"
-#include "FreeRTOS.h"
-#include "portable.h"
+extern void mbedtls_threading_set_alt( void ( * mutex_init )( mbedtls_threading_mutex_t * ),
+                                       void ( * mutex_free )( mbedtls_threading_mutex_t * ),
+                                       int ( * mutex_lock )( mbedtls_threading_mutex_t * ),
+                                       int ( * mutex_unlock )( mbedtls_threading_mutex_t * ) );
 
 
-#endif /* ifndef PORTABLE_DEFS_H_ */
+#endif /* ifndef __THREADING_ALT_H__ */

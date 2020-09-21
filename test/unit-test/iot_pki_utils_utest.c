@@ -30,9 +30,6 @@
 /* Test includes. */
 #include "unity.h"
 
-/* Mock includes. */
-#include "mock_portable.h"
-
 /* Library includes. */
 #include "iot_pki_utils.h"
 

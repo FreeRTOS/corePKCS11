@@ -54,6 +54,18 @@
 #endif
 
 #include "logging_stack.h"
+#include "mock_osal.h"
+
+/**
+ * @brief Malloc API used by iot_pkcs11.h
+ */
+#define PKCS11_MALLOC    mock_osal_malloc
+
+/**
+ * @brief Free API used by iot_pkcs11.h
+ */
+#define PKCS11_FREE      mock_osal_free
+
 
 /**
  * @brief PKCS #11 default user PIN.
