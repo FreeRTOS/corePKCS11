@@ -39,7 +39,7 @@ Doxygen pages, please run the following command from the root of this repository
 ```shell
 doxygen docs/doxygen/config.doxyfile
 ```
-t
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
