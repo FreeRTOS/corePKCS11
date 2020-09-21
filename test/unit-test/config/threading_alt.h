@@ -38,4 +38,3 @@ extern void mbedtls_threading_set_alt( void ( * mutex_init )( mbedtls_threading_
 
 
 #endif /* ifndef __THREADING_ALT_H__ */
-

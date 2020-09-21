@@ -1255,7 +1255,7 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
         return xResult;
     }
 
-    /* @[declare_pkcs11_pal_destroyobject] */
+/* @[declare_pkcs11_pal_destroyobject] */
     CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
     {
         CK_BYTE_PTR pcLabel = NULL;
@@ -1821,7 +1821,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
     if( CKR_OK == xResult )
     {
         /*
-          Assign the session.
+         * Assign the session.
          */
         pxSessionObj->ulState =
             ( 0UL != ( flags & CKF_RW_SESSION ) ) ? CKS_RW_PUBLIC_SESSION : CKS_RO_PUBLIC_SESSION;

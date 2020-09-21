@@ -59,12 +59,12 @@
 /**
  * @brief Malloc API used by iot_pkcs11.h
  */
-#define PKCS11_MALLOC mock_osal_malloc
+#define PKCS11_MALLOC    mock_osal_malloc
 
 /**
  * @brief Free API used by iot_pkcs11.h
  */
-#define PKCS11_FREE mock_osal_free
+#define PKCS11_FREE      mock_osal_free
 
 
 /**

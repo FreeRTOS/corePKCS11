@@ -24,7 +24,7 @@
  */
 
 /* This is a dummy file that contains OS layer stubs. This is needed in order to use
- * CMock to generate the necessary mocks for the mutex and memory function used 
+ * CMock to generate the necessary mocks for the mutex and memory function used
  * by the PKCS #11 mbed TLS implementation.
  */
 #ifndef MOCK_OSAL_H_
@@ -33,14 +33,14 @@
 #include <stddef.h>
 #include "threading_alt.h"
 
-void *mock_osal_malloc(size_t size);
-void *mock_osal_calloc(size_t nitems, size_t size);
-void mock_osal_free(void *ptr);
+void * mock_osal_malloc( size_t size );
+void * mock_osal_calloc( size_t nitems,
+                         size_t size );
+void mock_osal_free( void * ptr );
 
 void mock_osal_mutex_init( mbedtls_threading_mutex_t * );
 void mock_osal_mutex_free( mbedtls_threading_mutex_t * );
 int mock_osal_mutex_lock( mbedtls_threading_mutex_t * );
 int mock_osal_mutex_unlock( mbedtls_threading_mutex_t * );
 
-#endif
-
+#endif /* ifndef MOCK_OSAL_H_ */

@@ -151,7 +151,7 @@ typedef struct RsaParams_t
 /*!
  * @brief Wrapper stub for malloc.
  */
-void * pvPkcs11CallocCb( size_t nitems, 
+void * pvPkcs11CallocCb( size_t nitems,
                          size_t size,
                          int numCalls )
 {
@@ -173,31 +173,31 @@ void vPkcs11FreeCb( void * ptr,
     }
 }
 
-static void threading_mutex_init( mbedtls_threading_mutex_t *mutex )
+static void threading_mutex_init( mbedtls_threading_mutex_t * mutex )
 {
     mock_osal_mutex_init( mutex );
 }
 
-static void threading_mutex_free( mbedtls_threading_mutex_t *mutex )
+static void threading_mutex_free( mbedtls_threading_mutex_t * mutex )
 {
     mock_osal_mutex_free( mutex );
 }
 
 
-static int threading_mutex_lock( mbedtls_threading_mutex_t *mutex )
+static int threading_mutex_lock( mbedtls_threading_mutex_t * mutex )
 {
     return mock_osal_mutex_lock( mutex );
 }
 
-static int threading_mutex_unlock( mbedtls_threading_mutex_t *mutex )
+static int threading_mutex_unlock( mbedtls_threading_mutex_t * mutex )
 {
     return mock_osal_mutex_unlock( mutex );
 }
 
-void (*mbedtls_mutex_init)( mbedtls_threading_mutex_t * ) = threading_mutex_init;
-void (*mbedtls_mutex_free)( mbedtls_threading_mutex_t * ) = threading_mutex_free;
-int (*mbedtls_mutex_lock)( mbedtls_threading_mutex_t * ) = threading_mutex_lock;
-int (*mbedtls_mutex_unlock)( mbedtls_threading_mutex_t * ) = threading_mutex_unlock;
+void (* mbedtls_mutex_init)( mbedtls_threading_mutex_t * ) = threading_mutex_init;
+void (* mbedtls_mutex_free)( mbedtls_threading_mutex_t * ) = threading_mutex_free;
+int (* mbedtls_mutex_lock)( mbedtls_threading_mutex_t * ) = threading_mutex_lock;
+int (* mbedtls_mutex_unlock)( mbedtls_threading_mutex_t * ) = threading_mutex_unlock;
 
 
 /* ============================   UNITY FIXTURES ============================ */
@@ -297,7 +297,7 @@ static CK_RV prvOpenSession( CK_SESSION_HANDLE_PTR pxSession )
     mock_osal_calloc_Stub( pvPkcs11CallocCb );
     mock_osal_mutex_lock_IgnoreAndReturn( 0 );
     mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
-    mock_osal_mutex_init_CMockIgnore( );
+    mock_osal_mutex_init_CMockIgnore();
     xResult = C_OpenSession( 0, xFlags, NULL, 0, pxSession );
 
     return xResult;
@@ -1206,8 +1206,8 @@ void test_pkcs11_C_CreateObjectECPubKey( void )
         mbedtls_pk_write_pubkey_der_IgnoreAndReturn( 1 );
         mbedtls_pk_free_Stub( vMbedPkFree );
         PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
-        fake_mutex_lock_IgnoreAndReturn( 0 );
-        fake_mutex_unlock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
         mock_osal_free_Stub( vPkcs11FreeCb );
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
@@ -1348,8 +1348,8 @@ void test_pkcs11_C_CreateObjectRSAPrivKey( void )
         mbedtls_pk_write_key_der_IgnoreAndReturn( 1 );
         mbedtls_pk_free_Stub( vMbedPkFree );
         PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
-        mock_osal_lock_IgnoreAndReturn( 0 );
-        mock_osal_unlock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
         mock_osal_free_Stub( vPkcs11FreeCb );
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
