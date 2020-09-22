@@ -96,3 +96,14 @@ jobs:
           else
             exit 0
           fi
+            url-check:
+  url-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone This Repo
+        uses: actions/checkout@v2
+        with:
+            path: ./kernel
+      - name: URL Checker
+        run: |
+            bash kernel/.github/actions/url_verifier.sh kernel
