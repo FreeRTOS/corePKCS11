@@ -41,6 +41,7 @@
 #include "mock_bignum.h"
 #include "mock_iot_pki_utils.h"
 #include "mock_mbedtls_error.h"
+#include "mock_pk_internal.h"
 
 /* PKCS #11 includes. */
 #include "iot_pkcs11_config.h"
@@ -145,6 +146,43 @@ typedef struct RsaParams_t
     CK_BYTE exponent2[ EXPONENT_2_LENGTH + 1 ];
     CK_BYTE coefficient[ COEFFICIENT_LENGTH + 1 ];
 } RsaParams_t;
+
+/* ==========================  MBED TLS EXTERNS =========================== */
+/* Extern struct used by mbed TLS internally for managing RSA structs. */
+const mbedtls_pk_info_t mbedtls_rsa_info = {
+    MBEDTLS_PK_RSA,
+    "RSA",
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+};
+
+const mbedtls_pk_info_t mbedtls_eckey_info = {
+    MBEDTLS_PK_ECKEY,
+    "EC",
+    NULL,
+    NULL,
+#if defined(MBEDTLS_ECDSA_C)
+    NULL,
+    NULL,
+#else
+    NULL,
+    NULL,
+#endif
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+};
 
 /* ==========================  CALLBACK FUNCTIONS =========================== */
 
