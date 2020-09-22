@@ -159,7 +159,7 @@ list(APPEND mock_list
 # list the directories your mocks need
 list(APPEND mock_include_list
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls"
-            "${MODULE_ROOT_DIR}/3rdparty"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils"
             "${MODULE_ROOT_DIR}/test/unit-test/config"
             "${MODULE_ROOT_DIR}/source/include/"
     )
@@ -182,7 +182,7 @@ list(APPEND real_source_files
 list(APPEND real_include_directories
             "${MODULE_ROOT_DIR}/3rdparty/pkcs11"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include"
-            "${MODULE_ROOT_DIR}/3rdparty"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils"
             "${MODULE_ROOT_DIR}/test/unit-test/config"
             "${MODULE_ROOT_DIR}/source/include/"
             "${CMAKE_CURRENT_BINARY_DIR}/${mock_dir}"
@@ -193,7 +193,7 @@ list(APPEND real_include_directories
 list(APPEND test_include_directories
             "${MODULE_ROOT_DIR}/3rdparty/pkcs11"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls"
-            "${MODULE_ROOT_DIR}/3rdparty"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils"
             "${MODULE_ROOT_DIR}/test/unit-test/config"
             "${MODULE_ROOT_DIR}/source/include/"
             "${CMAKE_CURRENT_BINARY_DIR}/${mock_dir}"
