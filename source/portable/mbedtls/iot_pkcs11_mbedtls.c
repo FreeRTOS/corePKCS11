@@ -2172,7 +2172,51 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
 
         return xResult;
     }
-#endif /* if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 ) */
+
+/*
+ * @brief Helper function to load an EC group to the mbed TLS pk context.
+ */
+    static CK_RV prvLoadEcGroup( mbedtls_pk_context * pxMbedContext )
+    {
+        CK_RV xResult = CKR_OK;
+        mbedtls_ecp_keypair * pxKeyPair;
+        int32_t lMbedTLSResult = 0;
+
+        pxKeyPair = mbedtls_calloc( 1, sizeof( mbedtls_ecp_keypair ) );
+
+        if( pxKeyPair != NULL )
+        {
+            /* Initialize the info. */
+            pxMbedContext->pk_info = &mbedtls_eckey_info;
+
+            /* Initialize the context. */
+            pxMbedContext->pk_ctx = pxKeyPair;
+            mbedtls_ecp_keypair_init( pxKeyPair );
+            mbedtls_ecp_group_init( &pxKeyPair->grp );
+
+            /* At this time, only P-256 curves are supported. */
+            lMbedTLSResult = mbedtls_ecp_group_load( &pxKeyPair->grp,
+                                                     MBEDTLS_ECP_DP_SECP256R1 );
+
+            if( lMbedTLSResult != 0 )
+            {
+                LogError( ( "Failed creating an EC key. "
+                            "mbedtls_ecp_group_load failed: mbed "
+                            "TLS error = %s : %s.",
+                            mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                            mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                xResult = CKR_FUNCTION_FAILED;
+            }
+        }
+        else
+        {
+            LogError( ( "Failed creating an EC key. Could not allocate a "
+                        "mbedtls_ecp_keypair struct." ) );
+            xResult = CKR_HOST_MEMORY;
+        }
+
+        return xResult;
+    }
 
 /**
  * @brief Helper function for importing elliptic curve keys from
@@ -2182,7 +2226,6 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
  * @param[in] pxObject PKCS #11 object handle.
  * @param[in] xIsPrivate boolean indicating whether the key is private or public.
  */
-#if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
     static CK_RV prvCreateECKey( CK_ATTRIBUTE * pxTemplate,
                                  CK_ULONG ulCount,
                                  CK_OBJECT_HANDLE_PTR pxObject,
@@ -2194,9 +2237,7 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
         uint32_t ulIndex;
         CK_ATTRIBUTE_PTR pxLabel = NULL;
         CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
-        int32_t lMbedTLSResult = 0;
         mbedtls_pk_context xMbedContext;
-        mbedtls_ecp_keypair * pxKeyPair;
 
         mbedtls_pk_init( &xMbedContext );
 
@@ -2221,41 +2262,10 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
 
             /* If a key had been found by prvGetExistingKeyComponent, the keypair context
              * would have been malloc'ed. */
-            pxKeyPair = mbedtls_calloc( 1, sizeof( mbedtls_ecp_keypair ) );
+            xResult = prvLoadEcGroup( &xMbedContext );
 
-            if( pxKeyPair != NULL )
-            {
-                /* Initialize the info. */
-                xMbedContext.pk_info = &mbedtls_eckey_info;
-
-                /* Initialize the context. */
-                xMbedContext.pk_ctx = pxKeyPair;
-                mbedtls_ecp_keypair_init( pxKeyPair );
-                mbedtls_ecp_group_init( &pxKeyPair->grp );
-
-                /* At this time, only P-256 curves are supported. */
-                lMbedTLSResult = mbedtls_ecp_group_load( &pxKeyPair->grp,
-                                                         MBEDTLS_ECP_DP_SECP256R1 );
-
-                if( lMbedTLSResult != 0 )
-                {
-                    LogError( ( "Failed creating an EC key. "
-                                "mbedtls_ecp_group_load failed: mbed "
-                                "TLS error = %s : %s.",
-                                mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                                mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-                    xResult = CKR_FUNCTION_FAILED;
-                }
-
-                /* Clean up the mbedTLS key context. */
-                mbedtls_pk_free( &xMbedContext );
-            }
-            else
-            {
-                LogError( ( "Failed creating an EC key. Could not allocate a "
-                            "mbedtls_ecp_keypair struct." ) );
-                xResult = CKR_HOST_MEMORY;
-            }
+            /* Clean up the mbedTLS key context. */
+            mbedtls_pk_free( &xMbedContext );
         }
 
         /* Key will be assembled in the mbedTLS key context and then exported to DER for storage. */
