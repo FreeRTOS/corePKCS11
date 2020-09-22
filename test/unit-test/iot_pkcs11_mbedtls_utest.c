@@ -2253,6 +2253,49 @@ void test_pkcs11_C_DigestInitClosedSession( void )
 
     prvUninitializePkcs11();
 }
+
+/*!
+ * @brief C_DigestInit bad args.
+ *
+ */
+void test_pkcs11_C_DigestInitBadArgs( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_MECHANISM xMechanism = { 0 };
+
+    xMechanism.mechanism = CKM_SHA256;
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        xResult = C_DigestInit( xSession, NULL );
+        TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+
+        xMechanism.mechanism = ( CK_MECHANISM_TYPE ) ( -1 );
+        xResult = C_DigestInit( xSession, &xMechanism );
+        TEST_ASSERT_EQUAL( CKR_MECHANISM_INVALID, xResult );
+
+        xMechanism.mechanism = CKM_SHA256;
+        mbedtls_sha256_init_CMockIgnore();
+        mbedtls_sha256_starts_ret_IgnoreAndReturn( 1 );
+        xResult = C_DigestInit( xSession, &xMechanism );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+
+        xMechanism.mechanism = CKM_SHA256;
+        mbedtls_sha256_init_CMockIgnore();
+        mbedtls_sha256_starts_ret_IgnoreAndReturn( 0 );
+        xResult = C_DigestInit( xSession, &xMechanism );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        xResult = C_DigestInit( xSession, &xMechanism );
+        TEST_ASSERT_EQUAL( CKR_OPERATION_ACTIVE, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
 /* ======================  TESTING C_DigestUpdate  ============================ */
 
 /*!
