@@ -3362,6 +3362,63 @@ void test_pkcs11_C_GenerateKeyPairECDSABadPrivateKeyParam( void )
 }
 
 /*!
+ * @brief C_GenerateKeyPair Calloc Fail
+ *
+ */
+void test_pkcs11_C_GenerateKeyPairCallocFails( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xPrivKeyHandle = 0;
+    CK_OBJECT_HANDLE xPubKeyHandle = 0;
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        char * pucPublicKeyLabel = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
+        char * pucPrivateKeyLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
+
+        CK_MECHANISM xMechanism =
+        {
+            CKM_EC_KEY_PAIR_GEN, NULL_PTR, 0
+        };
+        CK_BYTE xEcParams[] = pkcs11DER_ENCODED_OID_P256; /* prime256v1 */
+        CK_KEY_TYPE xKeyType = CKK_EC;
+
+        CK_BBOOL xTrue = CK_TRUE;
+        CK_BBOOL xFalse = CK_FALSE;
+        CK_ATTRIBUTE xPublicKeyTemplate[] =
+        {
+            { CKA_KEY_TYPE,  &xKeyType,         sizeof( xKeyType )                           },
+            { CKA_VERIFY,    &xTrue,            sizeof( xTrue )                              },
+            { CKA_EC_PARAMS, xEcParams,         sizeof( xEcParams )                          },
+            { CKA_LABEL,     pucPublicKeyLabel, strlen( ( const char * ) pucPublicKeyLabel ) }
+        };
+
+        CK_ATTRIBUTE xPrivateKeyTemplate[] =
+        {
+            { CKA_KEY_TYPE, &xKeyType,          sizeof( xKeyType )                            },
+            { CKA_TOKEN,    &xTrue,             sizeof( xTrue )                               },
+            { CKA_PRIVATE,  &xFalse,            sizeof( xFalse )                              },
+            { CKA_SIGN,     &xTrue,             sizeof( xTrue )                               },
+            { CKA_LABEL,    pucPrivateKeyLabel, strlen( ( const char * ) pucPrivateKeyLabel ) }
+        };
+
+        mock_osal_calloc_IgnoreAndReturn( NULL );
+        mock_osal_free_CMockIgnore();
+        mbedtls_pk_free_CMockIgnore();
+        xResult = C_GenerateKeyPair( xSession, &xMechanism, xPublicKeyTemplate,
+                                     sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                     xPrivateKeyTemplate, sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                     &xPubKeyHandle, &xPrivKeyHandle );
+        TEST_ASSERT_EQUAL( CKR_HOST_MEMORY, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
+/*!
  * @brief C_GenerateKeyPair Bad Args.
  *
  */
@@ -3473,6 +3530,12 @@ void test_pkcs11_C_GenerateKeyPairBadArgs( void )
                                      &xPubKeyHandle, &xPrivKeyHandle );
         TEST_ASSERT_EQUAL( CKR_TEMPLATE_INCONSISTENT, xResult );
         xPublicKeyTemplate[ 4 ].pValue = &xTrue;
+
+        xResult = C_GenerateKeyPair( xSession, &xMechanism, xPublicKeyTemplate,
+                                     sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                     NULL, sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                     &xPubKeyHandle, &xPrivKeyHandle );
+        TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
     }
 
     prvCommonDeinitStubs();
@@ -3520,6 +3583,26 @@ void test_pkcs11_C_GenerateRandomDrbgFail( void )
         mbedtls_ctr_drbg_random_IgnoreAndReturn( -1 );
         xResult = C_GenerateRandom( xSession, ucRandData, ulRandLen );
         TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
+/*!
+ * @brief C_GenerateRandom bad args.
+ *
+ */
+void test_pkcs11_C_GenerateRandomBadArgs( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        xResult = C_GenerateRandom( xSession, NULL, 0 );
+        TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
     }
 
     prvCommonDeinitStubs();

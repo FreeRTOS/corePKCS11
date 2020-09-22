@@ -445,6 +445,27 @@ void test_IotPkcs11_xInitializePkcs11Token( void )
 }
 
 /*!
+ * @brief xInitializePkcs11Token already initialized.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11TokenAlreadyInit( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList );
+    C_Initialize_IgnoreAndReturn( CKR_CRYPTOKI_ALREADY_INITIALIZED );
+    mock_osal_malloc_Stub( pvPkcs11MallocCb );
+    mock_osal_free_Stub( vPkcs11FreeCb );
+    C_GetSlotList_Stub( ( void * ) xGet1Item );
+    C_GetTokenInfo_IgnoreAndReturn( CKR_OK );
+    C_InitToken_IgnoreAndReturn( CKR_OK );
+    xResult = xInitializePkcs11Token();
+
+    TEST_ASSERT_EQUAL( CKR_OK, xResult );
+}
+
+/*!
  * @brief xInitializePkcs11Token C_GetTokenInfo failure due to memory constraint.
  *
  */
