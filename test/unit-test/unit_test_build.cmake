@@ -150,7 +150,7 @@ list(APPEND mock_list
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/rsa.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/ecp.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/ecdsa.h"
-            "${MODULE_ROOT_DIR}/3rdparty/mbedtls_error.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils/mbedtls_error.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/pk.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/x509_crt.h"
             "${MODULE_ROOT_DIR}/source/include/iot_pki_utils.h"
@@ -261,7 +261,7 @@ set(mock_dir "wrapper_mocks")
 # list the files to mock here
 # Can't have an empty mock list.
 list(APPEND mock_list
-    "${MODULE_ROOT_DIR}/3rdparty/mbedtls_error.h"
+    "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils/mbedtls_error.h"
 )
 
 # list the directories your mocks need
