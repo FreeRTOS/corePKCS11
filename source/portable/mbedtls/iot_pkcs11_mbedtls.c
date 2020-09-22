@@ -4640,19 +4640,19 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
     {
         mbedtls_pk_init( &xCtx );
         lMbedTLSResult = mbedtls_pk_setup( &xCtx, mbedtls_pk_info_from_type( MBEDTLS_PK_ECKEY ) );
-    }
 
-    if( lMbedTLSResult != 0 )
-    {
-        LogError( ( "Failed generating a key pair. mbedtls_pk_setup failed: "
-                    "mbed TLS error = %s : %s.",
-                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-        xResult = CKR_FUNCTION_FAILED;
-    }
-    else
-    {
-        LogDebug( ( "mbedtls_pk_setup was successful." ) );
+        if( lMbedTLSResult != 0 )
+        {
+            LogError( ( "Failed generating a key pair. mbedtls_pk_setup failed: "
+                        "mbed TLS error = %s : %s.",
+                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+            xResult = CKR_FUNCTION_FAILED;
+        }
+        else
+        {
+            LogDebug( ( "mbedtls_pk_setup was successful." ) );
+        }
     }
 
     if( xResult == CKR_OK )
