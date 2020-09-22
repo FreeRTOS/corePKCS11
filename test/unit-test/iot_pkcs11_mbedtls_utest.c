@@ -2962,6 +2962,28 @@ void test_pkcs11_C_VerifyInitBadArgs( void )
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_MECHANISM_INVALID, xResult );
+
+        mock_osal_mutex_lock_IgnoreAndReturn( 1 );
+        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
+        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+        TEST_ASSERT_EQUAL( CKR_CANT_LOCK, xResult );
+
+        xResult = C_VerifyInit( xSession, &xMechanism, pkcs11configMAX_NUM_OBJECTS + 2 );
+        TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
+
+        xMechanism.mechanism = CKM_RSA_X_509;
+
+        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
+        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
+        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_OPERATION_ACTIVE, xResult );
     }
 
     prvCommonDeinitStubs();
