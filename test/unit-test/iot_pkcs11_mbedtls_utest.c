@@ -149,7 +149,8 @@ typedef struct RsaParams_t
 
 /* ==========================  MBED TLS EXTERNS =========================== */
 /* Extern struct used by mbed TLS internally for managing RSA structs. */
-const mbedtls_pk_info_t mbedtls_rsa_info = {
+const mbedtls_pk_info_t mbedtls_rsa_info =
+{
     MBEDTLS_PK_RSA,
     "RSA",
     NULL,
@@ -164,18 +165,19 @@ const mbedtls_pk_info_t mbedtls_rsa_info = {
     NULL,
 };
 
-const mbedtls_pk_info_t mbedtls_eckey_info = {
+const mbedtls_pk_info_t mbedtls_eckey_info =
+{
     MBEDTLS_PK_ECKEY,
     "EC",
     NULL,
     NULL,
-#if defined(MBEDTLS_ECDSA_C)
-    NULL,
-    NULL,
-#else
-    NULL,
-    NULL,
-#endif
+    #if defined( MBEDTLS_ECDSA_C )
+        NULL,
+        NULL,
+    #else
+        NULL,
+        NULL,
+    #endif
     NULL,
     NULL,
     NULL,
@@ -3190,7 +3192,7 @@ void test_pkcs11_C_VerifyBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         mock_osal_mutex_lock_IgnoreAndReturn( 1 );
-        xResult = C_Verify( xSession, pxDummyData, pkcs11RSA_2048_SIGNATURE_LENGTH, pxDummySignature, pkcs11RSA_2048_SIGNATURE_LENGTH);
+        xResult = C_Verify( xSession, pxDummyData, pkcs11RSA_2048_SIGNATURE_LENGTH, pxDummySignature, pkcs11RSA_2048_SIGNATURE_LENGTH );
         TEST_ASSERT_EQUAL( CKR_CANT_LOCK, xResult );
         mock_osal_mutex_lock_IgnoreAndReturn( 0 );
 
@@ -3222,10 +3224,10 @@ void test_pkcs11_C_VerifyBadArgs( void )
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
-        mbedtls_mpi_read_binary_IgnoreAndReturn(1);
-        xResult = C_Verify( xSession, pxDummyData, pkcs11SHA256_DIGEST_LENGTH, pxDummySignature, pkcs11ECDSA_P256_SIGNATURE_LENGTH);
+        mbedtls_mpi_read_binary_IgnoreAndReturn( 1 );
+        xResult = C_Verify( xSession, pxDummyData, pkcs11SHA256_DIGEST_LENGTH, pxDummySignature, pkcs11ECDSA_P256_SIGNATURE_LENGTH );
         TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
-        mbedtls_mpi_read_binary_IgnoreAndReturn(0);
+        mbedtls_mpi_read_binary_IgnoreAndReturn( 0 );
     }
 
     prvCommonDeinitStubs();
@@ -3600,9 +3602,9 @@ void test_pkcs11_C_GenerateKeyPairRSAGen( void )
         CK_BBOOL xFalse = CK_FALSE;
         CK_ATTRIBUTE xPublicKeyTemplate[] =
         {
-            { CKA_KEY_TYPE,  &xKeyType,         sizeof( xKeyType )                           },
-            { CKA_VERIFY,    &xTrue,            sizeof( xTrue )                              },
-            { CKA_LABEL,     pucPublicKeyLabel, strlen( ( const char * ) pucPublicKeyLabel ) }
+            { CKA_KEY_TYPE, &xKeyType,         sizeof( xKeyType )                           },
+            { CKA_VERIFY,   &xTrue,            sizeof( xTrue )                              },
+            { CKA_LABEL,    pucPublicKeyLabel, strlen( ( const char * ) pucPublicKeyLabel ) }
         };
 
         CK_ATTRIBUTE xPrivateKeyTemplate[] =
