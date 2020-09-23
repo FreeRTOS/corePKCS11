@@ -1081,7 +1081,7 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
         PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_free_Stub( vMbedPkFree );
+        mbedtls_pk_free_CMockIgnore();
         mock_osal_free_Stub( vPkcs11FreeCb );
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
@@ -1129,6 +1129,7 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
         mbedtls_ecp_keypair_init_CMockIgnore();
         mbedtls_ecp_group_init_CMockIgnore();
         mbedtls_ecp_group_load_IgnoreAndReturn( -1 );
+        mbedtls_pk_free_Stub( vMbedPkFree );
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
                                   sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),

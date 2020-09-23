@@ -2264,8 +2264,22 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
              * would have been malloc'ed. */
             xResult = prvLoadEcGroup( &xMbedContext );
 
-            /* Clean up the mbedTLS key context. */
-            mbedtls_pk_free( &xMbedContext );
+                if( lMbedTLSResult != 0 )
+                {
+                    LogError( ( "Failed creating an EC key. "
+                                "mbedtls_ecp_group_load failed: mbed "
+                                "TLS error = %s : %s.",
+                                mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                    xResult = CKR_FUNCTION_FAILED;
+                }
+            }
+            else
+            {
+                LogError( ( "Failed creating an EC key. Could not allocate a "
+                            "mbedtls_ecp_keypair struct." ) );
+                xResult = CKR_HOST_MEMORY;
+            }
         }
 
         /* Key will be assembled in the mbedTLS key context and then exported to DER for storage. */
@@ -2291,6 +2305,9 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
                                           CKK_EC,
                                           xIsPrivate );
         }
+
+        /* Clean up the mbedTLS key context. */
+        mbedtls_pk_free( &xMbedContext );
 
         return xResult;
     }
