@@ -2263,9 +2263,6 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
             /* If a key had been found by prvGetExistingKeyComponent, the keypair context
              * would have been malloc'ed. */
             xResult = prvLoadEcGroup( &xMbedContext );
-
-            /* Clean up the mbedTLS key context. */
-            mbedtls_pk_free( &xMbedContext );
         }
 
         /* Key will be assembled in the mbedTLS key context and then exported to DER for storage. */
@@ -2291,6 +2288,9 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
                                           CKK_EC,
                                           xIsPrivate );
         }
+
+        /* Clean up the mbedTLS key context. */
+        mbedtls_pk_free( &xMbedContext );
 
         return xResult;
     }
@@ -4650,19 +4650,19 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
     {
         mbedtls_pk_init( &xCtx );
         lMbedTLSResult = mbedtls_pk_setup( &xCtx, mbedtls_pk_info_from_type( MBEDTLS_PK_ECKEY ) );
-    }
 
-    if( lMbedTLSResult != 0 )
-    {
-        LogError( ( "Failed generating a key pair. mbedtls_pk_setup failed: "
-                    "mbed TLS error = %s : %s.",
-                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-        xResult = CKR_FUNCTION_FAILED;
-    }
-    else
-    {
-        LogDebug( ( "mbedtls_pk_setup was successful." ) );
+        if( lMbedTLSResult != 0 )
+        {
+            LogError( ( "Failed generating a key pair. mbedtls_pk_setup failed: "
+                        "mbed TLS error = %s : %s.",
+                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+            xResult = CKR_FUNCTION_FAILED;
+        }
+        else
+        {
+            LogDebug( ( "mbedtls_pk_setup was successful." ) );
+        }
     }
 
     if( xResult == CKR_OK )

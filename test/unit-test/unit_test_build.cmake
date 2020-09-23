@@ -149,6 +149,7 @@ list(APPEND mock_list
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/md.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/rsa.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/ecp.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/pk_internal.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/ecdsa.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils/mbedtls_error.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/pk.h"
@@ -173,7 +174,6 @@ list(APPEND mock_define_list
 
 # list the files you would like to test here
 list(APPEND real_source_files
-            ${MODULE_ROOT_DIR}/3rdparty/mbedtls/library/pk_wrap.c
             ${MODULE_ROOT_DIR}/source/portable/mbedtls/iot_pkcs11_mbedtls.c
             ${MODULE_ROOT_DIR}/test/unit-test/config/iot_pkcs11_config.h
     )
