@@ -929,7 +929,7 @@ static void prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
 static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
 {
     CK_RV xResult = CKR_OK;
-    int32_t lGotSemaphore = 0UL;
+    int32_t lGotSemaphore = 0L;
     uint32_t ulIndex = xAppHandle - 1UL;
 
     if( ulIndex >= pkcs11configMAX_NUM_OBJECTS )
@@ -940,29 +940,29 @@ static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
     if( xResult == CKR_OK )
     {
         lGotSemaphore = mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex );
-    }
 
-    if( lGotSemaphore == 0 )
-    {
-        if( xP11Context.xObjectList.xObjects[ ulIndex ].xHandle != CK_INVALID_HANDLE )
+        if( lGotSemaphore == 0 )
         {
-            ( void ) memset( &xP11Context.xObjectList.xObjects[ ulIndex ], 0, sizeof( P11Object_t ) );
+            if( xP11Context.xObjectList.xObjects[ ulIndex ].xHandle != CK_INVALID_HANDLE )
+            {
+                ( void ) memset( &xP11Context.xObjectList.xObjects[ ulIndex ], 0, sizeof( P11Object_t ) );
+            }
+            else
+            {
+                LogError( ( "Failed to remove an object from internal object list. "
+                            "Tried to delete an unknown object. The object handle "
+                            "was is no longer valid." ) );
+                xResult = CKR_OBJECT_HANDLE_INVALID;
+            }
+
+            ( void ) mbedtls_mutex_unlock( &xP11Context.xObjectList.xMutex );
         }
         else
         {
             LogError( ( "Failed to remove an object from internal object list. "
-                        "Tried to delete an unknown object. The object handle "
-                        "was is no longer valid." ) );
-            xResult = CKR_OBJECT_HANDLE_INVALID;
+                        "Could not take the xObjectList mutex." ) );
+            xResult = CKR_CANT_LOCK;
         }
-
-        ( void ) mbedtls_mutex_unlock( &xP11Context.xObjectList.xMutex );
-    }
-    else
-    {
-        LogError( ( "Failed to remove an object from internal object list. "
-                    "Could not take the xObjectList mutex." ) );
-        xResult = CKR_CANT_LOCK;
     }
 
     return xResult;
@@ -1847,18 +1847,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
                     "pkcs11configMAX_SESSIONS." ) );
     }
 
-    if( CKR_OK != xResult )
-    {
-        if( pxSessionObj != NULL )
-        {
-            mbedtls_mutex_free( &pxSessionObj->xSignMutex );
-            mbedtls_mutex_free( &pxSessionObj->xVerifyMutex );
-
-            ( void ) memset( pxSessionObj, 0, sizeof( P11Session_t ) );
-            *phSession = CK_INVALID_HANDLE;
-        }
-    }
-    else
+    if( CKR_OK == xResult )
     {
         /* Increment by one, as invalid handles in PKCS #11 are 0. */
         ++ulSessionCount;
