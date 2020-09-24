@@ -26,7 +26,7 @@
 /* FreeRTOS includes. */
 
 /**
- * @file iot_pki_utils.h
+ * @file iot_pki_utils.c
  * @brief Helper functions for PKCS #11
  */
 #include "iot_pki_utils.h"
@@ -35,6 +35,10 @@
 #include <stdint.h>
 #include <string.h>
 
+/**
+ * @ingroup pkcs11_macros
+ * @brief Failure value for PKI utils functions.
+ */
 #define FAILURE    ( -1 )
 
 /*-----------------------------------------------------------*/
