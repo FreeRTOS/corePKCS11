@@ -912,6 +912,30 @@ void test_pkcs11_C_OpenSessionBadArgs( void )
     TEST_ASSERT_EQUAL( CKR_OK, xResult );
 }
 
+/*!
+ * @brief C_OpenSession Unable to acquire mutex.
+ *
+ */
+void test_pkcs11_C_OpenSession_UnaquiredMutex( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_FLAGS xFlags = CKF_SERIAL_SESSION | CKF_RW_SESSION;
+
+    xResult = prvInitializePkcs11();
+    TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+    if( TEST_PROTECT() )
+    {
+        mock_osal_calloc_Stub( pvPkcs11CallocCb );
+        mock_osal_mutex_lock_ExpectAnyArgsAndReturn( 1 );
+        xResult = C_OpenSession( 0, xFlags, NULL, 0, &xSession );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+    }
+
+    xResult = prvUninitializePkcs11();
+    TEST_ASSERT_EQUAL( CKR_OK, xResult );
+}
 /* ======================  TESTING C_CloseSession  ============================ */
 
 /*!
