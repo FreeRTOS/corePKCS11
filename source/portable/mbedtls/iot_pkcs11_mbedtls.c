@@ -2849,10 +2849,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                     break;
 
                 case CKA_EC_PARAMS:
-
-                    pTemplate[ iAttrib ].ulValueLen = sizeof( ucP256Oid );
-
-                    if( pTemplate[ iAttrib ].pValue != NULL )
+                    if( pTemplate[ iAttrib ].pValue == NULL )
+                    {
+                        pTemplate[ iAttrib ].ulValueLen = sizeof( ucP256Oid );
+                    }
+                    else
                     {
                         if( pTemplate[ iAttrib ].ulValueLen < sizeof( ucP256Oid ) )
                         {
