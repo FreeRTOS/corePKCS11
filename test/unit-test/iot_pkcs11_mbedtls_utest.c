@@ -1185,8 +1185,6 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
                                   sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
-
-
     }
 
     prvCommonDeinitStubs();
@@ -2052,7 +2050,6 @@ void test_pkcs11_C_GetAttributeBadArgs( void )
 
         xResult = C_GetAttributeValue( xSession, pkcs11configMAX_NUM_OBJECTS + 2, ( CK_ATTRIBUTE_PTR ) &xResult, ulCount );
         TEST_ASSERT_EQUAL( CKR_OBJECT_HANDLE_INVALID, xResult );
-
     }
 
     prvCommonDeinitStubs();
@@ -2163,7 +2160,7 @@ void test_pkcs11_C_FindObjectsInitBadArgs( void )
 
         mock_osal_calloc_Stub( NULL );
         mock_osal_calloc_ExpectAnyArgsAndReturn( NULL );
-        xResult = C_FindObjectsInit( xSession, (CK_ATTRIBUTE_PTR ) &xFindTemplate, ulCount);
+        xResult = C_FindObjectsInit( xSession, ( CK_ATTRIBUTE_PTR ) &xFindTemplate, ulCount );
         mock_osal_calloc_Stub( pvPkcs11CallocCb );
         TEST_ASSERT_EQUAL( CKR_HOST_MEMORY, xResult );
 
@@ -4004,7 +4001,6 @@ void test_pkcs11_C_GenerateKeyPairBadArgs( void )
                                      xPrivateKeyTemplate, sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
                                      &xPubKeyHandle, &xPrivKeyHandle );
         TEST_ASSERT_EQUAL( CKR_TEMPLATE_INCONSISTENT, xResult );
-
     }
 
     prvCommonDeinitStubs();
