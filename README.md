@@ -19,7 +19,7 @@ A list of all the configurations and their default values are defined in the dox
 
 1. Go to the root directory of this repository.
 
-1. Run *cmake* while inside build directory: `cmake -S ../test -B build -DBUILD_CLONE_SUBMODULES=ON `
+1. Run *cmake* while inside build directory: `cmake -S ../test/unit-test -B build -DBUILD_CLONE_SUBMODULES=ON `
 
 1. Run this command to build the library and unit tests: `make -C build all`
 
