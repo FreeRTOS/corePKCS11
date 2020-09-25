@@ -1,0 +1,5 @@
+name : "FreeRTOS-PKCS"
+version: "v1.0.0"
+description: |
+  "Software implementation of the PKCS #11 standard.\n"
+license: "MIT"
