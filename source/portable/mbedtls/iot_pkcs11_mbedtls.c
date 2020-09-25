@@ -4254,7 +4254,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
         else
         {
             LogError( ( "Failed verify operation. Received an unexpected mechanism." ) );
-            xResult = CKR_TEMPLATE_INCONSISTENT;
         }
     }
 
