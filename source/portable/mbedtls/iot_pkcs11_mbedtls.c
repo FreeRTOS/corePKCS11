@@ -2850,9 +2850,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
 
                 case CKA_EC_PARAMS:
 
-                    pTemplate[ iAttrib ].ulValueLen = sizeof( ucP256Oid );
-
-                    if( pTemplate[ iAttrib ].pValue != NULL )
+                    if( pTemplate[ iAttrib ].pValue == NULL )
+                    {
+                        pTemplate[ iAttrib ].ulValueLen = sizeof( ucP256Oid );
+                    }
+                    else
                     {
                         if( pTemplate[ iAttrib ].ulValueLen < sizeof( ucP256Oid ) )
                         {
@@ -4253,7 +4255,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
         else
         {
             LogError( ( "Failed verify operation. Received an unexpected mechanism." ) );
-            xResult = CKR_TEMPLATE_INCONSISTENT;
         }
     }
 
