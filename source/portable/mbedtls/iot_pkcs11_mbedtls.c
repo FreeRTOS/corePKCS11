@@ -932,25 +932,22 @@ static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
     int32_t lGotSemaphore = 0L;
     uint32_t ulIndex = xAppHandle - 1UL;
 
-    if( xResult == CKR_OK )
+    lGotSemaphore = mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex );
+
+    if( lGotSemaphore == 0 )
     {
-        lGotSemaphore = mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex );
-
-        if( lGotSemaphore == 0 )
+        if( xP11Context.xObjectList.xObjects[ ulIndex ].xHandle != CK_INVALID_HANDLE )
         {
-            if( xP11Context.xObjectList.xObjects[ ulIndex ].xHandle != CK_INVALID_HANDLE )
-            {
-                ( void ) memset( &xP11Context.xObjectList.xObjects[ ulIndex ], 0, sizeof( P11Object_t ) );
-            }
+            ( void ) memset( &xP11Context.xObjectList.xObjects[ ulIndex ], 0, sizeof( P11Object_t ) );
+        }
 
-            ( void ) mbedtls_mutex_unlock( &xP11Context.xObjectList.xMutex );
-        }
-        else
-        {
-            LogError( ( "Failed to remove an object from internal object list. "
-                        "Could not take the xObjectList mutex." ) );
-            xResult = CKR_CANT_LOCK;
-        }
+        ( void ) mbedtls_mutex_unlock( &xP11Context.xObjectList.xMutex );
+    }
+    else
+    {
+        LogError( ( "Failed to remove an object from internal object list. "
+                    "Could not take the xObjectList mutex." ) );
+        xResult = CKR_CANT_LOCK;
     }
 
     return xResult;
