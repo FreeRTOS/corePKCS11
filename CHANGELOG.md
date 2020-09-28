@@ -1,6 +1,6 @@
 # Change Log for FreeRTOS-PKCS Library
 
-## v2.0.0 09/2020
+## v2.0.0 (September 2020)
 This is the first release of the FreeRTOS-PKCS library in this repository.
 
 This library is a software based implementation of the PKCS #11 specification.
