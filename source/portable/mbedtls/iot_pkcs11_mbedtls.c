@@ -932,11 +932,6 @@ static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
     int32_t lGotSemaphore = 0L;
     uint32_t ulIndex = xAppHandle - 1UL;
 
-    if( ulIndex >= pkcs11configMAX_NUM_OBJECTS )
-    {
-        xResult = CKR_OBJECT_HANDLE_INVALID;
-    }
-
     if( xResult == CKR_OK )
     {
         lGotSemaphore = mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex );
@@ -946,13 +941,6 @@ static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
             if( xP11Context.xObjectList.xObjects[ ulIndex ].xHandle != CK_INVALID_HANDLE )
             {
                 ( void ) memset( &xP11Context.xObjectList.xObjects[ ulIndex ], 0, sizeof( P11Object_t ) );
-            }
-            else
-            {
-                LogError( ( "Failed to remove an object from internal object list. "
-                            "Tried to delete an unknown object. The object handle "
-                            "was is no longer valid." ) );
-                xResult = CKR_OBJECT_HANDLE_INVALID;
             }
 
             ( void ) mbedtls_mutex_unlock( &xP11Context.xObjectList.xMutex );
@@ -990,14 +978,7 @@ static CK_RV prvAddObjectToList( CK_OBJECT_HANDLE xPalHandle,
     CK_BBOOL xObjectFound = ( CK_BBOOL ) CK_FALSE;
     uint32_t ulSearchIndex = 0;
 
-    if( xLabelLength > pkcs11configMAX_LABEL_LENGTH )
-    {
-        LogError( ( "Failed to add object to internal object list. "
-                    "The label length was out of range. Received %lu "
-                    "but expected <= %lu.", xLabelLength, pkcs11configMAX_LABEL_LENGTH ) );
-        xResult = CKR_DATA_LEN_RANGE;
-    }
-    else if( 0 == mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex ) )
+    if( 0 == mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex ) )
     {
         for( ulSearchIndex = 0; ulSearchIndex < pkcs11configMAX_NUM_OBJECTS; ulSearchIndex++ )
         {
@@ -1058,33 +1039,26 @@ static CK_RV prvAppendEmptyECDerKey( uint8_t * pusECPrivateKey,
     const uint8_t emptyPubKey[ 6 ] = { 0xa1, 0x04, 0x03, 0x02, 0x00, 0x00 };
     int32_t lCompare = 0;
 
-    if( pusECPrivateKey == NULL )
-    {
-        xResult = CKR_ARGUMENTS_BAD;
-    }
-    else
-    {
-        /*
-         * mbedtls_pk_write_key_der appends empty public
-         * key data when saving EC private key
-         * that does not have a public key associated with it.
-         * a1 04        -> Application identifier of length 4
-         * 03 02     -> Bit string of length 2
-         *    00 00  -> "Public key"
-         * https://forums.mbed.com/t/how-do-i-write-an-ec-private-key-w-no-public-key-to-der-format/4728 */
+    /*
+     * mbedtls_pk_write_key_der appends empty public
+     * key data when saving EC private key
+     * that does not have a public key associated with it.
+     * a1 04        -> Application identifier of length 4
+     * 03 02     -> Bit string of length 2
+     *    00 00  -> "Public key"
+     * https://forums.mbed.com/t/how-do-i-write-an-ec-private-key-w-no-public-key-to-der-format/4728 */
 
-        /* If there was no public key in the structure, this byte
-         * array will be appended to the valid private key.
-         * It must be removed so that we can read the private
-         * key back at a later time. */
-        lCompare = memcmp( &pusECPrivateKey[ ulDerBufSize - 6UL ], emptyPubKey, 6 );
+    /* If there was no public key in the structure, this byte
+     * array will be appended to the valid private key.
+     * It must be removed so that we can read the private
+     * key back at a later time. */
+    lCompare = memcmp( &pusECPrivateKey[ ulDerBufSize - 6UL ], emptyPubKey, 6 );
 
-        if( ( lCompare == 0 ) && ( *pulActualKeyLength >= 6UL ) )
-        {
-            /* Do not write the last 6 bytes to key storage. */
-            pusECPrivateKey[ ulDerBufSize - ( uint32_t ) lDerKeyLength + 1UL ] -= ( uint8_t ) 6;
-            *pulActualKeyLength -= 6UL;
-        }
+    if( ( lCompare == 0 ) && ( *pulActualKeyLength >= 6UL ) )
+    {
+        /* Do not write the last 6 bytes to key storage. */
+        pusECPrivateKey[ ulDerBufSize - ( uint32_t ) lDerKeyLength + 1UL ] -= ( uint8_t ) 6;
+        *pulActualKeyLength -= 6UL;
     }
 
     return xResult;
@@ -2006,11 +1980,6 @@ static CK_RV prvCreateCertificate( CK_ATTRIBUTE * pxTemplate,
         xResult = prvAddObjectToList( xPalHandle, pxObject, pxLabel->pValue, pxLabel->ulValueLen );
     }
 
-    if( xResult != CKR_OK )
-    {
-        xResult = PKCS11_PAL_DestroyObject( *pxObject );
-    }
-
     return xResult;
 }
 
@@ -2129,7 +2098,7 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
             LogDebug( ( "Could not find an existing PKCS #11 PAL object." ) );
         }
 
-        if( xResult == CKR_OK )
+        if( ( xResult == CKR_OK ) && ( *pxPalHandle != CK_INVALID_HANDLE ) )
         {
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */

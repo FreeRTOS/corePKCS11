@@ -1072,6 +1072,53 @@ void test_pkcs11_C_CreateObjectECPrivKey( void )
     prvCommonDeinitStubs();
 }
 
+/*!
+ * @brief C_CreateObject fail to malloc memory when loading EC curve.
+ *
+ */
+void test_pkcs11_C_CreateObjectECCurveLoadFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_KEY_TYPE xPrivateKeyType = CKK_EC;
+    CK_OBJECT_CLASS xPrivateKeyClass = CKO_PRIVATE_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    mbedtls_ecp_keypair xKeyContext = { 0 };
+    char * pucPrivLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
+    /* DER-encoding of an ANSI X9.62 Parameters value */
+    CK_BYTE * pxEcPrivParams = ( CK_BYTE * ) ( "\x06\x08" MBEDTLS_OID_EC_GRP_SECP256R1 );
+    CK_OBJECT_HANDLE xObject = 0;
+    const uint8_t pusEmptyPubKey[ 6 ] = { 0xa1, 0x04, 0x03, 0x02, 0x00, 0x00 };
+    uint8_t pusFakePrivateKey[ pkcs11_PRIVATE_EC_PRIME_256_DER_SIZE ] = { 0 };
+
+    ( void ) memcpy( &pusFakePrivateKey[ pkcs11_PRIVATE_EC_PRIME_256_DER_SIZE - sizeof( pusEmptyPubKey ) ], pusEmptyPubKey, sizeof( pusEmptyPubKey ) );
+
+
+    /* Private value D. */
+    CK_BYTE pxD[ EC_D_LENGTH ] = { 0 };
+
+    CK_ATTRIBUTE xPrivateKeyTemplate[] = EC_PRIV_KEY_INITIALIZER;
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        mbedtls_pk_init_CMockIgnore();
+        PKCS11_PAL_FindObject_IgnoreAndReturn( 0 );
+        mock_osal_calloc_IgnoreAndReturn( NULL );
+        mbedtls_pk_free_CMockIgnore();
+        mock_osal_free_Stub( vPkcs11FreeCb );
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
+                                  sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_HOST_MEMORY, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
 /*
  *!
  * @brief C_CreateObject Creating an EC private key attribute failures.
@@ -1133,6 +1180,7 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
                                   sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 
         xPrivateKeyTemplate[ 3 ].pValue = &xFalse;
         mbedtls_mpi_read_binary_IgnoreAndReturn( 0 );
@@ -1140,8 +1188,17 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
                                   sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
 
         xPrivateKeyTemplate[ 3 ].pValue = &xTrue;
+        xPrivateKeyTemplate[ 2 ].type = CKA_SIGN;
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
+                                  sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+        TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+
+        xPrivateKeyTemplate[ 2 ].type = CKA_LABEL;
         xPrivateKeyTemplate[ 5 ].pValue = &pucPrivLabel;
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
@@ -1178,6 +1235,18 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
                                   sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
         TEST_ASSERT_EQUAL( CKR_MECHANISM_INVALID, xResult );
+
+        xPrivateKeyType = CKK_EC;
+        mock_osal_calloc_Stub( pvPkcs11CallocCb );
+        mbedtls_ecp_group_load_IgnoreAndReturn( 0 );
+        xPrivateKeyTemplate[ 4 ].type = CKA_VERIFY;
+        xPrivateKeyTemplate[ 4 ].pValue = &xTrue;
+        xPrivateKeyTemplate[ 4 ].ulValueLen = sizeof( CK_BBOOL );
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
+                                  sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
 
 
         xResult = C_CreateObject( xSession,
@@ -1309,6 +1378,58 @@ void test_pkcs11_C_CreateObjectECPubKey( void )
     prvCommonDeinitStubs();
 }
 
+/*!
+ * @brief C_CreateObject Creating an EC public key fails when saving in PAL.
+ *
+ */
+void test_pkcs11_C_CreateObjectECPubKeyPalSaveFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_KEY_TYPE xPublicKeyType = CKK_EC;
+    CK_OBJECT_CLASS xPublicKeyClass = CKO_PUBLIC_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    char * pucPubLabel = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
+    size_t xLength = 256;
+    /* DER-encoding of an ANSI X9.62 Parameters value */
+    CK_BYTE pxEcPubParams[] = pkcs11DER_ENCODED_OID_P256;
+    CK_OBJECT_HANDLE xObject = 0;
+
+    CK_BYTE pxEcPoint[ 256 ] = { 0 };
+
+    CK_ATTRIBUTE xPublicKeyTemplate[] = EC_PUB_KEY_INITIALIZER;
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        mbedtls_pk_init_CMockIgnore();
+        mock_osal_calloc_Stub( pvPkcs11CallocCb );
+        PKCS11_PAL_FindObject_IgnoreAndReturn( CK_INVALID_HANDLE );
+        mbedtls_pk_parse_public_key_IgnoreAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        mbedtls_ecp_keypair_init_CMockIgnore();
+        mbedtls_ecp_group_init_CMockIgnore();
+        mbedtls_ecp_group_load_IgnoreAndReturn( 0 );
+        mbedtls_ecp_point_read_binary_IgnoreAndReturn( 0 );
+        mbedtls_mpi_read_binary_IgnoreAndReturn( 0 );
+        mbedtls_pk_write_pubkey_der_IgnoreAndReturn( 1 );
+        mbedtls_pk_free_Stub( vMbedPkFree );
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 0 );
+        mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
+        mock_osal_free_Stub( vPkcs11FreeCb );
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
+                                  sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_DEVICE_MEMORY, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
 /*
  *!
  * @brief C_CreateObject Creating an EC public key attribute failures.
@@ -1391,6 +1512,14 @@ void test_pkcs11_C_CreateObjectECPubKeyBadAtt( void )
 
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
 
+        xPublicKeyTemplate[ 3 ].type = CKA_SIGN;
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
+                                  sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+
+        xPublicKeyTemplate[ 3 ].type = CKA_VERIFY;
         xPublicKeyTemplate[ 3 ].pValue = &xTrue;
         mbedtls_ecp_point_read_binary_IgnoreAndReturn( -1 );
         mbedtls_strerror_highlevel_IgnoreAndReturn( NULL );
@@ -1594,6 +1723,110 @@ void test_pkcs11_C_CreateObjectCertificate( void )
 
 /*
  *!
+ * @brief C_CreateObject Creating a Certificate fails when saving to PAL.
+ *
+ */
+void test_pkcs11_C_CreateObjectCertificateSaveFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_OBJECT_CLASS xCertificateClass = CKO_CERTIFICATE;
+    CK_CERTIFICATE_TYPE xCertificateType = CKC_X_509;
+    CK_BBOOL xTokenStorage = CK_TRUE;
+    CK_BYTE xSubject[] = "TestSubject";
+    CK_BYTE xCert[] = "Empty Cert";
+    char * pucLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
+
+    PKCS11_CertificateTemplate_t xCertificateTemplate = CERT_INITIALIZER;
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 0 );
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xCertificateTemplate,
+                                  sizeof( xCertificateTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+        TEST_ASSERT_EQUAL( CKR_DEVICE_MEMORY, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
+/*
+ *!
+ * @brief C_CreateObject Creating a Certificate fails because the template is incomplete.
+ *
+ */
+void test_pkcs11_C_CreateObjectCertificateIncomplete( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_OBJECT_CLASS xCertificateClass = CKO_CERTIFICATE;
+    CK_CERTIFICATE_TYPE xCertificateType = CKC_X_509;
+    CK_BBOOL xTokenStorage = CK_TRUE;
+    CK_BYTE xSubject[] = "TestSubject";
+    CK_BYTE xCert[] = "Empty Cert";
+    char * pucLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
+
+    CK_ATTRIBUTE xCertificateTemplate[] =
+    {
+        { CKA_CLASS, &xCertificateClass, sizeof( CK_OBJECT_CLASS ) },
+    };
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xCertificateTemplate,
+                                  sizeof( xCertificateTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+        TEST_ASSERT_EQUAL( CKR_TEMPLATE_INCOMPLETE, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
+
+/*
+ *!
+ * @brief C_CreateObject Creating a Certificate with a label that is too long.
+ *
+ */
+void test_pkcs11_C_CreateObjectCertificateTooLongLabel( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_OBJECT_CLASS xCertificateClass = CKO_CERTIFICATE;
+    CK_CERTIFICATE_TYPE xCertificateType = CKC_X_509;
+    CK_BBOOL xTokenStorage = CK_TRUE;
+    CK_BYTE xSubject[] = "TestSubject";
+    CK_BYTE xCert[] = "Empty Cert";
+    char * pucLabel = "TestTemporyaryCertificate123456789ABEF";
+
+    PKCS11_CertificateTemplate_t xCertificateTemplate = CERT_INITIALIZER;
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xCertificateTemplate,
+                                  sizeof( xCertificateTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+        TEST_ASSERT_EQUAL( CKR_DATA_LEN_RANGE, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
+/*
+ *!
  * @brief C_CreateObject Bad Certificate type.
  *
  */
@@ -1610,6 +1843,7 @@ void test_pkcs11_C_CreateObjectCertificateBadType( void )
     char * pucLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
 
     PKCS11_CertificateTemplate_t xCertificateTemplate = CERT_INITIALIZER;
+
 
     prvCommonInitStubs();
 
@@ -1694,7 +1928,7 @@ void test_pkcs11_C_CreateObjectCertificateUnkownAtt( void )
                                   ( CK_ATTRIBUTE_PTR ) &xCertificateTemplate,
                                   sizeof( xCertificateTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
-        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_TYPE_INVALID, xResult );
     }
 
     prvCommonDeinitStubs();
@@ -2266,8 +2500,9 @@ void test_pkcs11_C_FindObjectsBadArgs( void )
         TEST_ASSERT_EQUAL( CK_INVALID_HANDLE, xObject );
         TEST_ASSERT_EQUAL( 0, ulFoundCount );
 
-        xResult = C_FindObjectsFinal( xSession );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+        xResult = C_FindObjects( xSession, NULL, 1, &ulFoundCount );
+        TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+        TEST_ASSERT_EQUAL( 0, ulFoundCount );
 
         xResult = C_FindObjects( xSession, ( CK_ATTRIBUTE_PTR ) &xObject, 0, &ulFoundCount );
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
@@ -4054,6 +4289,33 @@ void test_pkcs11_C_GenerateRandomDrbgFail( void )
 }
 
 /*!
+ * @brief C_GenerateRandom drbg session was not initialized.
+ *
+ */
+void test_pkcs11_C_GenerateRandomDrbgSessionInvalid( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_BYTE ucRandData[ 3 ] = { 0 };
+    CK_ULONG ulRandLen = sizeof( ucRandData );
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        mbedtls_entropy_free_CMockIgnore();
+        mbedtls_ctr_drbg_free_CMockIgnore();
+        mock_osal_mutex_free_CMockIgnore();
+        xResult = C_Finalize( NULL );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_ctr_drbg_random_IgnoreAndReturn( ulRandLen );
+        xResult = C_GenerateRandom( xSession, ucRandData, ulRandLen );
+        TEST_ASSERT_EQUAL( CKR_CRYPTOKI_NOT_INITIALIZED, xResult );
+    }
+}
+
+/*!
  * @brief C_GenerateRandom bad args.
  *
  */
@@ -4076,7 +4338,7 @@ void test_pkcs11_C_GenerateRandomBadArgs( void )
 /* ======================  TESTING C_DestroyObject  ============================ */
 
 /*!
- * @brief C_GenerateRandom happy path.
+ * @brief C_DestroyObject happy path.
  *
  */
 void test_pkcs11_C_DestroyObject( void )
@@ -4102,6 +4364,64 @@ void test_pkcs11_C_DestroyObject( void )
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
         xResult = C_DestroyObject( xSession, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
+/*!
+ * @brief C_DestroyObject failed to get mutex when removing object from internal list.
+ *
+ */
+void test_pkcs11_C_DestroyObjectNoLock( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonInitStubs();
+
+        xResult = prvCreateEcPub( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        xResult = prvCreateEcPriv( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mock_osal_calloc_Stub( pvPkcs11CallocCb );
+        mock_osal_free_Stub( vPkcs11FreeCb );
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 2 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        mock_osal_mutex_lock_ExpectAnyArgsAndReturn( -1 );
+        mock_osal_mutex_lock_ExpectAnyArgsAndReturn( -1 );
+        xResult = C_DestroyObject( xSession, xObject );
+        TEST_ASSERT_EQUAL( CKR_CANT_LOCK, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
+/*!
+ * @brief C_DestroyObject invalid object is pased to C_DestroyObject, and it can't be found.
+ *
+ */
+void test_pkcs11_C_DestroyObjectNullLabel( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 1;
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonInitStubs();
+
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mock_osal_calloc_Stub( pvPkcs11CallocCb );
+        mock_osal_free_Stub( vPkcs11FreeCb );
+        xResult = C_DestroyObject( xSession, xObject );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
     prvCommonDeinitStubs();
