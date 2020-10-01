@@ -1,4 +1,4 @@
-# FreeRTOS PKCS #11 Library
+# corePKCS11 Library 
 
 This repository contains a software based PKCS #11 library to enable rapid development and flexibility when developing libraries and platforms that rely on crypto operations.
 

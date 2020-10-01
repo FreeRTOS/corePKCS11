@@ -1,4 +1,4 @@
-name : "FreeRTOS-PKCS"
+name : "corePKCS11"
 version: "v2.0.0"
 description: |
   "Software implementation of the PKCS #11 standard.\n"
