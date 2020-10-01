@@ -1,5 +1,5 @@
 /*
- * FreeRTOS PKCS #11 V2.0.0
+ * corePKCS11 V2.0.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -33,7 +33,7 @@
 
 /**
  * @file iot_pkcs11.c
- * @brief FreeRTOS PKCS #11 Interface.
+ * @brief corePKCS11 Interface.
  *
  * This file contains wrapper functions for common PKCS #11 operations.
  */
