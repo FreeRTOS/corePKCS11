@@ -1,6 +1,6 @@
 cmake_minimum_required ( VERSION 3.13.0 )
-project ( "FreeRTOS PKCS unit test"
-          VERSION 1.0.0
+project ( "corePKCS11 unit test"
+          VERSION 2.0.0
           LANGUAGES C )
 
 # Allow the project to be organized into folders.
@@ -17,7 +17,7 @@ endif()
 
 # Set global path variables.
 get_filename_component(__MODULE_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
-set(MODULE_ROOT_DIR ${__MODULE_ROOT_DIR} CACHE INTERNAL "FreeRTOS PKCS repository root.")
+set(MODULE_ROOT_DIR ${__MODULE_ROOT_DIR} CACHE INTERNAL "corePKCS11 repository root.")
 
 # Configure options to always show in CMake GUI.
 option( BUILD_CLONE_SUBMODULES

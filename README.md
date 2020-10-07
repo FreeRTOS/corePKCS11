@@ -1,6 +1,12 @@
-# FreeRTOS PKCS #11 Library
+# corePKCS11 Library 
 
-This repository contains a software based PKCS #11 library to enable rapid development and flexibility when developing libraries and platforms that rely on crypto operations.
+This repository contains a software based implementation of the PKCS #11 interface (API)  to enable rapid development and flexibility when developing  applications that rely on cryptographic operations.
+
+Only a subset of the PKCS #11 standard is implemented, with a focus on operations involving asymmetric keys, random number generation, and hashing. 
+
+The targeted use cases include certificate and key management for TLS authentication and code-sign signature verification, on small embedded devices.
+
+To read more, the full PKCS #11 standard can be found [here](http://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html).
 
 ## Building Unit Tests.
 
@@ -19,7 +25,7 @@ A list of all the configurations and their default values are defined in the dox
 
 1. Go to the root directory of this repository.
 
-1. Run *cmake* while inside build directory: `cmake -S ../test -B build -DBUILD_CLONE_SUBMODULES=ON `
+1. Run *cmake* while inside build directory: `cmake -S ../test/unit-test -B build -DBUILD_CLONE_SUBMODULES=ON `
 
 1. Run this command to build the library and unit tests: `make -C build all`
 
