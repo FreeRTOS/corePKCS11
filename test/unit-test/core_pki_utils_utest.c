@@ -31,7 +31,7 @@
 #include "unity.h"
 
 /* Library includes. */
-#include "iot_pki_utils.h"
+#include "core_pki_utils.h"
 
 /*******************************************************************************
  * Unity fixtures

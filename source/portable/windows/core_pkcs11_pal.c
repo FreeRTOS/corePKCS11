@@ -25,7 +25,7 @@
 
 
 /**
- * @file iot_pkcs11_pal.c
+ * @file core_pkcs11_pal.c
  * @brief Windows Simulator file save and read implementation
  * for PKCS#11 based on mbedTLS with for software keys. This
  * file deviates from the FreeRTOS style standard for some function names and
@@ -35,8 +35,8 @@
 /*-----------------------------------------------------------*/
 
 #include "FreeRTOS.h"
-#include "iot_pkcs11.h"
-#include "iot_pkcs11_config.h"
+#include "core_pkcs11.h"
+#include "core_pkcs11_config.h"
 
 
 /* C runtime includes. */

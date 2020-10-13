@@ -3,7 +3,7 @@ project( "pkcs11_wrapper" )
 include( ${MODULE_ROOT_DIR}/pkcsFilePaths.cmake )
 
 # =============================  PKCS #11 wrapper unit tests  ===========================
-set(project_name "iot_pkcs11")
+set(project_name "core_pkcs11")
 set(utest_name "${project_name}_utest")
 set(utest_source "${project_name}_utest.c")
 
@@ -46,7 +46,7 @@ list(APPEND mock_define_list
 
 # list the files you would like to test here
 list(APPEND real_source_files
-            "${MODULE_ROOT_DIR}/source/iot_pkcs11.c"
+            "${MODULE_ROOT_DIR}/source/core_pkcs11.c"
             "${MODULE_ROOT_DIR}/test/unit-test/config/logging_stack.h"
             "${MODULE_ROOT_DIR}/test/unit-test/config/logging_levels.h"
         )
@@ -121,7 +121,7 @@ create_test(${utest_name}
 
 # =============================  PKCS #11 mbedtls unit tests  ===========================
 project( "pkcs11_mbedtls" )
-set(project_name "iot_pkcs11_mbedtls")
+set(project_name "core_pkcs11_mbedtls")
 set(utest_name "${project_name}_utest")
 set(utest_source "${project_name}_utest.c")
 # =====================  Create your mock here  (edit)  ========================
@@ -140,7 +140,7 @@ set( mock_dir "mbedtls_mocks" )
 # list the files to mock here
 list(APPEND mock_list
             "${MODULE_ROOT_DIR}/test/unit-test/config/mock_osal.h"
-            "${MODULE_ROOT_DIR}/source/include/iot_pkcs11_pal.h"
+            "${MODULE_ROOT_DIR}/source/include/core_pkcs11_pal.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/ctr_drbg.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/sha256.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/base64.h"
@@ -154,7 +154,7 @@ list(APPEND mock_list
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils/mbedtls_error.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/pk.h"
             "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/x509_crt.h"
-            "${MODULE_ROOT_DIR}/source/include/iot_pki_utils.h"
+            "${MODULE_ROOT_DIR}/source/include/core_pki_utils.h"
     )
 
 # list the directories your mocks need
@@ -174,8 +174,8 @@ list(APPEND mock_define_list
 
 # list the files you would like to test here
 list(APPEND real_source_files
-            ${MODULE_ROOT_DIR}/source/portable/mbedtls/iot_pkcs11_mbedtls.c
-            ${MODULE_ROOT_DIR}/test/unit-test/config/iot_pkcs11_config.h
+            ${MODULE_ROOT_DIR}/source/portable/mbedtls/core_pkcs11_mbedtls.c
+            ${MODULE_ROOT_DIR}/test/unit-test/config/core_pkcs11_config.h
     )
 
 # list the directories the module under test includes
@@ -242,7 +242,7 @@ create_test(${utest_name}
 
 # =============================  PKCS #11 utils unit tests  ===========================
 project( "pkcs11_utils" )
-set(project_name "iot_pki_utils")
+set(project_name "core_pki_utils")
 set(utest_name "${project_name}_utest")
 set(utest_source "${project_name}_utest.c")
 # =====================  Create your mock here  (edit)  ========================
@@ -278,7 +278,7 @@ list(APPEND mock_define_list
 
 # list the files you would like to test here
 list(APPEND real_source_files
-            ${MODULE_ROOT_DIR}/source/iot_pki_utils.c
+            ${MODULE_ROOT_DIR}/source/core_pki_utils.c
     )
 
 # list the directories the module under test includes

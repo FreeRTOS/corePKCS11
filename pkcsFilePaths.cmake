@@ -7,9 +7,9 @@
 
 # PKCS library source files.
 set( PKCS_SOURCES
-     "${CMAKE_CURRENT_LIST_DIR}/source/iot_pkcs11.c"
-     "${CMAKE_CURRENT_LIST_DIR}/source/portable/mbedtls/iot_pkcs11_mbedtls.c"
-     "${CMAKE_CURRENT_LIST_DIR}/source/iot_pki_utils.c"
+     "${CMAKE_CURRENT_LIST_DIR}/source/core_pkcs11.c"
+     "${CMAKE_CURRENT_LIST_DIR}/source/portable/mbedtls/core_pkcs11_mbedtls.c"
+     "${CMAKE_CURRENT_LIST_DIR}/source/core_pki_utils.c"
      )
 
  # PKCS library Public Include directories.

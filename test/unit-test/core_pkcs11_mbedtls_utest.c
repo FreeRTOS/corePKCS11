@@ -39,16 +39,16 @@
 #include "mock_mock_osal.h"
 #include "mock_rsa.h"
 #include "mock_bignum.h"
-#include "mock_iot_pki_utils.h"
+#include "mock_core_pki_utils.h"
 #include "mock_mbedtls_error.h"
 #include "mock_pk_internal.h"
 
 /* PKCS #11 includes. */
-#include "iot_pkcs11_config.h"
-#include "iot_pkcs11.h"
+#include "core_pkcs11_config.h"
+#include "core_pkcs11.h"
 
 /* This mock must be included after pkcs11.h */
-#include "mock_iot_pkcs11_pal.h"
+#include "mock_core_pkcs11_pal.h"
 
 /* mbedtls includes. */
 #include "oid.h"
@@ -123,7 +123,7 @@
 
 
 /*
- * @brief Macro taken from "iot_pkcs11_mbedtls.c"
+ * @brief Macro taken from "core_pkcs11_mbedtls.c"
  */
 #define pkcs11_PRIVATE_EC_PRIME_256_DER_SIZE    160
 

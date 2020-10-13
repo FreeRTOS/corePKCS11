@@ -24,10 +24,10 @@
  */
 
 /**
- * @file iot_pki_utils.c
+ * @file core_pki_utils.c
  * @brief Helper functions for PKCS #11
  */
-#include "iot_pki_utils.h"
+#include "core_pki_utils.h"
 
 /* CRT includes. */
 #include <stdint.h>
