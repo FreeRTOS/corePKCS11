@@ -23,8 +23,8 @@
  * http://www.FreeRTOS.org
  */
 
-#ifndef _core_pKCS11_H_
-#define _core_pKCS11_H_
+#ifndef _CORE_PKCS11_H_
+#define _CORE_PKCS11_H_
 
 #include <stdint.h>
 
@@ -319,4 +319,4 @@ CK_RV vAppendSHA256AlgorithmIdentifierSequence( const uint8_t * puc32ByteHashedM
     #pragma pack(pop, cryptoki)
 #endif
 
-#endif /* ifndef _core_pKCS11_H_ */
+#endif /* ifndef _CORE_PKCS11_H_ */
