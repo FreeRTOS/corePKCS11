@@ -23,8 +23,8 @@
  * http://www.FreeRTOS.org
  */
 
-#include "iot_pkcs11_config.h"
-#include "iot_pkcs11.h"
+#include "core_pkcs11_config.h"
+#include "core_pkcs11.h"
 
 /* C runtime includes. */
 #include <stdio.h>
@@ -32,7 +32,7 @@
 #include <string.h>
 
 /**
- * @file iot_pkcs11.c
+ * @file core_pkcs11.c
  * @brief corePKCS11 Interface.
  *
  * This file contains wrapper functions for common PKCS #11 operations.

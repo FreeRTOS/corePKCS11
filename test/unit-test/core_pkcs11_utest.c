@@ -28,8 +28,8 @@
 #include <stdbool.h>
 
 /* PKCS #11 includes. */
-#include "iot_pkcs11_config.h"
-#include "iot_pkcs11.h"
+#include "core_pkcs11_config.h"
+#include "core_pkcs11.h"
 
 /* Test includes. */
 #include "unity.h"
@@ -261,7 +261,7 @@ static CK_RV xGet1Item2( CK_BBOOL arg1,
 
 
 /*!
- * @brief Common stubs to most iot_pkcs11.c #11 test paths.
+ * @brief Common stubs to most core_pkcs11.c #11 test paths.
  *
  */
 static void vCommonStubs( void )

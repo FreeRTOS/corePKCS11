@@ -27,17 +27,17 @@ This PKCS #11 library implements a subset of the PKCS #11 API required to establ
         <td><b>With -Os Optimization</b></td>
     </tr>
     <tr>
-        <td>iot_pkcs11.c</td>
+        <td>core_pkcs11.c</td>
         <td>0.7K</td>
         <td>0.6K</td>
     </tr>
     <tr>
-        <td>iot_pki_utils.c</td>
+        <td>core_pki_utils.c</td>
         <td>0.4K</td>
         <td>0.3K</td>
     </tr>
     <tr>
-        <td>iot_pkcs11_mbedtls.c</td>
+        <td>core_pkcs11_mbedtls.c</td>
         <td>6.7K</td>
         <td>6.0K</td>
     </tr>
@@ -57,7 +57,7 @@ Currently, the PKCS #11 wrapper library has a dependency on:
 - The C standard library stdint
 - PKCS #11.
 
-Note: "iot_pkcs11.h" should always be included first as it defines the macros that are needed by the standard PKCS #11 header files.
+Note: "core_pkcs11.h" should always be included first as it defines the macros that are needed by the standard PKCS #11 header files.
 
 @dot "PKCS #11 wrapper direct dependencies"
 digraph pkcs11_wrapper_dependencies
@@ -272,7 +272,7 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 */
 
 /**
-@page pkcs11_iot_mbedtls_function PKCS #11 mbed TLS Implementation Functions
+@page pkcs11_core_mbedtls_function PKCS #11 mbed TLS Implementation Functions
 @brief Primary functions of the PKCS #11 mbed TLS based Implementation Library:<br><br>
 @subpage pkcs11_mbedtls_function_c_initialize <br>
 @subpage pkcs11_mbedtls_function_c_finalize <br>
@@ -300,87 +300,87 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 @subpage pkcs11_mbedtls_function_c_generate_random <br>
 
 @page pkcs11_mbedtls_function_c_initialize C_Initialize
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_initialize
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_initialize
 @page pkcs11_mbedtls_function_c_finalize C_Finalize
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_finalize
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_finalize
 @page pkcs11_mbedtls_function_c_getfunctionlist C_GetFunctionList
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getfunctionlist
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getfunctionlist
 @page pkcs11_mbedtls_function_c_getslotlist C_GetSlotList
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getslotlist
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getslotlist
 @page pkcs11_mbedtls_function_c_gettokeninfo C_GetTokenInfo
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_gettokeninfo
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_gettokeninfo
 @page pkcs11_mbedtls_function_c_getmechanisminfo C_GetMechanismInfo
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getmechanisminfo
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getmechanisminfo
 @page pkcs11_mbedtls_function_c_inittoken C_InitToken
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_inittoken
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_inittoken
 @page pkcs11_mbedtls_function_c_opensession C_OpenSession
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_opensession
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_opensession
 @page pkcs11_mbedtls_function_c_closesession C_CloseSession
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_closesession
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_closesession
 @page pkcs11_mbedtls_function_c_login C_Login
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_login
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_login
 @page pkcs11_mbedtls_function_c_createobject C_CreateObject
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_createobject
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_createobject
 @page pkcs11_mbedtls_function_c_destroyobject C_DestroyObject
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_destroyobject
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_destroyobject
 @page pkcs11_mbedtls_function_c_getattributevalue C_GetAttributeValue
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getattributevalue
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getattributevalue
 @page pkcs11_mbedtls_function_c_findobjectsinit C_FindObjectsInit
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_findobjectsinit
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_findobjectsinit
 @page pkcs11_mbedtls_function_c_findobjects C_FindObjects
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_findobjects
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_findobjects
 @page pkcs11_mbedtls_function_c_findobjectsfinal C_FindObjectsFinal
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_findobjectsfinal
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_findobjectsfinal
 @page pkcs11_mbedtls_function_c_digestinit C_DigestInit
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_digestinit
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_digestinit
 @page pkcs11_mbedtls_function_c_digestupdate C_DigestUpdate
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_digestupdate
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_digestupdate
 @page pkcs11_mbedtls_function_c_digestfinal C_DigestFinal
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_digestfinal
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_digestfinal
 @page pkcs11_mbedtls_function_c_signinit C_SignInit
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_signinit
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_signinit
 @page pkcs11_mbedtls_function_c_verifyinit C_VerifyInit
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_verifyinit
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_verifyinit
 @page pkcs11_mbedtls_function_c_verify C_Verify
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_verify
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_verify
 @page pkcs11_mbedtls_function_c_generatekeypair C_GenerateKeyPair
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_generatekeypair
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_generatekeypair
 @page pkcs11_mbedtls_function_c_generate_random C_GenerateRandom
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_generate_random
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_generate_random
 */
 
 
 /**
-@page pkcs11_iot_wrapper_function PKCS #11 Wrapper Functions
+@page pkcs11_core_wrapper_function PKCS #11 Wrapper Functions
 @brief Primary functions of the PKCS #11 wrapper Library:<br><br>
-@subpage pkcs11_iot_xinitializepkcs11 <br>
-@subpage pkcs11_iot_xgetslotlist <br>
-@subpage pkcs11_iot_xinitializepkcs11token <br>
-@subpage pkcs11_iot_xinitializepkcs11session <br>
-@subpage pkcs11_iot_xfindobjectwithlabelandclass <br>
-@subpage pkcs11_iot_vappendsha256algorithmidentifiersequence <br>
+@subpage pkcs11_core_xinitializepkcs11 <br>
+@subpage pkcs11_core_xgetslotlist <br>
+@subpage pkcs11_core_xinitializepkcs11token <br>
+@subpage pkcs11_core_xinitializepkcs11session <br>
+@subpage pkcs11_core_xfindobjectwithlabelandclass <br>
+@subpage pkcs11_core_vappendsha256algorithmidentifiersequence <br>
 
-@page pkcs11_iot_xinitializepkcs11 xInitializePKCS11
-@snippet iot_pkcs11.h declare_pkcs11_iot_xinitializepkcs11
+@page pkcs11_core_xinitializepkcs11 xInitializePKCS11
+@snippet core_pkcs11.h declare_pkcs11_core_xinitializepkcs11
 
-@page pkcs11_iot_xgetslotlist xGetSlotList
-@snippet iot_pkcs11.h declare_pkcs11_iot_xgetslotlist
+@page pkcs11_core_xgetslotlist xGetSlotList
+@snippet core_pkcs11.h declare_pkcs11_core_xgetslotlist
 
-@page pkcs11_iot_xinitializepkcs11token xInitializePkcs11Token
-@snippet iot_pkcs11.h declare_pkcs11_iot_xinitializepkcs11token
+@page pkcs11_core_xinitializepkcs11token xInitializePkcs11Token
+@snippet core_pkcs11.h declare_pkcs11_core_xinitializepkcs11token
 
-@page pkcs11_iot_xinitializepkcs11session  xInitializePkcs11Session
-@snippet iot_pkcs11.h declare_pkcs11_iot_xinitializepkcs11session
+@page pkcs11_core_xinitializepkcs11session  xInitializePkcs11Session
+@snippet core_pkcs11.h declare_pkcs11_core_xinitializepkcs11session
 
-@page pkcs11_iot_xfindobjectwithlabelandclass  xFindObjectWithLabelAndClass
-@snippet iot_pkcs11.h declare_pkcs11_iot_xfindobjectwithlabelandclass
+@page pkcs11_core_xfindobjectwithlabelandclass  xFindObjectWithLabelAndClass
+@snippet core_pkcs11.h declare_pkcs11_core_xfindobjectwithlabelandclass
 
-@page pkcs11_iot_vappendsha256algorithmidentifiersequence  vAppendSHA256AlgorithmIdentifierSequence
-@snippet iot_pkcs11.h declare_pkcs11_iot_vappendsha256algorithmidentifiersequence
+@page pkcs11_core_vappendsha256algorithmidentifiersequence  vAppendSHA256AlgorithmIdentifierSequence
+@snippet core_pkcs11.h declare_pkcs11_core_vappendsha256algorithmidentifiersequence
 */
 
 /**
-@page pkcs11_iot_pal_function PKCS #11 PAL Functions
+@page pkcs11_core_pal_function PKCS #11 PAL Functions
 @brief Primary functions of the PKCS #11 Platform Abstraction Layer Library:<br><br>
 @subpage pkcs11_pal_initialize <br>
 @subpage pkcs11_pal_saveobject <br>
@@ -390,35 +390,35 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 @subpage pkcs11_pal_getobjectvaluecleanup <br>
 
 @page pkcs11_pal_initialize PKCS11_PAL_Initialize
-@snippet iot_pkcs11_pal.h declare_pkcs11_pal_initialize
+@snippet core_pkcs11_pal.h declare_pkcs11_pal_initialize
 
 @page pkcs11_pal_saveobject PKCS11_PAL_SaveObject
-@snippet iot_pkcs11_pal.h declare_pkcs11_pal_saveobject
+@snippet core_pkcs11_pal.h declare_pkcs11_pal_saveobject
 
 @page pkcs11_pal_destroyobject PKCS11_PAL_DestroyObject
-@snippet iot_pkcs11_mbedtls.c declare_pkcs11_pal_destroyobject
+@snippet core_pkcs11_mbedtls.c declare_pkcs11_pal_destroyobject
 
 @page pkcs11_pal_findobject PKCS11_PAL_FindObject
-@snippet iot_pkcs11_pal.h declare_pkcs11_pal_findobject
+@snippet core_pkcs11_pal.h declare_pkcs11_pal_findobject
 
 @page pkcs11_pal_getobjectvalue PKCS11_PAL_GetObjectValue
-@snippet iot_pkcs11_pal.h declare_pkcs11_pal_getobjectvalue
+@snippet core_pkcs11_pal.h declare_pkcs11_pal_getobjectvalue
 
 @page pkcs11_pal_getobjectvaluecleanup PKCS11_PAL_GetObjectValueCleanup
-@snippet iot_pkcs11_pal.h declare_pkcs11_pal_getobjectvaluecleanup
+@snippet core_pkcs11_pal.h declare_pkcs11_pal_getobjectvaluecleanup
 */
 
 /**
-@page pkcs11_iot_utils_function PKCS #11 Utils Functions
+@page pkcs11_core_utils_function PKCS #11 Utils Functions
 @brief Primary functions of the PKCS #11 Utils Library:<br><br>
 @subpage pkcs11_utils_pkipkcs11signaturetombedtlssignature <br>
 @subpage pkcs11_utils_pkimbedtlssignaturetopkcs11signature <br>
 
 @page pkcs11_utils_pkipkcs11signaturetombedtlssignature PKI_mbedTLSSignatureToPkcs11Signature
-@snippet iot_pki_utils.h declare_pkcs11_utils_pkipkcs11signaturetombedtlssignature
+@snippet core_pki_utils.h declare_pkcs11_utils_pkipkcs11signaturetombedtlssignature
 
 @page pkcs11_utils_pkimbedtlssignaturetopkcs11signature PKI_pkcs11SignatureTombedTLSSignature
-@snippet iot_pki_utils.h declare_pkcs11_utils_pkimbedtlssignaturetopkcs11signature
+@snippet core_pki_utils.h declare_pkcs11_utils_pkimbedtlssignaturetopkcs11signature
 */
 
 

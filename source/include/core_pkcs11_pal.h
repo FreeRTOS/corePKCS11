@@ -23,17 +23,17 @@
  * http://www.FreeRTOS.org
  */
 
-#ifndef IOT_PKCS11_PAL
-#define IOT_PKCS11_PAL
+#ifndef CORE_PKCS11_PAL
+#define CORE_PKCS11_PAL
 
 /**
- * @file iot_pkcs11_pal.h
+ * @file core_pkcs11_pal.h
  * @brief Port Specific File Access functions for PKCS #11
  */
 
 /*-----------------------------------------------------------*/
 /*------------ Port Specific File Access API ----------------*/
-/*--------- See iot_pkcs11_pal.c for definitions ------------*/
+/*--------- See core_pkcs11_pal.c for definitions ------------*/
 /*-----------------------------------------------------------*/
 
 /*------------------------ PKCS #11 PAL functions -------------------------*/
@@ -140,4 +140,4 @@ void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
                                        CK_ULONG ulDataSize );
 /* @[declare_pkcs11_pal_getobjectvaluecleanup] */
 
-#endif /* IOT_PKCS11_PAL include guard. */
+#endif /* CORE_PKCS11_PAL include guard. */

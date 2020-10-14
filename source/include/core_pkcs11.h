@@ -23,8 +23,8 @@
  * http://www.FreeRTOS.org
  */
 
-#ifndef _IOT_PKCS11_H_
-#define _IOT_PKCS11_H_
+#ifndef _CORE_PKCS11_H_
+#define _CORE_PKCS11_H_
 
 #include <stdint.h>
 
@@ -33,7 +33,7 @@
 #endif
 
 /**
- * @file iot_pkcs11.h
+ * @file core_pkcs11.h
  * @brief Wrapper functions for PKCS #11
  */
 
@@ -222,9 +222,9 @@ typedef struct PKCS11_CertificateTemplate
  * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
  * for more information.
  */
-/* @[declare_pkcs11_iot_xinitializepkcs11] */
+/* @[declare_pkcs11_core_xinitializepkcs11] */
 CK_RV xInitializePKCS11( void );
-/* @[declare_pkcs11_iot_xinitializepkcs11] */
+/* @[declare_pkcs11_core_xinitializepkcs11] */
 
 /**
  * @brief Get a list of available PKCS #11 slots.
@@ -240,10 +240,10 @@ CK_RV xInitializePKCS11( void );
  *  \return CKR_OK or PKCS #11 error code. (PKCS #11 error codes are positive).
  *
  */
-/* @[declare_pkcs11_iot_xgetslotlist] */
+/* @[declare_pkcs11_core_xgetslotlist] */
 CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
                     CK_ULONG * pxSlotCount );
-/* @[declare_pkcs11_iot_xgetslotlist] */
+/* @[declare_pkcs11_core_xgetslotlist] */
 
 /**
  * \brief Initializes the PKCS #11 module and opens a session.
@@ -254,9 +254,9 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
  * \return  CKR_OK upon success.  PKCS #11 error code on failure.
  *          Note that PKCS #11 error codes are positive.
  */
-/* @[declare_pkcs11_iot_xinitializepkcs11session] */
+/* @[declare_pkcs11_core_xinitializepkcs11session] */
 CK_RV xInitializePkcs11Session( CK_SESSION_HANDLE * pxSession );
-/* @[declare_pkcs11_iot_xinitializepkcs11session] */
+/* @[declare_pkcs11_core_xinitializepkcs11session] */
 
 /**
  *  \brief Initializes a PKCS #11 module and token.
@@ -264,9 +264,9 @@ CK_RV xInitializePkcs11Session( CK_SESSION_HANDLE * pxSession );
  *  \return CKR_OK upon success.  PKCS #11 error code on failure.
  *          Note that PKCS #11 error codes are positive.
  */
-/* @[declare_pkcs11_iot_xinitializepkcs11token] */
+/* @[declare_pkcs11_core_xinitializepkcs11token] */
 CK_RV xInitializePkcs11Token( void );
-/* @[declare_pkcs11_iot_xinitializepkcs11token] */
+/* @[declare_pkcs11_core_xinitializepkcs11token] */
 
 /**
  * \brief Searches for an object with a matching label and class provided.
@@ -284,12 +284,12 @@ CK_RV xInitializePkcs11Token( void );
  * \note This function assumes that there is only one
  * object that meets the CLASS/LABEL criteria.
  */
-/* @[declare_pkcs11_iot_xfindobjectwithlabelandclass] */
+/* @[declare_pkcs11_core_xfindobjectwithlabelandclass] */
 CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
                                     char * pcLabelName,
                                     CK_OBJECT_CLASS xClass,
                                     CK_OBJECT_HANDLE_PTR pxHandle );
-/* @[declare_pkcs11_iot_xfindobjectwithlabelandclass] */
+/* @[declare_pkcs11_core_xfindobjectwithlabelandclass] */
 
 /**
  * \brief Appends digest algorithm sequence to SHA-256 hash for RSA signatures
@@ -310,13 +310,13 @@ CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
  * \return CKR_OK if successful, CKR_ARGUMENTS_BAD if NULL pointer passed in.
  *
  */
-/* @[declare_pkcs11_iot_vappendsha256algorithmidentifiersequence] */
+/* @[declare_pkcs11_core_vappendsha256algorithmidentifiersequence] */
 CK_RV vAppendSHA256AlgorithmIdentifierSequence( const uint8_t * puc32ByteHashedMessage,
                                                 uint8_t * puc51ByteHashOidBuffer );
-/* @[declare_pkcs11_iot_vappendsha256algorithmidentifiersequence] */
+/* @[declare_pkcs11_core_vappendsha256algorithmidentifiersequence] */
 
 #ifdef _WIN32
     #pragma pack(pop, cryptoki)
 #endif
 
-#endif /* ifndef _IOT_PKCS11_H_ */
+#endif /* ifndef _CORE_PKCS11_H_ */

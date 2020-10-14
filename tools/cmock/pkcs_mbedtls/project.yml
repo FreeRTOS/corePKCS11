@@ -38,6 +38,6 @@
     - '(?:fcntl\s*\(+.*?\)+)' # this function is causing some trouble with code coverage as the annotations are calling the mocked one, so we won't mock it
   :treat_externs: :include
   :includes_c_pre_header:
-    - "iot_pkcs11.h" # For iot_pkcs11_pal.h
+    - "core_pkcs11.h" # For core_pkcs11_pal.h
     - "md_internal.h"
     - "pk_internal.h"

@@ -24,17 +24,17 @@
  */
 
 /**
- * @file iot_pkcs11_mbedtls.c
+ * @file core_pkcs11_mbedtls.c
  * @brief mbedTLS-based PKCS#11 implementation for software keys. This
  * file deviates from the FreeRTOS style standard for some function names and
  * data types in order to maintain compliance with the PKCS #11 standard.
  */
 
 /* PKCS #11 includes. */
-#include "iot_pkcs11_config.h"
-#include "iot_pkcs11.h"
-#include "iot_pkcs11_pal.h"
-#include "iot_pki_utils.h"
+#include "core_pkcs11_config.h"
+#include "core_pkcs11.h"
+#include "core_pkcs11_pal.h"
+#include "core_pki_utils.h"
 
 /* mbedTLS includes. */
 #include "mbedtls/pk.h"
@@ -46,7 +46,6 @@
 #include "mbedtls/base64.h"
 #include "mbedtls/platform.h"
 #include "mbedtls/threading.h"
-#include "threading_alt.h"
 
 /* Custom mbedtls utils include. */
 #include "mbedtls_error.h"
@@ -246,7 +245,7 @@ typedef struct P11Object_t
  * @ingroup pkcs11_datatypes
  * @brief PKCS #11 object container list.
  *
- * This structure helps the iot_pkcs11_mbedtls.c maintain a mapping of all objects in one place.
+ * This structure helps the core_pkcs11_mbedtls.c maintain a mapping of all objects in one place.
  * Because some objects exist in device NVM and must be called by their "PAL Handles", and other
  * objects do not have designated NVM storage locations, the ObjectList maintains a list
  * of what object handles are available.
