@@ -25,9 +25,17 @@ A list of all the configurations and their default values are defined in the dox
 
 ### Steps to build **Library** and **Unit Tests**
 
-1. Go to the root directory of this repository.
+### Checkout CMock Submodule
+By default, the submodules in this repository are configured with `update=none` in [.gitmodules](.gitmodules) to avoid increasing clone time and disk space usage of other repositories (like [amazon-freertos](https://github.com/aws/amazon-freertos) that submodule this repository.
 
-1. Run *cmake* while inside build directory: `cmake -S ../test/unit-test -B build -DBUILD_CLONE_SUBMODULES=ON `
+To build unit tests, the submodule dependency of CMock is required. Use the following command to clone the submodule:
+```
+git submodule update --checkout --init --recursive test/unit-test/CMock
+```
+
+1. Go to the root directory of this repository. (Make sure that the **CMock** submodule is cloned as described [above](#checkout-cmock-submodule))
+
+1. Run *cmake* while inside build directory: `cmake -S ../test/unit-test -B build`
 
 1. Run this command to build the library and unit tests: `make -C build all`
 
