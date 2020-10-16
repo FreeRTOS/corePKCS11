@@ -1,5 +1,8 @@
 # Change Log for corePKCS11 Library
 
+## v2.0.1 (September 2020)
+* Replaced *iot* prefix on files with *core* prefix.
+
 ## v2.0.0 (September 2020)
 This is the first release of the corePKCS11 library in this repository.
 
