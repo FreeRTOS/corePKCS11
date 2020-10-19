@@ -2492,7 +2492,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_CreateObject )( CK_SESSION_HANDLE hSession,
 
     if( xResult == CKR_OK )
     {
-        LogInfo( ( "Creating a 0x%0X type object.", xClass ) );
+        LogInfo( ( "Creating a 0x%0lX type object.", xClass ) );
 
         switch( xClass )
         {
@@ -3753,7 +3753,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                 if( xExpectedInputLength != ulDataLen )
                 {
                     LogError( ( "Failed sign operation. The data buffer was "
-                                "too small. Expected: %u bytes and received "
+                                "too small. Expected: %lu bytes and received "
                                 "%lu bytes.", xExpectedInputLength, ulDataLen ) );
                     xResult = CKR_DATA_LEN_RANGE;
                 }
