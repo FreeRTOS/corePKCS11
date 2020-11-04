@@ -402,6 +402,7 @@ static CK_RV prvMbedTLS_Initialize( void )
     /* See explanation in prvCheckValidSessionAndModule for this exception. */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     int32_t lMbedTLSResult = 0;
+
     ( void ) memset( &xP11Context, 0, sizeof( xP11Context ) );
 
     mbedtls_mutex_init( &xP11Context.xObjectList.xMutex );
@@ -1314,6 +1315,7 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
 CK_DECLARE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pInitArgs )
 {
     CK_RV xResult = CKR_OK;
+
     ( void ) ( pInitArgs );
 
     /* See explanation in prvCheckValidSessionAndModule for this exception. */
