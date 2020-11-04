@@ -20,7 +20,9 @@ Deviations from the MISRA standard are listed below:
 ### Flagged by Coverity
 | Deviation | Category | Justification |
 | :-: | :-: | :-: |
+| Rule 8.7 | Advisory | API functions are not used by the library outside of the files they are defined; however, they must be externally visible in order to be used by an application. |
 | Rule 8.13 | Advisory | A pointer should be a const qualified type whenever possible. The files *could* be const qualified but the header files `pkcs11.h`, `pkcs11t.h`, and `pkcs11f.h` are derived from the PKCS #11 specification, and cannot be modified.|
+
 
 ### Suppressed with Coverity Comments
 | Deviation | Category | Justification |
