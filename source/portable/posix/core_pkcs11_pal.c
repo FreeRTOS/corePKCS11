@@ -411,7 +411,7 @@ void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
 
     if( NULL != pucData )
     {
-        PKCS11_FREE( pucData );
+        free( pucData );
     }
 }
 
