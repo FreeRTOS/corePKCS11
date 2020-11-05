@@ -104,35 +104,35 @@ static CK_RV prvFileExists( const char * pcFileName )
  *
  */
 static void prvLabelToFilenameHandle( const char * pcLabel,
-                                const char ** pcFileName,
-                               CK_OBJECT_HANDLE_PTR pHandle )
+                                      const char ** pcFileName,
+                                      CK_OBJECT_HANDLE_PTR pHandle )
 {
     if( ( pcLabel != NULL ) && ( pHandle != NULL ) && ( pcFileName != NULL ) )
     {
         if( 0 == strncmp( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
-                         pcLabel,
-                         sizeof( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
+                          pcLabel,
+                          sizeof( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
         {
             *pcFileName = pkcs11palFILE_NAME_CLIENT_CERTIFICATE;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsDeviceCertificate;
         }
         else if( 0 == strncmp( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
-                              pcLabel,
-                              sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) ) )
+                               pcLabel,
+                               sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) ) )
         {
             *pcFileName = pkcs11palFILE_NAME_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsDevicePrivateKey;
         }
         else if( 0 == strncmp( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
-                              pcLabel,
-                              sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
+                               pcLabel,
+                               sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
         {
             *pcFileName = pkcs11palFILE_NAME_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsDevicePublicKey;
         }
         else if( 0 == strncmp( pkcs11configLABEL_CODE_VERIFICATION_KEY,
-                              pcLabel,
-                              sizeof( pkcs11configLABEL_CODE_VERIFICATION_KEY ) ) )
+                               pcLabel,
+                               sizeof( pkcs11configLABEL_CODE_VERIFICATION_KEY ) ) )
         {
             *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsCodeSigningKey;
@@ -142,6 +142,7 @@ static void prvLabelToFilenameHandle( const char * pcLabel,
             *pcFileName = NULL;
             *pHandle = ( CK_OBJECT_HANDLE ) eInvalidHandle;
         }
+
         LogDebug( ( "Converted %s to %s", pcLabel, *pcFileName ) );
     }
     else
@@ -201,7 +202,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
             }
             else
             {
-                LogDebug ( ( "Successfully wrote %lu to %s", ulBytesWritten, pcFileName ) );
+                LogDebug( ( "Successfully wrote %lu to %s", ulBytesWritten, pcFileName ) );
             }
         }
 
@@ -226,6 +227,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 {
     const char * pcFileName = NULL;
     CK_OBJECT_HANDLE xHandle = ( CK_OBJECT_HANDLE ) eInvalidHandle;
+
     ( void ) usLength;
 
     if( pxLabel != NULL )
@@ -233,6 +235,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
         prvLabelToFilenameHandle( ( const char * ) pxLabel,
                                   &pcFileName,
                                   &xHandle );
+
         if( CKR_OK != prvFileExists( pcFileName ) )
         {
             xHandle = ( CK_OBJECT_HANDLE ) eInvalidHandle;
@@ -288,7 +291,7 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
         xReturn = CKR_KEY_HANDLE_INVALID;
     }
 
-    if( ( ppucData == NULL ) ||  ( pulDataSize == NULL ) || ( pIsPrivate == NULL ) )
+    if( ( ppucData == NULL ) || ( pulDataSize == NULL ) || ( pIsPrivate == NULL ) )
     {
         xReturn = CKR_ARGUMENTS_BAD;
         LogError( ( "Could not get object value. Received a NULL argument." ) );
@@ -314,6 +317,7 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
             {
                 *pulDataSize = lSize;
                 *ppucData = malloc( *pulDataSize );
+
                 if( NULL == *ppucData )
                 {
                     LogError( ( "Could not get object value. Malloc failed to allocate memory." ) );
