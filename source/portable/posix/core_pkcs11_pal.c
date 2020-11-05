@@ -159,9 +159,9 @@ static void prvLabelToFilenameHandle( const char * pcLabel,
  * @param[out] pHandle           The type of the PKCS #11 object.
  *
  */
-static void prvHandleToFilename( CK_OBJECT_HANDLE xHandle
-                                 const char ** pcFileName,
-                                 CK_BBOOL * pIsPrivate )
+static CK_RV prvHandleToFilename( CK_OBJECT_HANDLE xHandle,
+                                  const char ** pcFileName,
+                                  CK_BBOOL * pIsPrivate )
 {
     CK_RV xReturn = CKR_OK;
 
@@ -170,25 +170,25 @@ static void prvHandleToFilename( CK_OBJECT_HANDLE xHandle
         switch( ( CK_OBJECT_HANDLE ) xHandle )
         {
             case eAwsDeviceCertificate:
-                pcFileName = pkcs11palFILE_NAME_CLIENT_CERTIFICATE;
+                *pcFileName = pkcs11palFILE_NAME_CLIENT_CERTIFICATE;
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
                 break;
 
             case eAwsDevicePrivateKey:
-                pcFileName = pkcs11palFILE_NAME_KEY;
+                *pcFileName = pkcs11palFILE_NAME_KEY;
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
                 break;
 
             case eAwsDevicePublicKey:
-                pcFileName = pkcs11palFILE_NAME_KEY;
+                *pcFileName = pkcs11palFILE_NAME_KEY;
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
                 break;
 
             case eAwsCodeSigningKey:
-                pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
+                *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
                 break;
@@ -206,6 +206,74 @@ static void prvHandleToFilename( CK_OBJECT_HANDLE xHandle
     return xReturn;
 }
 
+/**
+ * @brief Reads object value from file system.
+ *
+ * @param[in] pcLabel            The PKCS #11 label to convert to a file name
+ * @param[out] pcFileName        The name of the file to check for existance.
+ * @param[out] pHandle           The type of the PKCS #11 object.
+ *
+ */
+static CK_RV prvReadData( const char * pcFileName,
+                          CK_BYTE_PTR * ppucData,
+                          CK_ULONG_PTR pulDataSize )
+{
+    CK_RV xReturn = CKR_OK;
+    FILE * pxFile = NULL;
+    size_t lSize = 0;
+
+    pxFile = fopen( pcFileName, "r" );
+
+    if( NULL == pxFile )
+    {
+        LogError( ( "PKCS #11 PAL failed to get object value. "
+                    "Could not open file named %s for reading.", pcFileName ) );
+        xReturn = CKR_FUNCTION_FAILED;
+    }
+    else
+    {
+        ( void ) fseek( pxFile, 0, SEEK_END );
+        lSize = ftell( pxFile );
+        ( void ) fseek( pxFile, 0, SEEK_SET );
+
+        if( lSize > 0UL )
+        {
+            *pulDataSize = lSize;
+            *ppucData = malloc( *pulDataSize );
+
+            if( NULL == *ppucData )
+            {
+                LogError( ( "Could not get object value. Malloc failed to allocate memory." ) );
+                xReturn = CKR_HOST_MEMORY;
+            }
+        }
+        else
+        {
+            LogError( ( "Could not get object value. Failed to determine object size." ) );
+            xReturn = CKR_FUNCTION_FAILED;
+        }
+    }
+
+    if( CKR_OK == xReturn )
+    {
+        lSize = 0;
+        lSize = fread( *ppucData, sizeof( uint8_t ), *pulDataSize, pxFile );
+
+        if( lSize != *pulDataSize )
+        {
+            LogError( ( "PKCS #11 PAL Failed to get object value. Expected to read %ld "
+                        "from %s but received %ld", *pulDataSize, pcFileName, lSize ) );
+            xReturn = CKR_FUNCTION_FAILED;
+        }
+    }
+
+    if( NULL != pxFile )
+    {
+        ( void ) fclose( pxFile );
+    }
+
+    return xReturn;
+}
 
 /*-----------------------------------------------------------*/
 
@@ -312,8 +380,6 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
                                  CK_BBOOL * pIsPrivate )
 {
     CK_RV xReturn = CKR_OK;
-    FILE * pxFile = NULL;
-    size_t lSize = 0;
     const char * pcFileName = NULL;
 
 
@@ -324,60 +390,12 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
     }
     else
     {
-        xReturn = prvHandleToFilename( xHandle, &pcFileName, &pIsPrivate );
+        xReturn = prvHandleToFilename( xHandle, &pcFileName, pIsPrivate );
     }
 
     if( xReturn == CKR_OK )
     {
-        pxFile = fopen( pcFileName, "r" );
-
-        if( NULL == pxFile )
-        {
-            LogError( ( "PKCS #11 PAL failed to get object value. "
-                        "Could not open file named %s for reading.", pcFileName ) );
-            xReturn = CKR_FUNCTION_FAILED;
-        }
-        else
-        {
-            ( void ) fseek( pxFile, 0, SEEK_END );
-            lSize = ftell( pxFile );
-            ( void ) fseek( pxFile, 0, SEEK_SET );
-
-            if( lSize > 0UL )
-            {
-                *pulDataSize = lSize;
-                *ppucData = malloc( *pulDataSize );
-
-                if( NULL == *ppucData )
-                {
-                    LogError( ( "Could not get object value. Malloc failed to allocate memory." ) );
-                    xReturn = CKR_HOST_MEMORY;
-                }
-            }
-            else
-            {
-                LogError( ( "Could not get object value. Failed to determine object size." ) );
-                xReturn = CKR_FUNCTION_FAILED;
-            }
-        }
-
-        if( CKR_OK == xReturn )
-        {
-            lSize = 0;
-            lSize = fread( *ppucData, sizeof( uint8_t ), *pulDataSize, pxFile );
-
-            if( lSize != *pulDataSize )
-            {
-                LogError( ( "PKCS #11 PAL Failed to get object value. Expected to read %ld "
-                            "from %s but received %ld", *pulDataSize, pcFileName, lSize ) );
-                xReturn = CKR_FUNCTION_FAILED;
-            }
-        }
-
-        if( NULL != pxFile )
-        {
-            ( void ) fclose( pxFile );
-        }
+        xReturn = prvReadData( pcFileName, ppucData, pulDataSize );
     }
 
     return xReturn;
