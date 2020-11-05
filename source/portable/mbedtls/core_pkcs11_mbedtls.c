@@ -401,8 +401,9 @@ static CK_RV prvMbedTLS_Initialize( void )
 
     /* See explanation in prvCheckValidSessionAndModule for this exception. */
     /* coverity[misra_c_2012_rule_10_5_violation] */
-    ( void ) memset( &xP11Context, 0, sizeof( xP11Context ) );
     int32_t lMbedTLSResult = 0;
+
+    ( void ) memset( &xP11Context, 0, sizeof( xP11Context ) );
 
     mbedtls_mutex_init( &xP11Context.xObjectList.xMutex );
     mbedtls_mutex_init( &xP11Context.xSessionMutex );
@@ -1313,9 +1314,9 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
 /* @[declare_pkcs11_mbedtls_c_initialize] */
 CK_DECLARE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pInitArgs )
 {
-    ( void ) ( pInitArgs );
-
     CK_RV xResult = CKR_OK;
+
+    ( void ) ( pInitArgs );
 
     /* See explanation in prvCheckValidSessionAndModule for this exception. */
     /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -1610,9 +1611,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetMechanismInfo )( CK_SLOT_ID slotID,
                                                   CK_MECHANISM_TYPE type,
                                                   CK_MECHANISM_INFO_PTR pInfo )
 {
-    /* Disable unused parameter warning. */
-    ( void ) slotID;
-
     CK_RV xResult = CKR_MECHANISM_INVALID;
 
     struct CryptoMechanisms
@@ -1631,6 +1629,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetMechanismInfo )( CK_SLOT_ID slotID,
         { CKM_SHA256,          { 0,    0,    CKF_DIGEST            } }
     };
     uint32_t ulMech = 0;
+
+    ( void ) slotID;
 
     if( pInfo == NULL )
     {
@@ -2492,7 +2492,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_CreateObject )( CK_SESSION_HANDLE hSession,
 
     if( xResult == CKR_OK )
     {
-        LogInfo( ( "Creating a 0x%0X type object.", xClass ) );
+        LogInfo( ( "Creating a 0x%0lX type object.", xClass ) );
 
         switch( xClass )
         {
@@ -3753,7 +3753,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                 if( xExpectedInputLength != ulDataLen )
                 {
                     LogError( ( "Failed sign operation. The data buffer was "
-                                "too small. Expected: %u bytes and received "
+                                "too small. Expected: %lu bytes and received "
                                 "%lu bytes.", xExpectedInputLength, ulDataLen ) );
                     xResult = CKR_DATA_LEN_RANGE;
                 }
@@ -3874,9 +3874,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
     CK_BYTE_PTR pxLabel = NULL;
     CK_ULONG xLabelLength = 0;
     int32_t lMbedTLSResult = 0;
+    CK_RV xResult = CKR_OK;
+
 
     pxSession = prvSessionPointerFromHandle( hSession );
-    CK_RV xResult = prvCheckValidSessionAndModule( pxSession );
+    xResult = prvCheckValidSessionAndModule( pxSession );
 
     if( NULL == pMechanism )
     {
@@ -4055,9 +4057,10 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
 {
     P11Session_t * pxSessionObj;
     int32_t lMbedTLSResult;
+    CK_RV xResult = CKR_OK;
 
     pxSessionObj = prvSessionPointerFromHandle( hSession );
-    CK_RV xResult = prvCheckValidSessionAndModule( pxSessionObj );
+    xResult = prvCheckValidSessionAndModule( pxSessionObj );
 
     /* Check parameters. */
     if( ( NULL == pData ) ||
