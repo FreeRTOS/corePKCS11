@@ -151,6 +151,62 @@ static void prvLabelToFilenameHandle( const char * pcLabel,
     }
 }
 
+/**
+ * @brief Maps object handle to file name
+ *
+ * @param[in] pcLabel            The PKCS #11 label to convert to a file name
+ * @param[out] pcFileName        The name of the file to check for existance.
+ * @param[out] pHandle           The type of the PKCS #11 object.
+ *
+ */
+static void prvHandleToFilename( CK_OBJECT_HANDLE xHandle
+                                 const char ** pcFileName,
+                                 CK_BBOOL * pIsPrivate )
+{
+    CK_RV xReturn = CKR_OK;
+
+    if( pcFileName != NULL )
+    {
+        switch( ( CK_OBJECT_HANDLE ) xHandle )
+        {
+            case eAwsDeviceCertificate:
+                pcFileName = pkcs11palFILE_NAME_CLIENT_CERTIFICATE;
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
+                break;
+
+            case eAwsDevicePrivateKey:
+                pcFileName = pkcs11palFILE_NAME_KEY;
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
+                break;
+
+            case eAwsDevicePublicKey:
+                pcFileName = pkcs11palFILE_NAME_KEY;
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
+                break;
+
+            case eAwsCodeSigningKey:
+                pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
+                break;
+
+            default:
+                xReturn = CKR_KEY_HANDLE_INVALID;
+                break;
+        }
+    }
+    else
+    {
+        LogError( ( "Could not convert label to filename. Received a NULL parameter." ) );
+    }
+
+    return xReturn;
+}
+
+
 /*-----------------------------------------------------------*/
 
 CK_RV PKCS11_PAL_Initialize( void )
@@ -261,40 +317,14 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
     const char * pcFileName = NULL;
 
 
-    if( xHandle == ( CK_OBJECT_HANDLE ) eAwsDeviceCertificate )
-    {
-        pcFileName = pkcs11palFILE_NAME_CLIENT_CERTIFICATE;
-        /* coverity[misra_c_2012_rule_10_5_violation] */
-        *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
-    }
-    else if( xHandle == ( CK_OBJECT_HANDLE ) eAwsDevicePrivateKey )
-    {
-        pcFileName = pkcs11palFILE_NAME_KEY;
-        /* coverity[misra_c_2012_rule_10_5_violation] */
-        *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
-    }
-    else if( xHandle == ( CK_OBJECT_HANDLE ) eAwsDevicePublicKey )
-    {
-        /* Public and private key are stored together in same file. */
-        pcFileName = pkcs11palFILE_NAME_KEY;
-        /* coverity[misra_c_2012_rule_10_5_violation] */
-        *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
-    }
-    else if( xHandle == ( CK_OBJECT_HANDLE ) eAwsCodeSigningKey )
-    {
-        pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
-        /* coverity[misra_c_2012_rule_10_5_violation] */
-        *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
-    }
-    else
-    {
-        xReturn = CKR_KEY_HANDLE_INVALID;
-    }
-
     if( ( ppucData == NULL ) || ( pulDataSize == NULL ) || ( pIsPrivate == NULL ) )
     {
         xReturn = CKR_ARGUMENTS_BAD;
         LogError( ( "Could not get object value. Received a NULL argument." ) );
+    }
+    else
+    {
+        xReturn = prvHandleToFilename( xHandle, &pcFileName, &pIsPrivate );
     }
 
     if( xReturn == CKR_OK )
