@@ -32,17 +32,17 @@
 
 void harness()
 {
-  uint8_t * pucSig;
-  const uint8_t * pucMbedSig;
-  uint32_t ulSigLen;
-  uint32_t ulMbedSigLen;
+    uint8_t * pucSig;
+    const uint8_t * pucMbedSig;
+    uint32_t ulSigLen;
+    uint32_t ulMbedSigLen;
 
-  __CPROVER_assume( ulSigLen == 64 && ulMbedSigLen == 72 );
-  pucSig = malloc( ulSigLen * sizeof( uint8_t ) );
-  pucMbedSig = malloc( ulMbedSigLen * sizeof( uint8_t ) );
+    __CPROVER_assume( ulSigLen == 64 && ulMbedSigLen == 72 );
+    pucSig = malloc( ulSigLen * sizeof( uint8_t ) );
+    pucMbedSig = malloc( ulMbedSigLen * sizeof( uint8_t ) );
 
-  PKI_mbedTLSSignatureToPkcs11Signature( pucSig, pucMbedSig );
+    PKI_mbedTLSSignatureToPkcs11Signature( pucSig, pucMbedSig );
 
-  free( pucSig );
-  free( pucMbedSig );
+    free( pucSig );
+    free( pucMbedSig );
 }
