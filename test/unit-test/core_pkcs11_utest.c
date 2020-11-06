@@ -361,11 +361,11 @@ void test_IotPkcs11_xGetSlotListBadFunctionList( void )
     CK_SLOT_ID_PTR pxSlotId = NULL;
     CK_ULONG xSlotCount = 0;
 
-    C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
+    C_GetFunctionList_IgnoreAndReturn( CKR_FUNCTION_FAILED );
     mock_osal_malloc_IgnoreAndReturn( NULL );
     xResult = xGetSlotList( &pxSlotId, &xSlotCount );
 
-    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }
 
 /*!
