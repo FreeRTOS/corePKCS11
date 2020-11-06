@@ -32,20 +32,20 @@
 
 void harness()
 {
-  int8_t ucReturn;
-  uint8_t * pucSig;
-  uint32_t ulSigLen;
-  size_t ulReturnLen;
+    int8_t ucReturn;
+    uint8_t * pucSig;
+    uint32_t ulSigLen;
+    size_t ulReturnLen;
 
-  __CPROVER_assume( ulSigLen == 72 );
-  pucSig = malloc( ulSigLen * sizeof( uint8_t ) );
+    __CPROVER_assume( ulSigLen == 72 );
+    pucSig = malloc( ulSigLen * sizeof( uint8_t ) );
 
-  ucReturn = PKI_pkcs11SignatureTombedTLSSignature( pucSig, &ulReturnLen );
+    ucReturn = PKI_pkcs11SignatureTombedTLSSignature( pucSig, &ulReturnLen );
 
-  if( ucReturn != -1 )
-  {
-    __CPROVER_assert( ulReturnLen <= 72, "The signature was larger than expected." );
-  }
+    if( ucReturn != -1 )
+    {
+        __CPROVER_assert( ulReturnLen <= 72, "The signature was larger than expected." );
+    }
 
-  free( pucSig );
+    free( pucSig );
 }
