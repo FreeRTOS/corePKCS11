@@ -48,7 +48,7 @@
  *                                        will be placed.  Caller must
  *                                        allocate 64 bytes of memory.
  * @param[in] pxMbedSignature             Pointer to DER encoded ECDSA
- *                                        signature.
+ *                                        signature. Buffer size is expected to be 72 bytes.
  *
  * \return 0 on success, -1 on failure.
  */

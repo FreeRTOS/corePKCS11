@@ -15,6 +15,6 @@ REMOVE_FUNCTION_BODY +=
 UNWINDSET +=
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
-PROJECT_SOURCES += $(SRCDIR)/test/cbmc/proofs/core_pki_utils.c
+PROJECT_SOURCES += $(SRCDIR)/source/core_pki_utils.c
 
 include ../Makefile.common

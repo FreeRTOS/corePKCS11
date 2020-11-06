@@ -15,6 +15,8 @@
 
 # Flags to pass to goto-cc for compilation (typically those passed to gcc -c)
 # COMPILE_FLAGS =
+COMPILE_FLAGS += -fPIC
+COMPILE_FLAGS += -std=gnu90
 
 # Flags to pass to goto-cc for linking (typically those passed to gcc)
 # LINK_FLAGS =
@@ -26,6 +28,7 @@
 # include directories in your project.
 #
 # INCLUDES =
+INCLUDES += -I$(SRCDIR)/source/include
 
 # Preprocessor definitions -D...
 # DEFINES =
