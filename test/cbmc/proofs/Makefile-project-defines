@@ -29,6 +29,7 @@ COMPILE_FLAGS += -std=gnu90
 #
 # INCLUDES =
 INCLUDES += -I$(SRCDIR)/source/include
+INCLUDES += -I$(CBMC_ROOT)/include
 INCLUDES += -I$(SRCDIR)/3rdparty/pkcs11
 INCLUDES += -I$(CBMC_ROOT)/proofs/config
 

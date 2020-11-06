@@ -1,5 +1,5 @@
 /*
- * corePKCS11 V2.0.0
+ * corePKCS v2.0.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -18,28 +18,18 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * http://aws.amazon.com/freertos
- * http://www.FreeRTOS.org
  */
 
 /**
- * @file xGetSlotList_harness.c
- * @brief Implements the proof harness for xGetSlotList function.
+ * @file pkcs11_interface_stubs.h
+ * @brief Stubs to mock calls to PKCS #11.
  */
-#include <stddef.h>
-#include "core_pkcs11.h"
 
-void harness()
-{
-    CK_SLOT_ID * pxSlotId;
-    CK_ULONG xSlotCount;
-    CK_RV xResult;
+#ifndef __PKCS11_INTERFACE_STUBS_H_
+#define __PKCS11_INTERFACE_STUBS_H_
 
+#include "pkcs11.h"
 
-    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
+CK_RV C_GetFunctionList( CK_FUNCTION_LIST_PTR_PTR ppFunctionList );
 
-    xResult = xGetSlotList( &pxSlotId, NULL );
-
-    __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "NULL pointer should be a bad argument." );
-}
+#endif

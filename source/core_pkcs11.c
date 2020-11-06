@@ -55,7 +55,7 @@ static CK_RV prvOpenSession( CK_SESSION_HANDLE * pxSession,
 
     xResult = C_GetFunctionList( &pxFunctionList );
 
-    if( xResult == CKR_OK )
+    if( ( xResult == CKR_OK ) && ( pxFunctionList != NULL ) && ( pxFunctionList->C_OpenSession != NULL ) )
     {
         xResult = pxFunctionList->C_OpenSession( xSlotId,
                                                  CKF_SERIAL_SESSION | CKF_RW_SESSION,
@@ -158,7 +158,7 @@ CK_RV xInitializePKCS11( void )
     xResult = C_GetFunctionList( &pxFunctionList );
 
     /* Initialize the PKCS #11 module. */
-    if( xResult == CKR_OK )
+    if( ( xResult == CKR_OK ) && ( pxFunctionList != NULL ) && ( pxFunctionList->C_Initialize != NULL ) )
     {
         xResult = pxFunctionList->C_Initialize( &xInitArgs );
     }
@@ -179,6 +179,11 @@ CK_RV xInitializePkcs11Token( void )
     CK_TOKEN_INFO_PTR pxTokenInfo = NULL;
 
     xResult = C_GetFunctionList( &pxFunctionList );
+
+    if( ( pxFunctionList == NULL ) || ( pxFunctionList->C_GetTokenInfo == NULL ) || ( pxFunctionList->C_InitToken == NULL ) )
+    {
+        xResult = CKR_FUNCTION_FAILED;
+    }
 
     if( xResult == CKR_OK )
     {
@@ -272,7 +277,7 @@ CK_RV xInitializePkcs11Session( CK_SESSION_HANDLE * pxSession )
     }
 
     /* Open a PKCS #11 session. */
-    if( xResult == CKR_OK )
+    if( ( xResult == CKR_OK ) && ( pxSlotId != NULL ) && ( xSlotCount >= 1 ) )
     {
         /* We will take the first slot available.
          * If your application has multiple slots, insert logic
@@ -284,7 +289,7 @@ CK_RV xInitializePkcs11Session( CK_SESSION_HANDLE * pxSession )
         PKCS11_FREE( pxSlotId );
     }
 
-    if( ( xResult == CKR_OK ) && ( pxFunctionList->C_Login != NULL ) )
+    if( ( xResult == CKR_OK ) && ( pxFunctionList != NULL ) && ( pxFunctionList->C_Login != NULL ) )
     {
         xResult = pxFunctionList->C_Login( *pxSession,
                                            CKU_USER,
@@ -314,7 +319,7 @@ CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
     {
         xTemplate[ 0 ].type = CKA_LABEL;
         xTemplate[ 0 ].pValue = ( CK_VOID_PTR ) pcLabelName;
-        xTemplate[ 0 ].ulValueLen = strlen( pcLabelName );
+        xTemplate[ 0 ].ulValueLen = strnlen( pcLabelName, pkcs11configMAX_LABEL_LENGTH );
 
         xTemplate[ 1 ].type = CKA_CLASS;
         xTemplate[ 1 ].pValue = &xClass;
@@ -323,9 +328,15 @@ CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
         xResult = C_GetFunctionList( &pxFunctionList );
     }
 
+    if( ( pxFunctionList == NULL ) || ( pxFunctionList->C_FindObjectsInit == NULL )
+            || ( pxFunctionList->C_FindObjects == NULL ) || ( pxFunctionList->C_FindObjectsFinal == NULL ) )
+    {
+        xResult = CKR_FUNCTION_FAILED;
+    }
+
     /* Initialize the FindObject state in the underlying PKCS #11 module based
      * on the search template provided by the caller. */
-    if( CKR_OK == xResult )
+    if( CKR_OK == xResult ) 
     {
         xResult = pxFunctionList->C_FindObjectsInit( xSession, xTemplate, sizeof( xTemplate ) / sizeof( CK_ATTRIBUTE ) );
     }

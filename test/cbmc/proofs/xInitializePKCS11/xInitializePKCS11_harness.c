@@ -24,22 +24,14 @@
  */
 
 /**
- * @file xGetSlotList_harness.c
+ * @file xInitializePKCS11_harness.c
  * @brief Implements the proof harness for xGetSlotList function.
  */
-#include <stddef.h>
 #include "core_pkcs11.h"
+#include "pkcs11_interface_stubs.h"
 
 void harness()
 {
-    CK_SLOT_ID * pxSlotId;
-    CK_ULONG xSlotCount;
-    CK_RV xResult;
-
-
-    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
-
-    xResult = xGetSlotList( &pxSlotId, NULL );
-
-    __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "NULL pointer should be a bad argument." );
+  CK_RV xResult;
+  xResult = xInitializePKCS11();
 }

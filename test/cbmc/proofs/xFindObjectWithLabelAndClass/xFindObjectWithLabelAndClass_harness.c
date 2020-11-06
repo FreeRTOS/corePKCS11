@@ -24,22 +24,24 @@
  */
 
 /**
- * @file xGetSlotList_harness.c
- * @brief Implements the proof harness for xGetSlotList function.
+ * @file xFindObjectWithLabelAndClass_harness.c
+ * @brief Implements the proof harness for xFindObjectWithLabelAndClass function.
  */
+
 #include <stddef.h>
 #include "core_pkcs11.h"
 
 void harness()
 {
-    CK_SLOT_ID * pxSlotId;
-    CK_ULONG xSlotCount;
-    CK_RV xResult;
 
+  CK_SESSION_HANDLE xSession;
+  CK_OBJECT_CLASS xClass;
+  CK_OBJECT_HANDLE xHandle;
+  char * pcLabel = "Random Label.";
+  CK_RV xResult;
 
-    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
+  xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, xClass, &xHandle );
 
-    xResult = xGetSlotList( &pxSlotId, NULL );
-
-    __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "NULL pointer should be a bad argument." );
+  xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, xClass, NULL );
+  __CPROVER_assert( xResult != CKR_OK, "NULL arguments should fail." );
 }

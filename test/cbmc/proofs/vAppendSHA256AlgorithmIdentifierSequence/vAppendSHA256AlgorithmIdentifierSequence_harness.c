@@ -23,23 +23,28 @@
  * http://www.FreeRTOS.org
  */
 
+
 /**
- * @file xGetSlotList_harness.c
- * @brief Implements the proof harness for xGetSlotList function.
+ * @file vAppendSHA256AlgorithmIdentifierSequence_harness.c
+ * @brief Implements the proof harness for vAppendSHA256AlgorithmIdentifierSequence function.
  */
 #include <stddef.h>
 #include "core_pkcs11.h"
 
 void harness()
 {
-    CK_SLOT_ID * pxSlotId;
-    CK_ULONG xSlotCount;
-    CK_RV xResult;
 
+    uint8_t * pucHash;
+    const uint8_t * pucOid;
+    uint32_t ulHashLen;
+    uint32_t ulOidLen;
 
-    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
+    __CPROVER_assume( ulHashLen == 32 && ulOidLen == 51 );
+    pucHash = malloc( ulHashLen * sizeof( uint8_t ) );
+    pucOid = malloc( ulOidLen * sizeof( uint8_t ) );
 
-    xResult = xGetSlotList( &pxSlotId, NULL );
+    vAppendSHA256AlgorithmIdentifierSequence( pucHash, pucOid );
 
-    __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "NULL pointer should be a bad argument." );
+    free( pucHash );
+    free( pucOid );
 }

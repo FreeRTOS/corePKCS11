@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 HARNESS_ENTRY = harness
-HARNESS_FILE = xGetSlotList_harness
+HARNESS_FILE = xFindObjectWithLabelAndClass_harness
 
 # This should be a unique identifier for this proof, and will appear on the
 # Litani dashboard. It can be human-readable and contain spaces if you wish.
-PROOF_UID = xGetSlotList
+PROOF_UID = xFindObjectWithLabelAndClass
 
 DEFINES +=
 INCLUDES +=
