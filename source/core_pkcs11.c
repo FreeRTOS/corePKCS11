@@ -83,7 +83,7 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
     else
     {
         xResult = C_GetFunctionList( &pxFunctionList );
-        
+
         if( pxFunctionList == NULL )
         {
             xResult = CKR_FUNCTION_FAILED;
@@ -96,10 +96,9 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
         {
             /* MISRA */
         }
-
     }
 
-    if( xResult == CKR_OK ) 
+    if( xResult == CKR_OK )
     {
         xResult = pxFunctionList->C_GetSlotList( CK_TRUE, /* Token Present. */
                                                  NULL,    /* We just want to know how many slots there are. */

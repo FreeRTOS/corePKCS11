@@ -31,18 +31,14 @@
 
 void harness()
 {
+    CK_SLOT_ID * pxSlotId;
+    CK_ULONG xSlotCount;
+    CK_RV xResult;
 
-   CK_SLOT_ID * pxSlotId;
-   CK_ULONG xSlotCount;
-   CK_RV xResult;
+    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
 
-   xResult = xGetSlotList( &pxSlotId, &xSlotCount );
-   
-   if( xResult == CKR_OK )
-   {
-    __CPROVER_assert( xSlotCount == 1, "Expected a slot count of one. This library currently only supports 1 slot." );
-   }
-    
-   
-
+    if( xResult == CKR_OK )
+    {
+        __CPROVER_assert( xSlotCount == 1, "Expected a slot count of one. This library currently only supports 1 slot." );
+    }
 }
