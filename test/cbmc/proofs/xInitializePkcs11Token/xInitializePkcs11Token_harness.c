@@ -31,6 +31,7 @@
 
 void harness()
 {
-  CK_RV xResult;
-  xResult = xInitializePkcs11Token();
+    CK_RV xResult;
+
+    xResult = xInitializePkcs11Token();
 }

@@ -33,15 +33,14 @@
 
 void harness()
 {
+    CK_SESSION_HANDLE xSession;
+    CK_OBJECT_CLASS xClass;
+    CK_OBJECT_HANDLE xHandle;
+    char * pcLabel = "Random Label.";
+    CK_RV xResult;
 
-  CK_SESSION_HANDLE xSession;
-  CK_OBJECT_CLASS xClass;
-  CK_OBJECT_HANDLE xHandle;
-  char * pcLabel = "Random Label.";
-  CK_RV xResult;
+    xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, xClass, &xHandle );
 
-  xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, xClass, &xHandle );
-
-  xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, xClass, NULL );
-  __CPROVER_assert( xResult != CKR_OK, "NULL arguments should fail." );
+    xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, xClass, NULL );
+    __CPROVER_assert( xResult != CKR_OK, "NULL arguments should fail." );
 }

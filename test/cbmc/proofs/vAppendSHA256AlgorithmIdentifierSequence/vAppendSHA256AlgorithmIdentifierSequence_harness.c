@@ -33,7 +33,6 @@
 
 void harness()
 {
-
     uint8_t * pucHash;
     const uint8_t * pucOid;
     uint32_t ulHashLen;

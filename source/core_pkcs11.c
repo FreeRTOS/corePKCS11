@@ -328,15 +328,15 @@ CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
         xResult = C_GetFunctionList( &pxFunctionList );
     }
 
-    if( ( pxFunctionList == NULL ) || ( pxFunctionList->C_FindObjectsInit == NULL )
-            || ( pxFunctionList->C_FindObjects == NULL ) || ( pxFunctionList->C_FindObjectsFinal == NULL ) )
+    if( ( pxFunctionList == NULL ) || ( pxFunctionList->C_FindObjectsInit == NULL ) ||
+        ( pxFunctionList->C_FindObjects == NULL ) || ( pxFunctionList->C_FindObjectsFinal == NULL ) )
     {
         xResult = CKR_FUNCTION_FAILED;
     }
 
     /* Initialize the FindObject state in the underlying PKCS #11 module based
      * on the search template provided by the caller. */
-    if( CKR_OK == xResult ) 
+    if( CKR_OK == xResult )
     {
         xResult = pxFunctionList->C_FindObjectsInit( xSession, xTemplate, sizeof( xTemplate ) / sizeof( CK_ATTRIBUTE ) );
     }

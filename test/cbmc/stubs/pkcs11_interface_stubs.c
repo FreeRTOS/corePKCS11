@@ -71,6 +71,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetSlotList )( CK_BBOOL tokenPresent,
 {
     CK_ULONG ulCount = nondet_uint64();
     static CK_SLOT_ID pxSlot[ 128 ] = { 0 };
+
     __CPROVER_assume( ulCount < 128 );
     __CPROVER_assume( ulCount <= sizeof( pxSlot ) );
 
@@ -99,18 +100,18 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetFunctionList )( CK_FUNCTION_LIST_PTR_PTR ppFunc
         NULL, /*C_SetPIN*/
         C_OpenSession,
         NULL,
-        NULL,    /*C_CloseAllSessions*/
-        NULL,    /*C_GetSessionInfo*/
-        NULL,    /*C_GetOperationState*/
-        NULL,    /*C_SetOperationState*/
+        NULL, /*C_CloseAllSessions*/
+        NULL, /*C_GetSessionInfo*/
+        NULL, /*C_GetOperationState*/
+        NULL, /*C_SetOperationState*/
         C_Login,
-        NULL,    /*C_Logout*/
+        NULL, /*C_Logout*/
         C_CreateObject,
-        NULL,    /*C_CopyObject*/
+        NULL, /*C_CopyObject*/
         C_DestroyObject,
-        NULL,    /*C_GetObjectSize*/
+        NULL, /*C_GetObjectSize*/
         C_GetAttributeValue,
-        NULL,    /*C_SetAttributeValue*/
+        NULL, /*C_SetAttributeValue*/
         C_FindObjectsInit,
         C_FindObjects,
         C_FindObjectsFinal,
@@ -174,4 +175,3 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetFunctionList )( CK_FUNCTION_LIST_PTR_PTR ppFunc
 
     return CKR_OK;
 }
-
