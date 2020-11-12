@@ -24,22 +24,20 @@
  */
 
 /**
- * @file xGetSlotList_harness.c
- * @brief Implements the proof harness for xGetSlotList function.
+ * @file xInitializePkcs11Session_harness.c
+ * @brief Implements the proof harness for xInitializePkcs11Session function.
  */
-#include <stddef.h>
 #include "core_pkcs11.h"
 
 void harness()
 {
-    CK_SLOT_ID * pxSlotId;
-    CK_ULONG xSlotCount;
+    CK_SESSION_HANDLE xSession;
     CK_RV xResult;
 
+    xResult = xInitializePkcs11Session( &xSession );
 
-    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
-
-    xResult = xGetSlotList( &pxSlotId, NULL );
-
-    __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "NULL pointer should be a bad argument." );
+    if( xResult == CKR_OK )
+    {
+        __CPROVER_assert( xSession != CK_INVALID_HANDLE, "Received no error code, but session handle was not invalid." );
+    }
 }
