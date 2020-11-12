@@ -33,6 +33,5 @@
 
 void harness()
 {
-  CK_RV xResult;
-  xResult = C_Initialize( NULL );
+  ( void ) C_Initialize( NULL );
 }
