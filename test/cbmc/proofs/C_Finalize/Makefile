@@ -9,12 +9,15 @@ HARNESS_FILE = C_Finalize_harness
 PROOF_UID = C_Finalize
 
 DEFINES +=
-INCLUDES +=
+INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY +=
 UNWINDSET +=
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
+PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/mbedtls_stubs.c
+PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/core_pkcs11_pal_stubs.c
 PROJECT_SOURCES += $(SRCDIR)/source/portable/mbedtls/core_pkcs11_mbedtls.c
 
 include ../Makefile.common
