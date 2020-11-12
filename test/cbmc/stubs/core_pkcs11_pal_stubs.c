@@ -32,4 +32,3 @@ CK_RV PKCS11_PAL_Initialize( void )
 {
     return CKR_OK;
 }
-

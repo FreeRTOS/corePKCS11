@@ -33,5 +33,5 @@
 
 void harness()
 {
-  ( void ) C_Initialize( NULL );
+    ( void ) C_Initialize( NULL );
 }

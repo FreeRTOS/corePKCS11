@@ -33,31 +33,31 @@
 #include "mbedtls/threading.h"
 
 
-void mbedtls_entropy_init( mbedtls_entropy_context *ctx )
+void mbedtls_entropy_init( mbedtls_entropy_context * ctx )
 {
     ( void ) ctx;
 }
 
-void mbedtls_entropy_free( mbedtls_entropy_context *ctx )
+void mbedtls_entropy_free( mbedtls_entropy_context * ctx )
 {
     ( void ) ctx;
 }
 
-void mbedtls_ctr_drbg_init( mbedtls_ctr_drbg_context *ctx )
+void mbedtls_ctr_drbg_init( mbedtls_ctr_drbg_context * ctx )
 {
     ( void ) ctx;
 }
 
-int mbedtls_ctr_drbg_seed( mbedtls_ctr_drbg_context *ctx,
-                   int (*f_entropy)(void *, unsigned char *, size_t),
-                   void *p_entropy,
-                   const unsigned char *custom,
-                   size_t len )
+int mbedtls_ctr_drbg_seed( mbedtls_ctr_drbg_context * ctx,
+                           int ( * f_entropy )( void *, unsigned char *, size_t ),
+                           void * p_entropy,
+                           const unsigned char * custom,
+                           size_t len )
 {
     return 0;
 }
 
-void mbedtls_ctr_drbg_free( mbedtls_ctr_drbg_context *ctx )
+void mbedtls_ctr_drbg_free( mbedtls_ctr_drbg_context * ctx )
 {
     ( void ) ctx;
 }
@@ -87,4 +87,3 @@ void (* mbedtls_mutex_init)( mbedtls_threading_mutex_t * ) = threading_mutex_ini
 void (* mbedtls_mutex_free)( mbedtls_threading_mutex_t * ) = threading_mutex_free;
 int (* mbedtls_mutex_lock)( mbedtls_threading_mutex_t * ) = threading_mutex_lock;
 int (* mbedtls_mutex_unlock)( mbedtls_threading_mutex_t * ) = threading_mutex_unlock;
-
