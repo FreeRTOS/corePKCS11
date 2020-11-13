@@ -59,7 +59,6 @@ int mbedtls_ctr_drbg_seed( mbedtls_ctr_drbg_context * ctx,
 
 void mbedtls_ctr_drbg_free( mbedtls_ctr_drbg_context * ctx )
 {
-
     __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
 }
 
