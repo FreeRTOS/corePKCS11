@@ -35,17 +35,17 @@
 
 void mbedtls_entropy_init( mbedtls_entropy_context * ctx )
 {
-    ( void ) ctx;
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
 }
 
 void mbedtls_entropy_free( mbedtls_entropy_context * ctx )
 {
-    ( void ) ctx;
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
 }
 
 void mbedtls_ctr_drbg_init( mbedtls_ctr_drbg_context * ctx )
 {
-    ( void ) ctx;
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
 }
 
 int mbedtls_ctr_drbg_seed( mbedtls_ctr_drbg_context * ctx,
@@ -59,27 +59,30 @@ int mbedtls_ctr_drbg_seed( mbedtls_ctr_drbg_context * ctx,
 
 void mbedtls_ctr_drbg_free( mbedtls_ctr_drbg_context * ctx )
 {
-    ( void ) ctx;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
 }
 
 static void threading_mutex_init( mbedtls_threading_mutex_t * mutex )
 {
-    ( void ) mutex;
+    __CPROVER_assert( mutex != NULL, "Received an unexpected NULL pointer." );
 }
 
 static void threading_mutex_free( mbedtls_threading_mutex_t * mutex )
 {
-    ( void ) mutex;
+    __CPROVER_assert( mutex != NULL, "Received an unexpected NULL pointer." );
 }
 
 
 static int threading_mutex_lock( mbedtls_threading_mutex_t * mutex )
 {
+    __CPROVER_assert( mutex != NULL, "Received an unexpected NULL pointer." );
     return 0;
 }
 
 static int threading_mutex_unlock( mbedtls_threading_mutex_t * mutex )
 {
+    __CPROVER_assert( mutex != NULL, "Received an unexpected NULL pointer." );
     return 0;
 }
 
