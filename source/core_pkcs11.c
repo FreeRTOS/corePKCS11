@@ -24,6 +24,9 @@
  */
 
 #include "core_pkcs11_config.h"
+/* Include config defaults file after main config file to get
+ * default values of configs not defined in main config file. */
+#include "core_pkcs11_config_defaults.h"
 #include "core_pkcs11.h"
 
 /* C runtime includes. */
