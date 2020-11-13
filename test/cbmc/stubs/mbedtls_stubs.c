@@ -54,6 +54,17 @@ int mbedtls_ctr_drbg_seed( mbedtls_ctr_drbg_context * ctx,
                            const unsigned char * custom,
                            size_t len )
 {
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( f_entropy != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( p_entropy != NULL, "Received an unexpected NULL pointer." );
+    return 0;
+}
+
+int mbedtls_ctr_drbg_random( void *p_rng,
+                     unsigned char *output, size_t output_len )
+{
+    __CPROVER_assert( p_rng != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( output != NULL, "Received an unexpected NULL pointer." );
     return 0;
 }
 
