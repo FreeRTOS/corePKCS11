@@ -33,7 +33,6 @@
 
 void harness()
 {
-
     CK_RV xResult;
     CK_FLAGS xFlags;
     CK_SESSION_HANDLE xSession;
@@ -43,6 +42,7 @@ void harness()
                                          " to be uninitialized." );
 
     xResult = C_OpenSession( 0, xFlags, NULL, 0, &xSession );
+
     if( xResult == CKR_OK )
     {
         ( void ) C_CloseSession( xSession );

@@ -36,6 +36,7 @@ void harness()
     CK_RV xResult;
     CK_FLAGS xFlags;
     CK_SESSION_HANDLE xSession;
+
     xResult = C_Initialize( NULL );
 
     __CPROVER_assert( xResult == CKR_OK, "PKCS #11 module needs to be initialized"
