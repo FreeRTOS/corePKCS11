@@ -114,7 +114,7 @@
  * @ingroup pkcs11_macros
  * @brief Indicates that no PKCS #11 operation is underway for given session.
  */
-#define pkcs11NO_OPERATION                      ( ( CK_MECHANISM_TYPE ) 0xFFFFFFFF )
+#define pkcs11NO_OPERATION                      ( ( CK_MECHANISM_TYPE ) 0xFFFFFFFFUL )
 
 /**
  * @ingroup pkcs11_macros
