@@ -28,6 +28,7 @@
  * @brief Stubs for mbed TLS functions.
  */
 
+#include "mbedtls/pk.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/threading.h"
@@ -72,6 +73,21 @@ int mbedtls_ctr_drbg_random( void * p_rng,
 void mbedtls_ctr_drbg_free( mbedtls_ctr_drbg_context * ctx )
 {
     __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+}
+
+int mbedtls_pk_sign( mbedtls_pk_context *ctx, mbedtls_md_type_t md_alg,
+             const unsigned char *hash, size_t hash_len,
+             unsigned char *sig, size_t *sig_len,
+             int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
+{
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( hash != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( sig != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( sig_len != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( f_rng != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( p_rng != NULL, "Received an unexpected NULL pointer." );
+    return 0;
+
 }
 
 static void threading_mutex_init( mbedtls_threading_mutex_t * mutex )
