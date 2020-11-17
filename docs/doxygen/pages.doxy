@@ -1,5 +1,6 @@
 /**
 @mainpage
+@anchor core_pkcs11
 @brief PKCS #11 Crypto Abstraction Library.
 
 > PKCS #11 is a standard maintained by OASIS for interacting with cryptographic hardware.
