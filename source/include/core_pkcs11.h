@@ -219,8 +219,6 @@ typedef struct PKCS11_CertificateTemplate
  * @brief Initializes a PKCS #11 session.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_core_xinitializepkcs11] */
 CK_RV xInitializePKCS11( void );
