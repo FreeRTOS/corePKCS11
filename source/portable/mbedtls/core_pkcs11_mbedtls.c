@@ -464,16 +464,17 @@ static CK_RV prvGetObjectClass( const CK_ATTRIBUTE * pxTemplate,
 {
     CK_RV xResult = CKR_TEMPLATE_INCOMPLETE;
     CK_ULONG ulIndex = 0;
+    CK_ATTRIBUTE_PTR pxAttribute = NULL;
 
     /* Search template for class attribute. */
     for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
     {
-        CK_ATTRIBUTE xAttribute = pxTemplate[ ulIndex ];
+        pxAttribute = &pxTemplate[ ulIndex ];
 
-        if( xAttribute.type == CKA_CLASS )
+        if( ( pxAttribute->type == CKA_CLASS ) && ( pxAttribute->ulValueLen == sizeof( CK_OBJECT_CLASS ) ) )
         {
             LogDebug( ( "Successfully found object class attribute." ) );
-            ( void ) memcpy( pxClass, xAttribute.pValue, sizeof( CK_OBJECT_CLASS ) );
+            ( void ) memcpy( pxClass, pxAttribute->pValue, sizeof( CK_OBJECT_CLASS ) );
             xResult = CKR_OK;
             break;
         }
@@ -524,7 +525,10 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
             break;
 
         case ( CKA_CERTIFICATE_TYPE ):
-            ( void ) memcpy( pxCertificateType, pxAttribute->pValue, sizeof( CK_CERTIFICATE_TYPE ) );
+            if( pxAttribute->ulValueLen >= sizeof( CK_CERTIFICATE_TYPE ) )
+            {
+                ( void ) memcpy( pxCertificateType, pxAttribute->pValue, sizeof( CK_CERTIFICATE_TYPE ) );
+            }
 
             if( *pxCertificateType != CKC_X_509 )
             {
@@ -536,7 +540,10 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
             break;
 
         case ( CKA_TOKEN ):
-            ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            if( pxAttribute->ulValueLen >= sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            }
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -582,7 +589,10 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         case ( CKA_SIGN ):
         case ( CKA_TOKEN ):
-            ( void ) memcpy( &xBool, pxAttribute->pValue, pxAttribute->ulValueLen );
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            }
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -685,7 +695,10 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         if( pxAttribute->type == CKA_SIGN )
         {
-            ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            if( pxAttribute->ulValueLen >= sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            }
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -731,7 +744,10 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         if( pxAttribute->type == CKA_VERIFY )
         {
-            ( void ) memcpy( &xBool, pxAttribute->pValue, pxAttribute->ulValueLen );
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, pxAttribute->ulValueLen );
+            }
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -745,17 +761,24 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
         {
             /* Strip the ANS.1 Encoding of type and length. Otherwise mbed TLS
              * won't be able to parse the binary EC point. */
-            lMbedTLSResult = mbedtls_ecp_point_read_binary( &pxKeyPair->grp,
-                                                            &pxKeyPair->Q,
-                                                            ( ( uint8_t * ) ( pxAttribute->pValue ) + 2U ),
-                                                            ( pxAttribute->ulValueLen - 2U ) );
-
-            if( lMbedTLSResult != 0 )
+            if( pxAttribute->ulValueLen >= 2UL )
             {
-                xResult = CKR_FUNCTION_FAILED;
-                LogError( ( "Failed to parse EC public key. mbedtls_ecp_point_read_binary failed: mbed TLS error = %s : %s.",
-                            mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                            mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                lMbedTLSResult = mbedtls_ecp_point_read_binary( &pxKeyPair->grp,
+                                                                &pxKeyPair->Q,
+                                                                ( ( uint8_t * ) ( pxAttribute->pValue ) + 2U ),
+                                                                ( pxAttribute->ulValueLen - 2U ) );
+
+                if( lMbedTLSResult != 0 )
+                {
+                    xResult = CKR_FUNCTION_FAILED;
+                    LogError( ( "Failed to parse EC public key. mbedtls_ecp_point_read_binary failed: mbed TLS error = %s : %s.",
+                                mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                }
+            }
+            else
+            {
+                xResult = CKR_ATTRIBUTE_VALUE_INVALID;
             }
         }
 
@@ -792,7 +815,10 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             case ( CKA_TOKEN ):
                 LogDebug( ( "Found CKA_TOKEN." ) );
                 pxEcBoolAtt = ( CK_BBOOL * ) pxAttribute->pValue;
-                ( void ) memcpy( &xBool, pxEcBoolAtt, sizeof( CK_BBOOL ) );
+                if( pxAttribute->ulValueLen >= sizeof( CK_BBOOL ) )
+                {
+                    ( void ) memcpy( &xBool, pxEcBoolAtt, sizeof( CK_BBOOL ) );
+                }
 
                 /* See explanation in prvCheckValidSessionAndModule for this exception. */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -808,10 +834,13 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                 LogDebug( ( "Found CKA_EC_PARAMS." ) );
                 pxEcAttVal = ( CK_BYTE * ) pxAttribute->pValue;
 
-                if( memcmp( pxEcCurve, pxEcAttVal, pxAttribute->ulValueLen ) != 0 )
+                if( pxAttribute->ulValueLen == sizeof( pxEcCurve ) )
                 {
-                    xResult = CKR_TEMPLATE_INCONSISTENT;
-                    LogError( ( "Failed parsing EC key template. The elliptic curve was wrong. Expected elliptic curve P-256." ) );
+                    if( memcmp( pxEcCurve, pxEcAttVal, sizeof( pxEcCurve ) ) != 0 )
+                    {
+                        xResult = CKR_TEMPLATE_INCONSISTENT;
+                        LogError( ( "Failed parsing EC key template. The elliptic curve was wrong. Expected elliptic curve P-256." ) );
+                    }
                 }
 
                 break;
@@ -1021,7 +1050,7 @@ static CK_RV prvAddObjectToList( CK_OBJECT_HANDLE xPalHandle,
 
         /* See explanation in prvCheckValidSessionAndModule for this exception. */
         /* coverity[misra_c_2012_rule_10_5_violation] */
-        if( ( xResult == CKR_OK ) && ( xObjectFound == ( CK_BBOOL ) CK_FALSE ) )
+        if( ( xResult == CKR_OK ) && ( xObjectFound == ( CK_BBOOL ) CK_FALSE ) && ( xLabelLength <= pkcs11configMAX_LABEL_LENGTH ) )
         {
             xP11Context.xObjectList.xObjects[ ulSearchIndex - 1UL ].xHandle = xPalHandle;
             ( void ) memcpy( xP11Context.xObjectList.xObjects[ ulSearchIndex - 1UL ].xLabel, pcLabel, xLabelLength );
@@ -1066,7 +1095,7 @@ static CK_RV prvAppendEmptyECDerKey( uint8_t * pusECPrivateKey,
      * array will be appended to the valid private key.
      * It must be removed so that we can read the private
      * key back at a later time. */
-    lCompare = memcmp( &pusECPrivateKey[ ulDerBufSize - 6UL ], emptyPubKey, 6 );
+    lCompare = memcmp( &pusECPrivateKey[ ulDerBufSize - 6UL ], emptyPubKey, sizeof( emptyPubKey ) );
 
     if( ( lCompare == 0 ) && ( *pulActualKeyLength >= 6UL ) )
     {
@@ -1165,7 +1194,7 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
         xResult = prvAppendEmptyECDerKey( pxDerKey, ulDerBufSize, lDerKeyLength, &ulActualKeyLength );
     }
 
-    if( xResult == CKR_OK )
+    if( ( xResult == CKR_OK ) && ( lDerKeyLength < ulDerBufSize ) && ( lDerKeyLength > 0) )
     {
         xPalHandle = PKCS11_PAL_SaveObject( pxLabel,
                                             pxDerKey + ( ulDerBufSize - ( uint32_t ) lDerKeyLength ),
@@ -2007,7 +2036,7 @@ static void prvGetKeyType( CK_KEY_TYPE * pxKeyType,
     {
         xAttribute = pxTemplate[ ulIndex ];
 
-        if( xAttribute.type == CKA_KEY_TYPE )
+        if( ( xAttribute.type == CKA_KEY_TYPE ) && ( xAttribute.ulValueLen == sizeof( CK_KEY_TYPE ) ) )
         {
             LogDebug( ( "Successfully found the key type in the template." ) );
             ( void ) memcpy( pxKeyType, xAttribute.pValue, sizeof( CK_KEY_TYPE ) );
@@ -4258,7 +4287,10 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_KEY_TYPE ):
-            ( void ) memcpy( &xTemp, pxAttribute->pValue, sizeof( CK_ULONG ) );
+            if( pxAttribute->ulValueLen == sizeof( CK_ULONG ) )
+            {
+                ( void ) memcpy( &xTemp, pxAttribute->pValue, sizeof( CK_ULONG ) );
+            }
 
             if( xTemp != CKK_EC )
             {
@@ -4270,7 +4302,10 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_SIGN ):
-            ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            }
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -4286,7 +4321,10 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_PRIVATE ):
-            ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            }
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -4302,7 +4340,10 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_TOKEN ):
-            ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            }
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -4357,7 +4398,10 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_KEY_TYPE ):
-            ( void ) memcpy( &xKeyType, ( CK_KEY_TYPE * ) pxAttribute->pValue, sizeof( CK_KEY_TYPE ) );
+            if( pxAttribute->ulValueLen == sizeof( CK_KEY_TYPE ) )
+            {
+                ( void ) memcpy( &xKeyType, ( CK_KEY_TYPE * ) pxAttribute->pValue, sizeof( CK_KEY_TYPE ) );
+            }
 
             if( xKeyType != CKK_EC )
             {
@@ -4371,11 +4415,14 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
         case ( CKA_EC_PARAMS ):
             pxEcAttVal = ( CK_BYTE * ) pxAttribute->pValue;
 
-            if( memcmp( pxEcParams, pxEcAttVal, sizeof( pxEcParams ) ) != 0 )
+            if( pxAttribute->ulValueLen == sizeof( pxEcParams ) )
             {
-                LogError( ( "Failed parsing public key template. Only P-256 key "
-                            "generation is supported." ) );
-                xResult = CKR_TEMPLATE_INCONSISTENT;
+                if( memcmp( pxEcParams, pxEcAttVal, sizeof( pxEcParams ) ) != 0 )
+                {
+                    LogError( ( "Failed parsing public key template. Only P-256 key "
+                                "generation is supported." ) );
+                    xResult = CKR_TEMPLATE_INCONSISTENT;
+                }
             }
 
             LogDebug( ( "CKA_EC_PARAMS was in public key template." ) );
@@ -4384,7 +4431,10 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_VERIFY ):
-            ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            }
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -4402,7 +4452,10 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_TOKEN ):
-            ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            }
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
