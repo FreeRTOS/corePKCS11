@@ -81,19 +81,19 @@
  * @brief Maximum length (in characters) for a PKCS #11 CKA_LABEL
  * attribute.
  */
-#define pkcs11configMAX_LABEL_LENGTH                       32
+#define pkcs11configMAX_LABEL_LENGTH                       ( ( CK_ULONG ) 32 )
 
 /**
  * @brief Maximum number of token objects that can be stored
  * by the PKCS #11 module.
  */
-#define pkcs11configMAX_NUM_OBJECTS                        ( ( uint32_t ) 6 )
+#define pkcs11configMAX_NUM_OBJECTS                        ( ( CK_ULONG ) 6 )
 
 /**
  * @brief Maximum number of sessions that can be stored
  * by the PKCS #11 module.
  */
-#define pkcs11configMAX_SESSIONS                           ( ( uint32_t ) 10 )
+#define pkcs11configMAX_SESSIONS                           ( ( CK_ULONG ) 10 )
 
 /**
  * @brief Set to 1 if a PAL destroy object is implemented.
