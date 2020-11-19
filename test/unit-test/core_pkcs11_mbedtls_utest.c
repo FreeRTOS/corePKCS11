@@ -2279,7 +2279,7 @@ void test_pkcs11_C_GetAttributeBadArgs( void )
         xResult = C_GetAttributeValue( -1, xObject, ( CK_ATTRIBUTE_PTR ) &xResult, ulCount );
         TEST_ASSERT_EQUAL( CKR_SESSION_HANDLE_INVALID, xResult );
 
-        xResult = C_GetAttributeValue( xSession, NULL, ( CK_ATTRIBUTE_PTR ) &xResult, ulCount );
+        xResult = C_GetAttributeValue( xSession, CKR_OBJECT_HANDLE_INVALID, ( CK_ATTRIBUTE_PTR ) &xResult, ulCount );
         TEST_ASSERT_EQUAL( CKR_OBJECT_HANDLE_INVALID, xResult );
 
         xResult = C_GetAttributeValue( xSession, pkcs11configMAX_NUM_OBJECTS + 2, ( CK_ATTRIBUTE_PTR ) &xResult, ulCount );
@@ -2504,7 +2504,7 @@ void test_pkcs11_C_FindObjectsBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
         TEST_ASSERT_EQUAL( 0, ulFoundCount );
 
-        xResult = C_FindObjects( xSession, ( CK_ATTRIBUTE_PTR ) &xObject, 0, &ulFoundCount );
+        xResult = C_FindObjects( xSession, ( CK_OBJECT_HANDLE_PTR ) &xObject, 0, &ulFoundCount );
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
     }
 
