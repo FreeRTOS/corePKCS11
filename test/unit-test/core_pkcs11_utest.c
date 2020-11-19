@@ -361,11 +361,11 @@ void test_IotPkcs11_xGetSlotListBadFunctionList( void )
     CK_SLOT_ID_PTR pxSlotId = NULL;
     CK_ULONG xSlotCount = 0;
 
-    C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
+    C_GetFunctionList_IgnoreAndReturn( CKR_FUNCTION_FAILED );
     mock_osal_malloc_IgnoreAndReturn( NULL );
     xResult = xGetSlotList( &pxSlotId, &xSlotCount );
 
-    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }
 
 /*!
@@ -379,11 +379,11 @@ void test_IotPkcs11_xGetSlotListBadSlotList( void )
     CK_ULONG xSlotCount = 0;
 
     vCommonStubs();
-    C_GetSlotList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
+    C_GetSlotList_IgnoreAndReturn( CKR_FUNCTION_FAILED );
     mock_osal_malloc_IgnoreAndReturn( NULL );
     xResult = xGetSlotList( &pxSlotId, &xSlotCount );
 
-    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }
 
 /*!
@@ -533,7 +533,7 @@ void test_IotPkcs11_xInitializePkcs11TokenBadFunctionList( void )
     C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
     xResult = xInitializePkcs11Token();
 
-    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }
 
 /*!
@@ -552,7 +552,7 @@ void test_IotPkcs11_xInitializePkcs11TokenNullTokenInfo( void )
     C_GetSlotList_Stub( ( void * ) xGet1Item );
     xResult = xInitializePkcs11Token();
 
-    TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 
     prvP11FunctionList.C_GetTokenInfo = C_GetTokenInfo;
 }
@@ -573,7 +573,7 @@ void test_IotPkcs11_xInitializePkcs11TokenNullInitToken( void )
     C_GetSlotList_Stub( ( void * ) xGet1Item );
     xResult = xInitializePkcs11Token();
 
-    TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 
     prvP11FunctionList.C_InitToken = C_InitToken;
 }
@@ -739,8 +739,8 @@ void test_IotPkcs11_xInitializePkcs11SessionAlreadyInitialized( void )
     C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList );
     C_Initialize_IgnoreAndReturn( CKR_CRYPTOKI_ALREADY_INITIALIZED );
     C_GetSlotList_IgnoreAndReturn( CKR_OK );
-    mock_osal_malloc_Stub( pvPkcs11MallocCb );
-    mock_osal_free_Stub( vPkcs11FreeCb );
+    mock_osal_malloc_IgnoreAndReturn( &xResult );
+    mock_osal_free_CMockIgnore();
     C_OpenSession_IgnoreAndReturn( CKR_OK );
     C_Login_IgnoreAndReturn( CKR_OK );
     xResult = xInitializePkcs11Session( &xHandle );
@@ -825,5 +825,5 @@ void test_IotPkcs11_xFindObjectWithLabelAndClassBadFunctionList( void )
     C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
     xResult = xFindObjectWithLabelAndClass( xHandle, pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS, CKO_PRIVATE_KEY, &xPrivateKeyHandle );
 
-    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }

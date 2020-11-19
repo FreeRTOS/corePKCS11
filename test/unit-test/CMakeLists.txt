@@ -1,75 +1,333 @@
-cmake_minimum_required ( VERSION 3.13.0 )
-project ( "corePKCS11 unit test"
-          VERSION 2.0.0
-          LANGUAGES C )
+project( "pkcs11_wrapper" )
+#Include filepaths for source and include.
+include( ${MODULE_ROOT_DIR}/pkcsFilePaths.cmake )
 
-# Allow the project to be organized into folders.
-set_property( GLOBAL PROPERTY USE_FOLDERS ON )
+# =============================  PKCS #11 wrapper unit tests  ===========================
+set(project_name "core_pkcs11")
+set(utest_name "${project_name}_utest")
+set(utest_source "${project_name}_utest.c")
 
-# Use C90.
-set( CMAKE_C_STANDARD 90 )
-set( CMAKE_C_STANDARD_REQUIRED ON )
+# =====================  Create your mock here  (edit)  ========================
 
-# Do not allow in-source build.
-if( ${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR} )
-    message( FATAL_ERROR "In-source build is not allowed. Please build in a separate directory, such as ${PROJECT_SOURCE_DIR}/build." )
-endif()
+# list of files to preprocess
+# pkcs11.h is pre-processed to generate it's function prototypes.
+list(APPEND preprocessed_mock_list
+        "${MODULE_ROOT_DIR}/3rdparty/pkcs11/pkcs11.h"
+    )
 
-# Set global path variables.
-get_filename_component(__MODULE_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
-set(MODULE_ROOT_DIR ${__MODULE_ROOT_DIR} CACHE INTERNAL "corePKCS11 repository root.")
+set(preprocess_commands
+        "-I ${MODULE_ROOT_DIR}/3rdparty/pkcs11/ -D'CK_PTR=*' -D'NULL_PTR=0' \
+        -D'CK_DEFINE_FUNCTION( returnType, name )=returnType name'\
+        -D'CK_DECLARE_FUNCTION( returnType, name )=returnType name'\
+        -D'CK_DECLARE_FUNCTION_POINTER( returnType, name )=returnType( CK_PTR name )'\
+        -D'CK_CALLBACK_FUNCTION( returnType, name )=returnType( CK_PTR name )'"
+    )
 
-# Configure options to always show in CMake GUI.
-option( BUILD_CLONE_SUBMODULES
-        "Set this to ON to automatically clone any required Git submodules. When OFF, submodules must be manually cloned."
-        OFF )
+# list the files to mock here
+list(APPEND mock_list
+        "${MODULE_ROOT_DIR}/3rdparty/pkcs11/pkcs11.h"
+        "${MODULE_ROOT_DIR}/test/unit-test/config/mock_osal.h"
+    )
 
-# Set output directories.
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
+# list the directories your mocks need
+list(APPEND mock_include_list
+        config
+        "${PKCS_INCLUDE_PUBLIC_DIRS}"
+        "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls"
+        "${MODULE_ROOT_DIR}/test/unit-test/config"
+    )
 
-# Define a CMock resource path.
-set( CMOCK_DIR ${MODULE_ROOT_DIR}/test/unit-test/CMock CACHE INTERNAL "CMock library source directory." )
+#list the definitions of your mocks to control what to be included
+list(APPEND mock_define_list
+    ""
+    )
 
-# Include CMock build configuration.
-include( cmock_build.cmake )
+# ================= Create the library under test here (edit) ==================
 
-# Check if the CMock source directory exists, and if not present, clone the submodule
-# if BUILD_CLONE_SUBMODULES configuration is enabled.
-if( NOT EXISTS ${CMOCK_DIR}/src )
-    # Attempt to clone CMock.
-    if( ${BUILD_CLONE_SUBMODULES} )
-        clone_cmock()
-    else()
-        message( FATAL_ERROR "The required submodule CMock does not exist. Either clone it manually, or set BUILD_CLONE_SUBMODULES to 1 to automatically clone it during build." )
-    endif()
-endif()
+# list the files you would like to test here
+list(APPEND real_source_files
+            "${MODULE_ROOT_DIR}/source/core_pkcs11.c"
+            "${MODULE_ROOT_DIR}/test/unit-test/config/logging_stack.h"
+            "${MODULE_ROOT_DIR}/test/unit-test/config/logging_levels.h"
+        )
 
-# Add unit test and coverage configuration.
+# list the directories the module under test includes
+list(APPEND real_include_directories
+    "config"
+    ${MODULE_ROOT_DIR}/source/include
+    ${MODULE_ROOT_DIR}/3rdparty/pkcs11
+    )
 
-# Use CTest utility for managing test runs. This has to be added BEFORE
-# defining test targets with add_test()
-enable_testing()
+# =====================  Create UnitTest Code here (edit)  =====================
 
-# We do this to swap out the default mbed TLS config for one geared towards the
-# unit tests.
-add_compile_definitions( MBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" )
+# list the directories your test needs to include
+list(APPEND test_include_directories
+            "config"
+            "${CMAKE_CURRENT_BINARY_DIR}/pkcs_wrapper/mocks"
+            ${PKCS_INCLUDE_PUBLIC_DIRS}
+            ${PKCS_INCLUDE_PRIVATE_DIRS}
+        )
+
+# =============================  (end edit)  ===================================
+
+set(mock_name "${project_name}_mock")
+set(real_name "${project_name}_real")
+set(pre_mock_name  "pre_${mock_name}")
+
+set(mock_dir "wrapper_mocks")
+create_mock_list("${mock_name}"
+                "${mock_list}"
+                "${MODULE_ROOT_DIR}/tools/cmock/pkcs_wrapper/project.yml"
+                "${mock_include_list}"
+                "${mock_define_list}"
+                "${mock_dir}"
+        )
+
+separate_arguments(unix_flags UNIX_COMMAND "${preprocess_commands}")
+
+preprocess_mock_list(${mock_name}
+            ${preprocessed_mock_list}
+            "${unix_flags}"
+        )
+
+add_dependencies(${mock_name}
+                ${pre_mock_name}
+    )
+
+create_real_library(${real_name}
+                    "${real_source_files}"
+                    "${real_include_directories}"
+                    "${mock_name}"
+        )
+
+list(APPEND utest_link_list
+            -l${mock_name}
+            lib${real_name}.a
+        )
+
+list(APPEND utest_dep_list
+            ${real_name}
+        )
+
+create_test(${utest_name}
+            ${utest_source}
+            "${utest_link_list}"
+            "${utest_dep_list}"
+            "${test_include_directories}"
+            "${MODULE_ROOT_DIR}/tools/cmock/pkcs_wrapper/project.yml"
+            "${mock_dir}"
+        )
 
 
-# Add build targets for CMock and Unit, required for unit testing.
-add_cmock_targets()
+# =============================  PKCS #11 mbedtls unit tests  ===========================
+project( "pkcs11_mbedtls" )
+set(project_name "core_pkcs11_mbedtls")
+set(utest_name "${project_name}_utest")
+set(utest_source "${project_name}_utest.c")
+# =====================  Create your mock here  (edit)  ========================
 
-# Add function to enable CMock based tests and coverage.
-include( ${MODULE_ROOT_DIR}/tools/cmock/create_test.cmake )
+# clear the original variables
+set( mock_list "" )
+set( mock_include_list "" )
+set( mock_define_list "" )
+set( real_source_files "" )
+set( real_include_directories "" )
+set( test_include_directories "" )
+set( utest_link_list "" )
+set( utest_dep_list "" )
+set( mock_dir "mbedtls_mocks" )
 
-# Include build configuration for unit tests.
-include( unit_test_build.cmake )
+# list the files to mock here
+list(APPEND mock_list
+            "${MODULE_ROOT_DIR}/test/unit-test/config/mock_osal.h"
+            "${MODULE_ROOT_DIR}/source/include/core_pkcs11_pal.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/ctr_drbg.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/sha256.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/base64.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/bignum.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/entropy.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/md.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/rsa.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/ecp.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/pk_internal.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/ecdsa.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils/mbedtls_error.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/pk.h"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls/x509_crt.h"
+            "${MODULE_ROOT_DIR}/source/include/core_pki_utils.h"
+    )
 
-# Add a target for running coverage on tests.
-add_custom_target( coverage
-    COMMAND ${CMAKE_COMMAND} -P ${MODULE_ROOT_DIR}/tools/cmock/coverage.cmake
-    DEPENDS cmock unity core_pkcs11_mbedtls_utest core_pkcs11_utest core_pki_utils_utest
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+# list the directories your mocks need
+list(APPEND mock_include_list
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils"
+            "${MODULE_ROOT_DIR}/test/unit-test/config"
+            "${MODULE_ROOT_DIR}/source/include/"
+    )
+
+#list the definitions of your mocks to control what to be included
+list(APPEND mock_define_list
+    ""
+    )
+
+# ================= Create the library under test here (edit) ==================
+
+# list the files you would like to test here
+list(APPEND real_source_files
+            ${MODULE_ROOT_DIR}/source/portable/mbedtls/core_pkcs11_mbedtls.c
+            ${MODULE_ROOT_DIR}/test/unit-test/config/core_pkcs11_config.h
+    )
+
+# list the directories the module under test includes
+list(APPEND real_include_directories
+            "${MODULE_ROOT_DIR}/3rdparty/pkcs11"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils"
+            "${MODULE_ROOT_DIR}/test/unit-test/config"
+            "${MODULE_ROOT_DIR}/source/include/"
+            "${CMAKE_CURRENT_BINARY_DIR}/${mock_dir}"
+    )
+# =====================  Create UnitTest Code here (edit)  =====================
+
+# list the directories your test needs to include
+list(APPEND test_include_directories
+            "${MODULE_ROOT_DIR}/3rdparty/pkcs11"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls/include/mbedtls"
+            "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils"
+            "${MODULE_ROOT_DIR}/test/unit-test/config"
+            "${MODULE_ROOT_DIR}/source/include/"
+            "${CMAKE_CURRENT_BINARY_DIR}/${mock_dir}"
+    )
+# =============================  (end edit)  ===================================
+
+set(mock_name "${project_name}_mock")
+set(real_name "${project_name}_real")
+
+create_mock_list("${mock_name}"
+            "${mock_list}"
+            "${MODULE_ROOT_DIR}/tools/cmock/pkcs_mbedtls/project.yml"
+            "${mock_include_list}"
+            "${mock_define_list}"
+            "${mock_dir}"
+    )
+
+# PKCS #11 header files must always come before the mbedTLS header files
+target_include_directories(${mock_name} BEFORE PUBLIC
+            "${MODULE_ROOT_DIR}/3rdparty/pkcs11"
+    )
+
+create_real_library(${real_name}
+            "${real_source_files}"
+            "${real_include_directories}"
+            "${mock_name}"
+    )
+
+list(APPEND utest_link_list
+            -l${mock_name}
+            lib${real_name}.a
+    )
+
+list(APPEND utest_dep_list
+            ${real_name}
+    )
+
+create_test(${utest_name}
+            "${utest_source}"
+            "${utest_link_list}"
+            "${utest_dep_list}"
+            "${test_include_directories}"
+            "${MODULE_ROOT_DIR}/tools/cmock/pkcs_mbedtls/project.yml"
+            "${mock_dir}"
+    )
+
+# =============================  PKCS #11 utils unit tests  ===========================
+project( "pkcs11_utils" )
+set(project_name "core_pki_utils")
+set(utest_name "${project_name}_utest")
+set(utest_source "${project_name}_utest.c")
+# =====================  Create your mock here  (edit)  ========================
+
+# clear the original variables
+set( mock_list "" )
+set( mock_include_list "" )
+set( mock_define_list "" )
+set( real_source_files "" )
+set( real_include_directories "" )
+set( test_include_directories "" )
+set( utest_link_list "" )
+set( utest_dep_list "" )
+set(mock_dir "wrapper_mocks")
+
+# list the files to mock here
+# Can't have an empty mock list.
+list(APPEND mock_list
+    "${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils/mbedtls_error.h"
 )
 
+# list the directories your mocks need
+list(APPEND mock_include_list
+         config
+    )
+
+#list the definitions of your mocks to control what to be included
+list(APPEND mock_define_list
+    ""
+    )
+
+# ================= Create the library under test here (edit) ==================
+
+# list the files you would like to test here
+list(APPEND real_source_files
+            ${MODULE_ROOT_DIR}/source/core_pki_utils.c
+    )
+
+# list the directories the module under test includes
+list(APPEND real_include_directories
+            config
+            "${MODULE_ROOT_DIR}/source/include/"
+            "${CMAKE_CURRENT_BINARY_DIR}/${mock_dir}"
+    )
+# =====================  Create UnitTest Code here (edit)  =====================
+
+# list the directories your test needs to include
+list(APPEND test_include_directories
+            config
+            "${MODULE_ROOT_DIR}/source/include/"
+            "${CMAKE_CURRENT_BINARY_DIR}/${mock_dir}"
+    )
+# =============================  (end edit)  ===================================
+
+set(mock_name "${project_name}_mock")
+set(real_name "${project_name}_real")
+
+create_mock_list("${mock_name}"
+            "${mock_list}"
+            "${MODULE_ROOT_DIR}/tools/cmock/pkcs_wrapper/project.yml"
+            "${mock_include_list}"
+            "${mock_define_list}"
+            "${mock_dir}"
+    )
+
+create_real_library(${real_name}
+            "${real_source_files}"
+            "${real_include_directories}"
+            "${mock_name}"
+    )
+
+list(APPEND utest_link_list
+            -l${mock_name}
+            lib${real_name}.a
+    )
+
+list(APPEND utest_dep_list
+            ${real_name}
+    )
+
+create_test(${utest_name}
+            "${utest_source}"
+            "${utest_link_list}"
+            "${utest_dep_list}"
+            "${test_include_directories}"
+            "${MODULE_ROOT_DIR}/tools/cmock/pkcs_wrapper/project.yml"
+            "${mock_dir}"
+    )

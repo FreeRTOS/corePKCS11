@@ -114,7 +114,7 @@
  * @ingroup pkcs11_macros
  * @brief Indicates that no PKCS #11 operation is underway for given session.
  */
-#define pkcs11NO_OPERATION                      ( ( CK_MECHANISM_TYPE ) -1 )
+#define pkcs11NO_OPERATION                      ( ( CK_MECHANISM_TYPE ) 0xFFFFFFFFUL )
 
 /**
  * @ingroup pkcs11_macros
@@ -377,14 +377,33 @@ static CK_BBOOL prvOperationActive( const P11Session_t * pxSession )
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xResult = ( CK_BBOOL ) CK_FALSE;
 
-    if( ( pxSession->xOperationDigestMechanism != pkcs11NO_OPERATION ) ||
-        ( pxSession->xOperationSignMechanism != pkcs11NO_OPERATION ) ||
-        ( pxSession->xOperationVerifyMechanism != pkcs11NO_OPERATION ) ||
-        ( pxSession->pxFindObjectLabel != NULL ) )
+    if( ( pxSession->xOperationDigestMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
     {
         /* See explanation in prvCheckValidSessionAndModule for this exception. */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = ( CK_BBOOL ) CK_TRUE;
+    }
+    else if( ( pxSession->xOperationSignMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
+    {
+        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* coverity[misra_c_2012_rule_10_5_violation] */
+        xResult = ( CK_BBOOL ) CK_TRUE;
+    }
+    else if( ( pxSession->xOperationVerifyMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
+    {
+        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* coverity[misra_c_2012_rule_10_5_violation] */
+        xResult = ( CK_BBOOL ) CK_TRUE;
+    }
+    else if( pxSession->pxFindObjectLabel != NULL )
+    {
+        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* coverity[misra_c_2012_rule_10_5_violation] */
+        xResult = ( CK_BBOOL ) CK_TRUE;
+    }
+    else
+    {
+        /* MISRA */
     }
 
     return xResult;
@@ -865,7 +884,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
  * @param[out] pxAppHandle       Pointer to the application handle to be provided.
  *                               CK_INVALID_HANDLE if no object found.
  */
-static void prvFindObjectInListByLabel( const CK_BYTE_PTR pcLabel,
+static void prvFindObjectInListByLabel( const CK_BYTE * pcLabel,
                                         CK_ULONG xLabelLength,
                                         CK_OBJECT_HANDLE_PTR pxPalHandle,
                                         CK_OBJECT_HANDLE_PTR pxAppHandle )
@@ -901,7 +920,7 @@ static void prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
                                          CK_BYTE_PTR * ppcLabel,
                                          CK_ULONG_PTR pxLabelLength )
 {
-    uint32_t ulIndex = xAppHandle - 1UL;
+    CK_OBJECT_HANDLE ulIndex = xAppHandle - ( ( CK_OBJECT_HANDLE ) 1 );
 
     *ppcLabel = NULL;
     *pxLabelLength = 0;
@@ -929,8 +948,8 @@ static void prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
 static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
 {
     CK_RV xResult = CKR_OK;
-    int32_t lGotSemaphore = 0L;
-    uint32_t ulIndex = xAppHandle - 1UL;
+    int32_t lGotSemaphore = ( int32_t ) 0;
+    CK_OBJECT_HANDLE ulIndex = xAppHandle - ( ( CK_OBJECT_HANDLE ) 1 );
 
     lGotSemaphore = mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex );
 
@@ -965,7 +984,7 @@ static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
  */
 static CK_RV prvAddObjectToList( CK_OBJECT_HANDLE xPalHandle,
                                  CK_OBJECT_HANDLE_PTR pxAppHandle,
-                                 const CK_BYTE_PTR pcLabel,
+                                 const CK_BYTE * pcLabel,
                                  CK_ULONG xLabelLength )
 {
     CK_RV xResult = CKR_HOST_MEMORY;
@@ -1054,8 +1073,8 @@ static CK_RV prvAppendEmptyECDerKey( uint8_t * pusECPrivateKey,
     if( ( lCompare == 0 ) && ( *pulActualKeyLength >= 6UL ) )
     {
         /* Do not write the last 6 bytes to key storage. */
-        pusECPrivateKey[ ulDerBufSize - ( uint32_t ) lDerKeyLength + 1UL ] -= ( uint8_t ) 6;
-        *pulActualKeyLength -= 6UL;
+        pusECPrivateKey[ ulDerBufSize - ( uint32_t ) lDerKeyLength + ( ( uint32_t ) 1 ) ] -= ( uint8_t ) 6;
+        *pulActualKeyLength -= ( ( uint32_t ) 6 );
     }
 
     return xResult;
@@ -1308,8 +1327,6 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
  * @return CKR_OK if successful.
  * CKR_CRYPTOKI_ALREADY_INITIALIZED if C_Initialize was previously called.
  * All other errors indicate that the PKCS #11 module is not ready to be used.
- * See <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_initialize] */
 CK_DECLARE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pInitArgs )
@@ -1402,8 +1419,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pReserved )
  *                                  pointer to function list will be placed.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_getfunctionlist] */
 CK_DECLARE_FUNCTION( CK_RV, C_GetFunctionList )( CK_FUNCTION_LIST_PTR_PTR ppFunctionList )
@@ -1511,8 +1526,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetFunctionList )( CK_FUNCTION_LIST_PTR_PTR ppFunc
  *                              to the list.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_getslotlist] */
 CK_DECLARE_FUNCTION( CK_RV, C_GetSlotList )( CK_BBOOL tokenPresent,
@@ -1701,8 +1714,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_InitToken )( CK_SLOT_ID slotID,
  *                              session's handle will be placed.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_opensession] */
 CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
@@ -1836,8 +1847,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
  *                              be terminated.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_closesession] */
 CK_DECLARE_FUNCTION( CK_RV, C_CloseSession )( CK_SESSION_HANDLE hSession )
@@ -2463,8 +2472,6 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
  * </table>
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_createobject] */
 CK_DECLARE_FUNCTION( CK_RV, C_CreateObject )( CK_SESSION_HANDLE hSession,
@@ -2530,8 +2537,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_CreateObject )( CK_SESSION_HANDLE hSession,
  * be destroyed.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_destroyobject] */
 CK_DECLARE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE hSession,
@@ -2590,8 +2595,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE hSession,
  * </table>
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_getattributevalue] */
 CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
@@ -2924,8 +2927,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
  * @param[in] ulCount                       The number of attributes in pTemplate.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_findobjectsinit] */
 CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE hSession,
@@ -3046,8 +3047,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE hSession,
  * pulObjectCount will be set to 0.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_findobjects] */
 CK_DECLARE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE hSession,
@@ -3176,8 +3175,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE hSession,
  * @param[in] hSession                      Handle of a valid PKCS #11 session.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_findobjectsfinal] */
 CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsFinal )( CK_SESSION_HANDLE hSession )
@@ -3227,8 +3224,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsFinal )( CK_SESSION_HANDLE hSession )
  *                                          the mechanism CKM_SHA256.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_digestinit] */
 CK_DECLARE_FUNCTION( CK_RV, C_DigestInit )( CK_SESSION_HANDLE hSession,
@@ -3309,8 +3304,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestInit )( CK_SESSION_HANDLE hSession,
  * @param[in] ulPartLen                     Length of the data located at pPart.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_digestupdate] */
 CK_DECLARE_FUNCTION( CK_RV, C_DigestUpdate )( CK_SESSION_HANDLE hSession,
@@ -3390,8 +3383,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestUpdate )( CK_SESSION_HANDLE hSession,
  *                                          the digest placed in pDigest.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_digestfinal] */
 CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
@@ -3491,8 +3482,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
  *                                          mechanism chosen by pMechanism.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_signinit] */
 CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
@@ -3678,8 +3667,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
  *                                          data.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_sign] */
 CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
@@ -3855,8 +3842,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
  *                                          mechanism chosen by pxMechanism.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_verifyinit] */
 CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
@@ -4045,8 +4030,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
  * @param[in] ulSignatureLen                Length of pucSignature in bytes.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_verify] */
 CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
@@ -4488,8 +4471,6 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
  * \note CKA_LOCAL attribute is not supported.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_generatekeypair] */
 CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
@@ -4718,8 +4699,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
  * @param[in] ulRandomLen       Length of data (in bytes) to be generated.
  *
  * @return CKR_OK if successful.
- * Else, see <a href="https://tiny.amazon.com/wtscrttv">PKCS #11 specification</a>
- * for more information.
  */
 /* @[declare_pkcs11_mbedtls_c_generate_random] */
 CK_DECLARE_FUNCTION( CK_RV, C_GenerateRandom )( CK_SESSION_HANDLE hSession,
