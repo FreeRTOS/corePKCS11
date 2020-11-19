@@ -114,7 +114,7 @@
  * @ingroup pkcs11_macros
  * @brief Indicates that no PKCS #11 operation is underway for given session.
  */
-#define pkcs11NO_OPERATION                      ( ( CK_MECHANISM_TYPE ) -1UL )
+#define pkcs11NO_OPERATION                      ( ( CK_MECHANISM_TYPE ) 0xFFFFFFFFUL )
 
 /**
  * @ingroup pkcs11_macros
@@ -377,14 +377,33 @@ static CK_BBOOL prvOperationActive( const P11Session_t * pxSession )
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xResult = ( CK_BBOOL ) CK_FALSE;
 
-    if( ( pxSession->xOperationDigestMechanism != pkcs11NO_OPERATION ) ||
-        ( pxSession->xOperationSignMechanism != pkcs11NO_OPERATION ) ||
-        ( pxSession->xOperationVerifyMechanism != pkcs11NO_OPERATION ) ||
-        ( pxSession->pxFindObjectLabel != NULL ) )
-    {
+    if( ( pxSession->xOperationDigestMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
+    { 
         /* See explanation in prvCheckValidSessionAndModule for this exception. */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = ( CK_BBOOL ) CK_TRUE;
+    }
+    else if ( ( pxSession->xOperationSignMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
+    { 
+        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* coverity[misra_c_2012_rule_10_5_violation] */
+        xResult = ( CK_BBOOL ) CK_TRUE;
+    }
+    else if( (  pxSession->xOperationVerifyMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
+    { 
+        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* coverity[misra_c_2012_rule_10_5_violation] */
+        xResult = ( CK_BBOOL ) CK_TRUE;
+    }
+    else if   ( pxSession->pxFindObjectLabel != NULL ) 
+    { 
+        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* coverity[misra_c_2012_rule_10_5_violation] */
+        xResult = ( CK_BBOOL ) CK_TRUE;
+    }
+    else
+    {
+	/* MISRA */
     }
 
     return xResult;
