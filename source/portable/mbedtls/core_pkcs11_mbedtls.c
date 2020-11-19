@@ -378,32 +378,32 @@ static CK_BBOOL prvOperationActive( const P11Session_t * pxSession )
     CK_BBOOL xResult = ( CK_BBOOL ) CK_FALSE;
 
     if( ( pxSession->xOperationDigestMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
-    { 
+    {
         /* See explanation in prvCheckValidSessionAndModule for this exception. */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = ( CK_BBOOL ) CK_TRUE;
     }
-    else if ( ( pxSession->xOperationSignMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
-    { 
+    else if( ( pxSession->xOperationSignMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
+    {
         /* See explanation in prvCheckValidSessionAndModule for this exception. */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = ( CK_BBOOL ) CK_TRUE;
     }
-    else if( (  pxSession->xOperationVerifyMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
-    { 
+    else if( ( pxSession->xOperationVerifyMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
+    {
         /* See explanation in prvCheckValidSessionAndModule for this exception. */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = ( CK_BBOOL ) CK_TRUE;
     }
-    else if   ( pxSession->pxFindObjectLabel != NULL ) 
-    { 
+    else if( pxSession->pxFindObjectLabel != NULL )
+    {
         /* See explanation in prvCheckValidSessionAndModule for this exception. */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = ( CK_BBOOL ) CK_TRUE;
     }
     else
     {
-	/* MISRA */
+        /* MISRA */
     }
 
     return xResult;
