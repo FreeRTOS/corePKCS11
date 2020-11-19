@@ -47,7 +47,7 @@ int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
                                               const uint8_t * pxMbedSignature )
 {
     int8_t xReturn = 0;
-    const uint8_t * pxNextLength;
+    const uint8_t * pxNextLength = NULL;
     uint8_t ucSigComponentLength;
 
     if( ( pxSignaturePKCS == NULL ) || ( pxMbedSignature == NULL ) )
