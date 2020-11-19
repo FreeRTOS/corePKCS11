@@ -26,6 +26,9 @@
  * @brief Stringification utilities for high-level and low-level codes of mbed TLS.
  */
 
+#ifndef _MBEDTLS_ERROR_H_
+#define _MBEDTLS_ERROR_H_
+
 
 #ifdef __cplusplus
     extern "C" {
@@ -56,3 +59,5 @@ const char * mbedtls_strerror_lowlevel( int errnum );
 #ifdef __cplusplus
     }
 #endif
+
+#endif /* _MBEDTLS_ERROR_H_ */

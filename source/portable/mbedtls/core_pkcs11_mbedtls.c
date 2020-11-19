@@ -948,7 +948,7 @@ static void prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
 static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
 {
     CK_RV xResult = CKR_OK;
-    int32_t lGotSemaphore = 0L;
+    int32_t lGotSemaphore = ( int32_t ) 0;
     uint32_t ulIndex = xAppHandle - 1UL;
 
     lGotSemaphore = mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex );
