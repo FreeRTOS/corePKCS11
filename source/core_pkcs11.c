@@ -277,7 +277,7 @@ CK_RV xInitializePkcs11Session( CK_SESSION_HANDLE * pxSession )
     }
 
     /* Open a PKCS #11 session. */
-    if( ( xResult == CKR_OK ) && ( pxSlotId != NULL ) && ( xSlotCount >= 1 ) )
+    if( ( xResult == CKR_OK ) && ( pxSlotId != NULL ) && ( xSlotCount >= 1UL ) )
     {
         /* We will take the first slot available.
          * If your application has multiple slots, insert logic
@@ -346,7 +346,7 @@ CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
         /* Find the first matching object, if any. */
         xResult = pxFunctionList->C_FindObjects( xSession,
                                                  pxHandle,
-                                                 1,
+                                                 1UL,
                                                  &ulCount );
     }
 
