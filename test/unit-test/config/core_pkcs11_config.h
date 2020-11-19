@@ -32,29 +32,28 @@
 #ifndef _AWS_PKCS11_CONFIG_H_
 #define _AWS_PKCS11_CONFIG_H_
 
-/**************************************************/
-/******* DO NOT CHANGE the following order ********/
-/**************************************************/
 
-/* Include logging header files and define logging macros in the following order:
- * 1. Include the header file "logging_levels.h".
- * 2. Define the LIBRARY_LOG_NAME and LIBRARY_LOG_LEVEL macros depending on
- * the logging configuration for PKCS #11.
- * 3. Include the header file "logging_stack.h", if logging is enabled for PKCS #11.
- */
-#include "logging_levels.h"
-
-/* Logging configuration for the PKCS #11 library. */
-#ifndef LIBRARY_LOG_NAME
-    #define LIBRARY_LOG_NAME    "PKCS11"
-#endif
-
-#ifndef LIBRARY_LOG_LEVEL
-    #define LIBRARY_LOG_LEVEL    LOG_NONE
-#endif
-
-#include "logging_stack.h"
 #include "mock_osal.h"
+
+/*
+ * @brief define away log macros.
+ */
+#define DISABLE_LOGGING
+#ifndef LogError
+    #define LogError( message )
+#endif
+
+#ifndef LogWarn
+    #define LogWarn( message )
+#endif
+
+#ifndef LogInfo
+    #define LogInfo( message )
+#endif
+
+#ifndef LogDebug
+    #define LogDebug( message )
+#endif
 
 /**
  * @brief Malloc API used by core_pkcs11.h
@@ -88,13 +87,13 @@
  * @brief Maximum number of token objects that can be stored
  * by the PKCS #11 module.
  */
-#define pkcs11configMAX_NUM_OBJECTS                        6
+#define pkcs11configMAX_NUM_OBJECTS                        ( ( uint32_t ) 6 )
 
 /**
  * @brief Maximum number of sessions that can be stored
  * by the PKCS #11 module.
  */
-#define pkcs11configMAX_SESSIONS                           10
+#define pkcs11configMAX_SESSIONS                           ( ( uint32_t ) 10 )
 
 /**
  * @brief Set to 1 if a PAL destroy object is implemented.

@@ -884,7 +884,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
  * @param[out] pxAppHandle       Pointer to the application handle to be provided.
  *                               CK_INVALID_HANDLE if no object found.
  */
-static void prvFindObjectInListByLabel( const CK_BYTE_PTR pcLabel,
+static void prvFindObjectInListByLabel( const CK_BYTE * pcLabel,
                                         CK_ULONG xLabelLength,
                                         CK_OBJECT_HANDLE_PTR pxPalHandle,
                                         CK_OBJECT_HANDLE_PTR pxAppHandle )
@@ -920,7 +920,7 @@ static void prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
                                          CK_BYTE_PTR * ppcLabel,
                                          CK_ULONG_PTR pxLabelLength )
 {
-    uint32_t ulIndex = xAppHandle - 1UL;
+    uint32_t ulIndex = xAppHandle - ( ( uint32_t ) 1 );
 
     *ppcLabel = NULL;
     *pxLabelLength = 0;
@@ -949,7 +949,7 @@ static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
 {
     CK_RV xResult = CKR_OK;
     int32_t lGotSemaphore = ( int32_t ) 0;
-    uint32_t ulIndex = xAppHandle - 1UL;
+    uint32_t ulIndex = xAppHandle - ( ( uint32_t ) 1 );
 
     lGotSemaphore = mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex );
 
@@ -984,7 +984,7 @@ static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
  */
 static CK_RV prvAddObjectToList( CK_OBJECT_HANDLE xPalHandle,
                                  CK_OBJECT_HANDLE_PTR pxAppHandle,
-                                 const CK_BYTE_PTR pcLabel,
+                                 const CK_BYTE * pcLabel,
                                  CK_ULONG xLabelLength )
 {
     CK_RV xResult = CKR_HOST_MEMORY;
@@ -1073,8 +1073,8 @@ static CK_RV prvAppendEmptyECDerKey( uint8_t * pusECPrivateKey,
     if( ( lCompare == 0 ) && ( *pulActualKeyLength >= 6UL ) )
     {
         /* Do not write the last 6 bytes to key storage. */
-        pusECPrivateKey[ ulDerBufSize - ( uint32_t ) lDerKeyLength + 1UL ] -= ( uint8_t ) 6;
-        *pulActualKeyLength -= 6UL;
+        pusECPrivateKey[ ulDerBufSize - ( uint32_t ) lDerKeyLength + ( ( uint32_t ) 1 ) ] -= ( uint8_t ) 6; 
+        *pulActualKeyLength -= ( ( uint32_t) 6 );
     }
 
     return xResult;
