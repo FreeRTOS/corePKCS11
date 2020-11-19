@@ -1073,8 +1073,8 @@ static CK_RV prvAppendEmptyECDerKey( uint8_t * pusECPrivateKey,
     if( ( lCompare == 0 ) && ( *pulActualKeyLength >= 6UL ) )
     {
         /* Do not write the last 6 bytes to key storage. */
-        pusECPrivateKey[ ulDerBufSize - ( uint32_t ) lDerKeyLength + ( ( uint32_t ) 1 ) ] -= ( uint8_t ) 6; 
-        *pulActualKeyLength -= ( ( uint32_t) 6 );
+        pusECPrivateKey[ ulDerBufSize - ( uint32_t ) lDerKeyLength + ( ( uint32_t ) 1 ) ] -= ( uint8_t ) 6;
+        *pulActualKeyLength -= ( ( uint32_t ) 6 );
     }
 
     return xResult;
