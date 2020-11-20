@@ -1840,7 +1840,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
         /* Increment by one, as invalid handles in PKCS #11 are 0. */
         ++ulSessionCount;
         *phSession = ulSessionCount;
-        LogDebug( ( "Current session count at %d", ( int ) ( ulSessionCount - 1UL ) ) );
+        LogDebug( ( "Current session count at %lu",  ( unsigned long int ) ( ulSessionCount - 1UL ) ) );
     }
 
     return xResult;
