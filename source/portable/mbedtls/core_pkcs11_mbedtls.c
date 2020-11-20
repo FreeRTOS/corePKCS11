@@ -362,7 +362,7 @@ static P11Session_t * prvSessionPointerFromHandle( CK_SESSION_HANDLE xSession )
     }
     else
     {
-        LogDebug( ( "Could not convert from CK_SESSION_HANDLE to P11Session_t pointer. Session handle was out of the valid range. Session handle was: %lu.", xSession ) );
+        LogDebug( ( "Could not convert from CK_SESSION_HANDLE to P11Session_t pointer. Session handle was out of the valid range. Session handle was: %lu.", ( unsigned long int ) xSession ) );
     }
 
     return pxSession;
@@ -501,7 +501,8 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
         case ( CKA_VALUE ):
             *ppxCertificateValue = pxAttribute->pValue;
             *pxCertificateLength = pxAttribute->ulValueLen;
-            LogDebug( ( "Found CKA_VALUE attribute. Certificate value length was: %lu.", pxAttribute->ulValueLen ) );
+            LogDebug( ( "Found CKA_VALUE attribute. Certificate value length was: %lu.", 
+                        ( unsigned long int ) pxAttribute->ulValueLen ) );
             break;
 
         case ( CKA_LABEL ):
@@ -515,7 +516,9 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
             {
                 LogError( ( "Failed parsing certificate template. Label length "
                             "was not in the valid range. Found %lu and expected %lu. "
-                            "Consider updating pkcs11configMAX_LABEL_LENGTH.", pxAttribute->ulValueLen, pkcs11configMAX_LABEL_LENGTH ) );
+                            "Consider updating pkcs11configMAX_LABEL_LENGTH.", 
+                            ( unsigned long int ) pxAttribute->ulValueLen, 
+                            ( unsigned long int ) pkcs11configMAX_LABEL_LENGTH ) );
                 xResult = CKR_DATA_LEN_RANGE;
             }
 
@@ -527,7 +530,8 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
 
             if( *pxCertificateType != CKC_X_509 )
             {
-                LogError( ( "Failed parsing certificate template. Certificate type was invalid. Expected CKC_X_509, but found 0x%0lX.", *pxCertificateType ) );
+                LogError( ( "Failed parsing certificate template. Certificate type was invalid. "
+                            "Expected CKC_X_509, but found 0x%0lX.", ( unsigned long int ) *pxCertificateType ) );
                 xResult = CKR_ATTRIBUTE_VALUE_INVALID;
             }
 
@@ -541,7 +545,8 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
-                LogError( ( "Failed parsing certificate template. Only token key object types are supported. Consider making the CKA_TOKEN type CK_TRUE." ) );
+                LogError( ( "Failed parsing certificate template. Only token key object "
+                            "types are supported. Consider making the CKA_TOKEN type CK_TRUE." ) );
                 xResult = CKR_ATTRIBUTE_VALUE_INVALID;
             }
 
@@ -549,13 +554,14 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
 
         case ( CKA_CLASS ):
         case ( CKA_SUBJECT ):
-            LogDebug( ( "Received attribute type 0x%0X and ignored it.", pxAttribute->type ) );
+            LogDebug( ( "Received attribute type 0x%0lX and ignored it.", ( unsigned long int ) pxAttribute->type ) );
 
             /* Do nothing.  This was already parsed out of the template previously. */
             break;
 
         default:
-            LogError( ( "Failed parsing certificate template. Received an unknown template type with value 0x%0lX.", pxAttribute->type ) );
+            LogError( ( "Failed parsing certificate template. Received an unknown "
+                        "template type with value 0x%0lX.", ( unsigned long int ) pxAttribute->type ) );
             xResult = CKR_ATTRIBUTE_TYPE_INVALID;
             break;
     }
@@ -654,7 +660,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             break;
 
         default:
-            LogError( ( "Failed to parse RSA private key template. Unknown attribute type 0x%0lX found for RSA private key.", pxAttribute->type ) );
+            LogError( ( "Failed to parse RSA private key template. Unknown attribute type 0x%0lX "
+                        "found for RSA private key.", ( unsigned long int ) pxAttribute->type ) );
             xResult = CKR_ATTRIBUTE_TYPE_INVALID;
             break;
     }
@@ -787,7 +794,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             case ( CKA_CLASS ):
             case ( CKA_KEY_TYPE ):
             case ( CKA_LABEL ):
-                LogDebug( ( "Received attribute type 0x%0X and ignored it.", pxAttribute->type ) );
+                LogDebug( ( "Received attribute type 0x%0lX and ignored it.", ( unsigned long int ) pxAttribute->type ) );
                 /* Do nothing. These attribute types were checked previously. */
                 break;
 
@@ -860,7 +867,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
             default:
                 LogError( ( "Failed parsing EC key template. Unknown attribute "
-                            "0x%0lX found for an EC key.", pxAttribute->type ) );
+                            "0x%0lX found for an EC key.", ( unsigned long int ) pxAttribute->type ) );
                 xResult = CKR_ATTRIBUTE_TYPE_INVALID;
                 break;
         }
@@ -1125,7 +1132,7 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
         }
     }
 
-    LogDebug( ( "Allocating a %lu bytes sized buffer to write the key to.", ulDerBufSize ) );
+    LogDebug( ( "Allocating a %lu bytes sized buffer to write the key to.", ( unsigned long int ) ulDerBufSize ) );
     pxDerKey = mbedtls_calloc( 1, ulDerBufSize );
 
     if( pxDerKey == NULL )
@@ -1347,7 +1354,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pInitArgs )
         }
         else
         {
-            LogError( ( "Failed to initialize PKCS #11. PAL failed with error code: 0x%0lX", xResult ) );
+            LogError( ( "Failed to initialize PKCS #11. PAL failed with error code: 0x%0lX", ( unsigned long int ) xResult ) );
         }
     }
     else
@@ -1571,7 +1578,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetSlotList )( CK_BBOOL tokenPresent,
                 pSlotList[ 0 ] = pkcs11SLOT_ID;
                 *pulCount = 1;
                 LogDebug( ( "Successfully Returned a PKCS #11 slot with ID "
-                            "%lu with a count of %lu.", pkcs11SLOT_ID, *pulCount ) );
+                            "%lu with a count of %lu.", ( unsigned long int ) pkcs11SLOT_ID, ( unsigned long int ) *pulCount ) );
             }
         }
     }
@@ -1806,7 +1813,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
          */
         pxSessionObj->ulState =
             ( 0UL != ( flags & CKF_RW_SESSION ) ) ? CKS_RW_PUBLIC_SESSION : CKS_RO_PUBLIC_SESSION;
-        LogDebug( ( "Assigned a 0x%0X Type Session.", pxSessionObj->ulState ) );
+        LogDebug( ( "Assigned a 0x%0lX Type Session.", ( unsigned long int ) pxSessionObj->ulState ) );
     }
 
     /*
@@ -1833,7 +1840,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
         /* Increment by one, as invalid handles in PKCS #11 are 0. */
         ++ulSessionCount;
         *phSession = ulSessionCount;
-        LogDebug( ( "Current session count at %d", ( ulSessionCount - 1UL ) ) );
+        LogDebug( ( "Current session count at %d", ( int ) ( ulSessionCount - 1UL ) ) );
     }
 
     return xResult;
@@ -2416,7 +2423,7 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
     else
     {
         LogError( ( "Failed to create public key. Received an invalid mechanism. "
-                    "Invalid key type 0x%0lX", xKeyType ) );
+                    "Invalid key type 0x%0lX", ( unsigned long int ) xKeyType ) );
         xResult = CKR_MECHANISM_INVALID;
     }
 
@@ -2499,7 +2506,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_CreateObject )( CK_SESSION_HANDLE hSession,
 
     if( xResult == CKR_OK )
     {
-        LogInfo( ( "Creating a 0x%0lX type object.", xClass ) );
+        LogInfo( ( "Creating a 0x%0lX type object.", ( unsigned long int ) xClass ) );
 
         switch( xClass )
         {
@@ -2548,7 +2555,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE hSession,
     if( xResult == CKR_OK )
     {
         xResult = PKCS11_PAL_DestroyObject( hObject );
-        LogDebug( ( "PKCS11_PAL_DestroyObject returned 0x%0X", xResult ) );
+        LogDebug( ( "PKCS11_PAL_DestroyObject returned 0x%0lX", ( unsigned long int ) xResult ) );
     }
     else
     {
@@ -2752,7 +2759,9 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                         {
                             LogError( ( "Failed to parse attribute. Buffer was "
                                         "too small to contain data. Expected %lu "
-                                        "but got %lu.", ulLength, pTemplate[ iAttrib ].ulValueLen ) );
+                                        "but got %lu.", 
+                                        ( unsigned long int ) ulLength, 
+                                        ( unsigned long int ) pTemplate[ iAttrib ].ulValueLen ) );
                             xResult = CKR_BUFFER_TOO_SMALL;
                         }
                         else
@@ -2949,7 +2958,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE hSession,
         xResult = CKR_ARGUMENTS_BAD;
         LogError( ( "Failed to initialize find object operation. Find objects "
                     "does not support searching by %lu attributes. Expected to "
-                    "search with either 1 or 2 attributes.", ulCount ) );
+                    "search with either 1 or 2 attributes.", ( unsigned long int ) ulCount ) );
     }
 
     if( xResult == CKR_OK )
@@ -2981,7 +2990,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE hSession,
         else
         {
             LogError( ( "Failed to initialize find object operation. Failed to "
-                        "allocate %lu bytes.", pTemplate->ulValueLen + 1UL ) );
+                        "allocate %lu bytes.", ( unsigned long int ) pTemplate->ulValueLen + 1UL ) );
             xResult = CKR_HOST_MEMORY;
         }
     }
@@ -3425,7 +3434,9 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
             {
                 LogError( ( "Failed to finish digest operation. Received a "
                             "buffer that was too small. Expected %lu and "
-                            "received %lu.", pkcs11SHA256_DIGEST_LENGTH, *pulDigestLen ) );
+                            "received %lu.", 
+                            ( unsigned long int ) pkcs11SHA256_DIGEST_LENGTH, 
+                            ( unsigned long int ) *pulDigestLen ) );
                 xResult = CKR_BUFFER_TOO_SMALL;
             }
             else
@@ -3532,7 +3543,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
             if( xResult != CKR_OK )
             {
                 LogError( ( "Failed to initialize sign operation. Unable to "
-                            "retrieve value of private key for signing 0x%0lX.", xResult ) );
+                            "retrieve value of private key for signing 0x%0lX.", ( unsigned long int ) xResult ) );
                 xResult = CKR_KEY_HANDLE_INVALID;
             }
         }
@@ -3608,7 +3619,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
             if( xKeyType != MBEDTLS_PK_RSA )
             {
                 LogError( ( "Failed to initialize sign operation. Signing key "
-                            "type (0x%0X) does not match RSA mechanism.", xKeyType ) );
+                            "type (0x%0lX) does not match RSA mechanism.", ( unsigned long int ) xKeyType ) );
                 xResult = CKR_KEY_TYPE_INCONSISTENT;
             }
         }
@@ -3617,14 +3628,14 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
             if( ( xKeyType != MBEDTLS_PK_ECDSA ) && ( xKeyType != MBEDTLS_PK_ECKEY ) )
             {
                 LogError( ( "Failed to initialize sign operation. Signing key "
-                            "type (0x%0X) does not match ECDSA mechanism.", xKeyType ) );
+                            "type (0x%0lX) does not match ECDSA mechanism.", ( unsigned long int ) xKeyType ) );
                 xResult = CKR_KEY_TYPE_INCONSISTENT;
             }
         }
         else
         {
             LogError( ( "Failed to initialize sign operation. Unsupported "
-                        "mechanism type (0x%0lX).", pMechanism->mechanism ) );
+                        "mechanism type (0x%0lX).", ( unsigned long int ) pMechanism->mechanism ) );
             xResult = CKR_MECHANISM_INVALID;
         }
     }
@@ -3730,7 +3741,9 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
             {
                 LogError( ( "Failed sign operation. The signature buffer was "
                             "too small. Expected: %lu bytes and received %lu "
-                            "bytes.", xSignatureLength, *pulSignatureLen ) );
+                            "bytes.", 
+                            ( unsigned long int ) xSignatureLength, 
+                            ( unsigned long int ) *pulSignatureLen ) );
                 xResult = CKR_BUFFER_TOO_SMALL;
             }
 
@@ -3741,7 +3754,9 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                 {
                     LogError( ( "Failed sign operation. The data buffer was "
                                 "too small. Expected: %lu bytes and received "
-                                "%lu bytes.", xExpectedInputLength, ulDataLen ) );
+                                "%lu bytes.", 
+                                ( unsigned long int ) xExpectedInputLength, 
+                                ( unsigned long int ) ulDataLen ) );
                     xResult = CKR_DATA_LEN_RANGE;
                 }
             }
@@ -3896,7 +3911,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
             if( xResult != CKR_OK )
             {
                 LogError( ( "Failed to initialize verify operation. Unable to "
-                            "retrieve value of private key for signing 0x%0lX.", xResult ) );
+                            "retrieve value of private key for signing 0x%0lX.", 
+                            ( unsigned long int ) xResult ) );
             }
         }
         else
@@ -3978,8 +3994,9 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
             if( xKeyType != MBEDTLS_PK_RSA )
             {
                 LogError( ( "Failed to initialize verify operation. "
-                            "Verification key type (0x%0X) does not match "
-                            "RSA mechanism.", xKeyType ) );
+                            "Verification key type (0x%0lX) does not match "
+                            "RSA mechanism.", 
+                            ( unsigned long int ) xKeyType ) );
                 xResult = CKR_KEY_TYPE_INCONSISTENT;
             }
         }
@@ -3988,22 +4005,24 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
             if( ( xKeyType != MBEDTLS_PK_ECDSA ) && ( xKeyType != MBEDTLS_PK_ECKEY ) )
             {
                 LogError( ( "Failed to initialize verify operation. "
-                            "Verification key type (0x%0X) does not match "
-                            "ECDSA mechanism.", xKeyType ) );
+                            "Verification key type (0x%0lX) does not match "
+                            "ECDSA mechanism.", 
+                            ( unsigned long int ) xKeyType ) );
                 xResult = CKR_KEY_TYPE_INCONSISTENT;
             }
         }
         else
         {
             LogError( ( "Failed to initialize verify operation. Unsupported "
-                        "mechanism type 0x%0lX", pMechanism->mechanism ) );
+                        "mechanism type 0x%0lX", 
+                        ( unsigned long int ) pMechanism->mechanism ) );
             xResult = CKR_MECHANISM_INVALID;
         }
     }
 
     if( xResult == CKR_OK )
     {
-        LogDebug( ( "Verify mechanism set to 0x%0X.", pMechanism->mechanism ) );
+        LogDebug( ( "Verify mechanism set to 0x%0lX.", ( unsigned long int ) pMechanism->mechanism ) );
         pxSession->xOperationVerifyMechanism = pMechanism->mechanism;
     }
 
@@ -4524,7 +4543,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
         if( pucDerFile == NULL )
         {
             LogError( ( "Failed generating a key pair. Could not allocated a "
-                        "buffer of size %u bytes.", pkcs11KEY_GEN_MAX_DER_SIZE ) );
+                        "buffer of size %u bytes.", ( unsigned int ) pkcs11KEY_GEN_MAX_DER_SIZE ) );
             xResult = CKR_HOST_MEMORY;
         }
     }
@@ -4629,7 +4648,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
         {
             xPalPublic = PKCS11_PAL_SaveObject( pxPublicLabel, pucDerFile + pkcs11KEY_GEN_MAX_DER_SIZE - lMbedTLSResult, ( uint32_t ) lMbedTLSResult );
             LogDebug( ( "PKCS11_PAL_SaveObject returned a %lu PAL handle value "
-                        "for the public key." ) );
+                        "for the public key.", ( unsigned long int ) xPalPublic ) );
         }
         else
         {
@@ -4649,7 +4668,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
         {
             xPalPrivate = PKCS11_PAL_SaveObject( pxPrivateLabel, pucDerFile + pkcs11KEY_GEN_MAX_DER_SIZE - lMbedTLSResult, ( uint32_t ) lMbedTLSResult );
             LogDebug( ( "PKCS11_PAL_SaveObject returned a %lu PAL handle value "
-                        "for the private key." ) );
+                        "for the private key.", ( unsigned long int ) xPalPrivate ) );
         }
         else
         {
@@ -4672,7 +4691,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
             if( xResult != CKR_OK )
             {
                 ( void ) PKCS11_PAL_DestroyObject( *phPrivateKey );
-                LogDebug( ( "Destroyed %lu private key handle due to errors.", *phPrivateKey ) );
+                LogDebug( ( "Destroyed %lu private key handle due to errors.", ( unsigned long int ) *phPrivateKey ) );
             }
         }
         else
@@ -4734,7 +4753,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateRandom )( CK_SESSION_HANDLE hSession,
         }
         else
         {
-            LogDebug( ( "Successfully generated %lu random bytes.", ulRandomLen ) );
+            LogDebug( ( "Successfully generated %lu random bytes.", ( unsigned long int ) ulRandomLen ) );
         }
     }
 
