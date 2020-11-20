@@ -33,8 +33,8 @@
 
 void harness()
 {
-
     CK_FUNCTION_LIST_PTR pFunctionList;
+
     ( void ) C_GetFunctionList( &pFunctionList );
     ( void ) C_GetFunctionList( NULL ); /* Unhappy path. */
 }

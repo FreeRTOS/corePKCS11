@@ -33,21 +33,21 @@
 
 void harness()
 {
-  CK_BBOOL xToken;
-  CK_ULONG ulSlotSize;
-  CK_RV xResult;
+    CK_BBOOL xToken;
+    CK_ULONG ulSlotSize;
+    CK_RV xResult;
 
     /* Respect the API contract. PKCS #11 MUST be initialized before getting a slot. */
-  xResult = C_Initialize( NULL );
-  __CPROVER_assume( xResult == CKR_OK );
+    xResult = C_Initialize( NULL );
+    __CPROVER_assume( xResult == CKR_OK );
 
-  /* At the time of writing this proof corePKCS11 only has one slot.
-   * Should this change please change the below assumption to new 
-   * number of slots.
-   */
-  __CPROVER_assume( ulSlotSize <= 1 );
-  CK_SLOT_ID_PTR pxSlot = nondet_bool() ? malloc( sizeof( CK_SLOT_ID ) * ulSlotSize ): NULL;
+    /* At the time of writing this proof corePKCS11 only has one slot.
+     * Should this change please change the below assumption to new
+     * number of slots.
+     */
+    __CPROVER_assume( ulSlotSize <= 1 );
+    CK_SLOT_ID_PTR pxSlot = nondet_bool() ? malloc( sizeof( CK_SLOT_ID ) * ulSlotSize ) : NULL;
 
-  ( void ) C_GetSlotList( xToken, pxSlot, &ulSlotSize );
-  ( void ) C_GetSlotList( xToken, pxSlot, NULL );
+    ( void ) C_GetSlotList( xToken, pxSlot, &ulSlotSize );
+    ( void ) C_GetSlotList( xToken, pxSlot, NULL );
 }
