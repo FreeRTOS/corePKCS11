@@ -14,6 +14,6 @@ set( PKCS_SOURCES
 
  # PKCS library Public Include directories.
  set( PKCS_INCLUDE_PUBLIC_DIRS
-     "${CMAKE_CURRENT_LIST_DIR}/3rdparty/pkcs11"
+     "${CMAKE_CURRENT_LIST_DIR}/source/dependency/3rdparty/pkcs11"
      "${CMAKE_CURRENT_LIST_DIR}/source/include"
      )

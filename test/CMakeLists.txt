@@ -42,7 +42,7 @@ add_library( coverity_analysis
 target_compile_definitions( coverity_analysis PUBLIC -DMBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" )
 
 # corePKCS11 public include path.
-target_include_directories( coverity_analysis PUBLIC ${PKCS_INCLUDE_PUBLIC_DIRS} ${MODULE_ROOT_DIR}/3rdparty/mbedtls/include ${MODULE_ROOT_DIR}/3rdparty/mbedtls_utils ${MODULE_ROOT_DIR}/test/unit-test/config )
+target_include_directories( coverity_analysis PUBLIC ${PKCS_INCLUDE_PUBLIC_DIRS} ${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include ${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls_utils ${MODULE_ROOT_DIR}/test/unit-test/config )
 
 #  ====================================  Test Configuration ========================================
 

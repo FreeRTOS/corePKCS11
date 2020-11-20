@@ -9,8 +9,8 @@ HARNESS_FILE = C_OpenSession_harness
 PROOF_UID = C_OpenSession
 
 DEFINES +=
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls/include
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY +=
 UNWINDSET +=
