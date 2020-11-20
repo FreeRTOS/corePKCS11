@@ -2,4 +2,15 @@ name : "corePKCS11"
 version: "v2.0.0"
 description: |
   "Software implementation of the PKCS #11 standard.\n"
+dependencies:
+  - name : "mbedtls"
+    version: "v2.16.8"
+    repository:
+      type: "git"
+      url: "https://github.com/ARMmbed/mbedtls/"
+  - name : "pkcs11"
+    version: "v2.40"
+    repository:
+      type: "git"
+      url: "https://github.com/amazon-freertos/pkcs11"
 license: "MIT"
