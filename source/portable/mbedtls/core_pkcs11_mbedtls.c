@@ -501,12 +501,11 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
         case ( CKA_VALUE ):
             *ppxCertificateValue = pxAttribute->pValue;
             *pxCertificateLength = pxAttribute->ulValueLen;
-            LogDebug( ( "Found CKA_VALUE attribute. Certificate value length was: %lu.", 
+            LogDebug( ( "Found CKA_VALUE attribute. Certificate value length was: %lu.",
                         ( unsigned long int ) pxAttribute->ulValueLen ) );
             break;
 
         case ( CKA_LABEL ):
-            LogDebug( ( "Found CKA_LABEL attribute." ) );
 
             if( pxAttribute->ulValueLen <= pkcs11configMAX_LABEL_LENGTH )
             {
@@ -516,8 +515,8 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
             {
                 LogError( ( "Failed parsing certificate template. Label length "
                             "was not in the valid range. Found %lu and expected %lu. "
-                            "Consider updating pkcs11configMAX_LABEL_LENGTH.", 
-                            ( unsigned long int ) pxAttribute->ulValueLen, 
+                            "Consider updating pkcs11configMAX_LABEL_LENGTH.",
+                            ( unsigned long int ) pxAttribute->ulValueLen,
                             ( unsigned long int ) pkcs11configMAX_LABEL_LENGTH ) );
                 xResult = CKR_DATA_LEN_RANGE;
             }
@@ -525,7 +524,6 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
             break;
 
         case ( CKA_CERTIFICATE_TYPE ):
-            LogDebug( ( "Found CKA_CERTIFICATE_TYPE." ) );
             ( void ) memcpy( pxCertificateType, pxAttribute->pValue, sizeof( CK_CERTIFICATE_TYPE ) );
 
             if( *pxCertificateType != CKC_X_509 )
@@ -538,15 +536,12 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
             break;
 
         case ( CKA_TOKEN ):
-            LogDebug( ( "Found CKA_TOKEN." ) );
             ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
-                LogError( ( "Failed parsing certificate template. Only token key object "
-                            "types are supported. Consider making the CKA_TOKEN type CK_TRUE." ) );
                 xResult = CKR_ATTRIBUTE_VALUE_INVALID;
             }
 
@@ -554,8 +549,6 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
 
         case ( CKA_CLASS ):
         case ( CKA_SUBJECT ):
-            LogDebug( ( "Received attribute type 0x%0lX and ignored it.", ( unsigned long int ) pxAttribute->type ) );
-
             /* Do nothing.  This was already parsed out of the template previously. */
             break;
 
@@ -595,8 +588,6 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
-                LogError( ( "Failed to parse RSA private key template. Expected "
-                            "to receive CK_TRUE for CKA_TOKEN or CKA_SIGN." ) );
                 xResult = CKR_ATTRIBUTE_VALUE_INVALID;
             }
 
@@ -1840,7 +1831,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
         /* Increment by one, as invalid handles in PKCS #11 are 0. */
         ++ulSessionCount;
         *phSession = ulSessionCount;
-        LogDebug( ( "Current session count at %lu",  ( unsigned long int ) ( ulSessionCount - 1UL ) ) );
+        LogDebug( ( "Current session count at %lu", ( unsigned long int ) ( ulSessionCount - 1UL ) ) );
     }
 
     return xResult;
@@ -2759,8 +2750,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                         {
                             LogError( ( "Failed to parse attribute. Buffer was "
                                         "too small to contain data. Expected %lu "
-                                        "but got %lu.", 
-                                        ( unsigned long int ) ulLength, 
+                                        "but got %lu.",
+                                        ( unsigned long int ) ulLength,
                                         ( unsigned long int ) pTemplate[ iAttrib ].ulValueLen ) );
                             xResult = CKR_BUFFER_TOO_SMALL;
                         }
@@ -3434,8 +3425,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
             {
                 LogError( ( "Failed to finish digest operation. Received a "
                             "buffer that was too small. Expected %lu and "
-                            "received %lu.", 
-                            ( unsigned long int ) pkcs11SHA256_DIGEST_LENGTH, 
+                            "received %lu.",
+                            ( unsigned long int ) pkcs11SHA256_DIGEST_LENGTH,
                             ( unsigned long int ) *pulDigestLen ) );
                 xResult = CKR_BUFFER_TOO_SMALL;
             }
@@ -3741,8 +3732,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
             {
                 LogError( ( "Failed sign operation. The signature buffer was "
                             "too small. Expected: %lu bytes and received %lu "
-                            "bytes.", 
-                            ( unsigned long int ) xSignatureLength, 
+                            "bytes.",
+                            ( unsigned long int ) xSignatureLength,
                             ( unsigned long int ) *pulSignatureLen ) );
                 xResult = CKR_BUFFER_TOO_SMALL;
             }
@@ -3754,8 +3745,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                 {
                     LogError( ( "Failed sign operation. The data buffer was "
                                 "too small. Expected: %lu bytes and received "
-                                "%lu bytes.", 
-                                ( unsigned long int ) xExpectedInputLength, 
+                                "%lu bytes.",
+                                ( unsigned long int ) xExpectedInputLength,
                                 ( unsigned long int ) ulDataLen ) );
                     xResult = CKR_DATA_LEN_RANGE;
                 }
@@ -3911,7 +3902,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
             if( xResult != CKR_OK )
             {
                 LogError( ( "Failed to initialize verify operation. Unable to "
-                            "retrieve value of private key for signing 0x%0lX.", 
+                            "retrieve value of private key for signing 0x%0lX.",
                             ( unsigned long int ) xResult ) );
             }
         }
@@ -3995,7 +3986,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
             {
                 LogError( ( "Failed to initialize verify operation. "
                             "Verification key type (0x%0lX) does not match "
-                            "RSA mechanism.", 
+                            "RSA mechanism.",
                             ( unsigned long int ) xKeyType ) );
                 xResult = CKR_KEY_TYPE_INCONSISTENT;
             }
@@ -4006,7 +3997,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
             {
                 LogError( ( "Failed to initialize verify operation. "
                             "Verification key type (0x%0lX) does not match "
-                            "ECDSA mechanism.", 
+                            "ECDSA mechanism.",
                             ( unsigned long int ) xKeyType ) );
                 xResult = CKR_KEY_TYPE_INCONSISTENT;
             }
@@ -4014,7 +4005,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
         else
         {
             LogError( ( "Failed to initialize verify operation. Unsupported "
-                        "mechanism type 0x%0lX", 
+                        "mechanism type 0x%0lX",
                         ( unsigned long int ) pMechanism->mechanism ) );
             xResult = CKR_MECHANISM_INVALID;
         }
