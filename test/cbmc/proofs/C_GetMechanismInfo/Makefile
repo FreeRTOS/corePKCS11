@@ -15,7 +15,7 @@ INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls_utils
 REMOVE_FUNCTION_BODY +=
 
 # Add the time of writing this proof, 5 mechanisms are supported.
-# One extra unwind for 
+# One extra unwind to prove memory safety.
 UNWINDSET +=  C_GetMechanismInfo.0:6
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
