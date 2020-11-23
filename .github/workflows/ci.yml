@@ -65,7 +65,16 @@ jobs:
   spell-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Parent Repo
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          repository: aws/aws-iot-device-sdk-embedded-C
+      - run: rm -r libraries/standard/corePKCS11
+      - name: Clone This Repo
+        uses: actions/checkout@v2
+        with:
+          path: libraries/standard/corePKCS11
       - name: Install spell
         run: |
           sudo apt-get install spell
@@ -73,7 +82,8 @@ jobs:
       - name: Check spelling
         run: |
           PATH=$PATH:$PWD/tools/spell
-          find-unknown-comment-words --directory source/
+          sed -i 's/find $DIRNAME/find $DIRNAME -not -path '*test*' -not -path '*dependency*'/g' tools/spell/find-unknown-comment-words
+          find-unknown-comment-words --directory libraries/standard/corePKCS11
           if [ "$?" = "0" ]; then
             exit 0
           else
