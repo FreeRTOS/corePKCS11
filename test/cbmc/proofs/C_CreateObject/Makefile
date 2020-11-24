@@ -20,8 +20,8 @@ TEMPLATE_SIZE=6
 
 DEFINES += -DTEMPLATE_SIZE=$(TEMPLATE_SIZE)
 
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls/include
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY += C_Initialize
 REMOVE_FUNCTION_BODY += C_Finalize

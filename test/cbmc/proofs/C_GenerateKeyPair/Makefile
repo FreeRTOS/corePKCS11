@@ -8,9 +8,12 @@ HARNESS_FILE = C_GenerateKeyPair_harness
 # Litani dashboard. It can be human-readable and contain spaces if you wish.
 PROOF_UID = C_GenerateKeyPair
 
-DEFINES +=
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls/include
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls_utils
+TEMPLATE_SIZE=10
+
+DEFINES += -DTEMPLATE_SIZE=$(TEMPLATE_SIZE)
+
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY += C_Initialize
 REMOVE_FUNCTION_BODY += C_Finalize
@@ -26,12 +29,13 @@ UNWINDSET += harness.0:10
 UNWINDSET += harness.1:10
 UNWINDSET += memcmp.0:32
 UNWINDSET += memcpy.0:32
+
 # The nested memcmp in this loop will exponentially increase the CBMC bounds checking.
 # Be very careful increasing this. At the time of writing this, the PKCS stack was
 # configured to store just one object.
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvAddObjectToList.0:2
-UNWINDSET += C_GenerateKeyPair.0:10
-UNWINDSET += C_GenerateKeyPair.1:10
+UNWINDSET += C_GenerateKeyPair.0:$(TEMPLATE_SIZE)
+UNWINDSET += C_GenerateKeyPair.1:$(TEMPLATE_SIZE)
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/mbedtls_stubs.c

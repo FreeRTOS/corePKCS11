@@ -29,7 +29,6 @@
  */
 
 #include <stddef.h>
-#include <string.h>
 #include <stdlib.h>
 #include "mbedtls/ecp.h"
 #include "mbedtls/oid.h"
@@ -77,11 +76,11 @@ void harness()
     CK_ULONG ulPubKeyAttrLen;
     CK_ULONG ulPrivKeyAttrLen;
 
-    __CPROVER_assume( ulPrivKeyAttrLen > 0 && ulPubKeyAttrLen < 10 );
+    __CPROVER_assume( ulPrivKeyAttrLen > 0 && ulPubKeyAttrLen < TEMPLATE_SIZE );
     pxPublicKey = malloc( sizeof( CK_ATTRIBUTE ) * ulPubKeyAttrLen );
     __CPROVER_assume( pxPublicKey  != NULL );
 
-    __CPROVER_assume( ulPrivKeyAttrLen > 0 && ulPrivKeyAttrLen < 10 );
+    __CPROVER_assume( ulPrivKeyAttrLen > 0 && ulPrivKeyAttrLen < TEMPLATE_SIZE );
     pxPrivateKey = malloc( sizeof( CK_ATTRIBUTE ) * ulPrivKeyAttrLen );
     __CPROVER_assume( pxPrivateKey != NULL );
 
@@ -95,15 +94,18 @@ void harness()
     for(int i = 0; i< ulPrivKeyAttrLen; i++)
     {
         /* Currently a 2048 bit RSA private key is the largest supported object. */
-        __CPROVER_assume( ( pxPrivateKey[i].ulValueLen > 0 ) && 
-                ( pxPrivateKey[i].ulValueLen <= 300 ) );
+        __CPROVER_assume( pxPrivateKey[i].ulValueLen <= 1200 );
         pxPrivateKey[i].pValue = malloc( pxPrivateKey[i].ulValueLen );
         __CPROVER_assume( pxPrivateKey[i].pValue != NULL );
     }
 
      __CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
-    ( void ) C_GenerateKeyPair( xSession, &xMechanism, pxPublicKey,
+    ( void ) C_GenerateKeyPair( xSession, 
+                                 &xMechanism, 
+                                 pxPublicKey,
                                  ulPubKeyAttrLen,
-                                 pxPrivateKey, ulPrivKeyAttrLen,
-                                 &xPubKeyHandle, &xPrivKeyHandle );
+                                 pxPrivateKey, 
+                                 ulPrivKeyAttrLen,
+                                 &xPubKeyHandle, 
+                                 &xPrivKeyHandle );
 }
