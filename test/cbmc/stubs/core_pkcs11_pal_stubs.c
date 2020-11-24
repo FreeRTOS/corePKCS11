@@ -25,6 +25,8 @@
  * @brief Stubs to mock calls to core PKCS #11 PAL.
  */
 
+#include <stddef.h>
+
 #include "core_pkcs11.h"
 #include "core_pkcs11_pal.h"
 
@@ -38,5 +40,9 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
                                  CK_ULONG_PTR pulDataSize,
                                  CK_BBOOL * pIsPrivate )
 {
+    __CPROVER_assert( ppucData != NULL, "ppucData was NULL." );
+    __CPROVER_assert( pulDataSize != NULL, "pulDataSize was NULL." );
+    __CPROVER_assert( pIsPrivate != NULL, "pIsPrivate was NULL." );
+    nondet_bool() ? ( *pIsPrivate = CK_TRUE ) : ( *pIsPrivate = CK_FALSE );
     return CKR_OK;
 }
