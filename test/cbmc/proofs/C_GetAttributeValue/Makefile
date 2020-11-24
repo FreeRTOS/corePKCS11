@@ -20,8 +20,8 @@ INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY +=
 
-# In the harness we are going to assume 8 as there are only 7 cases we care about in the loop, plus 1 for the 
-# default in the switch statement. We will unroll 1 extra time for good measure .
+# In the harness we are going to assume 8 as there are only 7 cases we care about in the loop, plus 1 for the
+# default in the switch statement. We will unroll 1 extra time for good measure.
 # The number is arbitrary, but we bound the loop so it doesn't check forever.
 # NOTE: If this proof is slow we can reduce this unwind.
 UNWINDSET += C_GetAttributeValue.0:$(UNWIND_SIZE)
