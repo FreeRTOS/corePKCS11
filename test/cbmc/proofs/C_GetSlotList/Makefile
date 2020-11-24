@@ -9,8 +9,8 @@ HARNESS_FILE = C_GetSlotList_harness
 PROOF_UID = C_GetSlotList
 
 DEFINES +=
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls/include
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 # This proof doesn't care about these stubs
 REMOVE_FUNCTION_BODY += C_Finalize
