@@ -62,6 +62,8 @@
 #define EC_PARAMS_LENGTH    10
 #define EC_D_LENGTH         32
 
+#define pkcs11EC_POINT_LENGTH                 ( ( 32UL * 2UL ) + 1UL + 1UL + 1UL )
+
 #define EC_PRIV_KEY_INITIALIZER                                                            \
     {                                                                                      \
         { CKA_CLASS, &xPrivateKeyClass, sizeof( CK_OBJECT_CLASS ) },                       \
@@ -1985,7 +1987,7 @@ void test_pkcs11_C_GetAttributeValueAttParsing( void )
     CK_ULONG ulLength = 1;
     CK_BYTE pulKnownBuf[] = pkcs11DER_ENCODED_OID_P256;
     CK_BYTE pulBuf[ sizeof( pulKnownBuf ) ] = { 0 };
-    CK_BYTE ulPoint = 0;
+    CK_BYTE ulPoint [ pkcs11EC_POINT_LENGTH ] = { 0 };
     CK_BYTE ulKnownPoint = 0x04;
     CK_BBOOL xIsPrivate = CK_FALSE;
     CK_OBJECT_CLASS xPrivateKeyClass = { 0 };
@@ -2023,16 +2025,14 @@ void test_pkcs11_C_GetAttributeValueAttParsing( void )
         xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
-        /* This is hard coded in the library. We need to update this test case and the
-         * library code to either have this in the config or use a macro instead of a magic number. */
-        TEST_ASSERT_EQUAL( 67, xTemplate.ulValueLen );
+        TEST_ASSERT_EQUAL( pkcs11EC_POINT_LENGTH, xTemplate.ulValueLen );
 
         xTemplate.pValue = &ulPoint;
         xTemplate.ulValueLen = sizeof( ulPoint );
 
         xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
-        TEST_ASSERT_EQUAL( ulKnownPoint, ulPoint );
+        TEST_ASSERT_EQUAL( ulKnownPoint, ulPoint [ 0 ] );
 
         xTemplate.pValue = &ulPoint;
         xTemplate.ulValueLen = sizeof( ulPoint );
