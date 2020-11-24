@@ -523,6 +523,7 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
             break;
 
         case ( CKA_CERTIFICATE_TYPE ):
+
             if( pxAttribute->ulValueLen >= sizeof( CK_CERTIFICATE_TYPE ) )
             {
                 ( void ) memcpy( pxCertificateType, pxAttribute->pValue, sizeof( CK_CERTIFICATE_TYPE ) );
@@ -538,6 +539,7 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
             break;
 
         case ( CKA_TOKEN ):
+
             if( pxAttribute->ulValueLen >= sizeof( CK_BBOOL ) )
             {
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
@@ -584,8 +586,10 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
         case ( CKA_LABEL ):
             /* Do nothing. These values were parsed previously. */
             break;
+
         case ( CKA_SIGN ):
         case ( CKA_TOKEN ):
+
             if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
             {
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
@@ -807,6 +811,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
             case ( CKA_TOKEN ):
                 pxEcBoolAtt = ( CK_BBOOL * ) pxAttribute->pValue;
+
                 if( pxAttribute->ulValueLen >= sizeof( CK_BBOOL ) )
                 {
                     ( void ) memcpy( &xBool, pxEcBoolAtt, sizeof( CK_BBOOL ) );
@@ -838,6 +843,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
             case ( CKA_VERIFY ):
             case ( CKA_EC_POINT ):
+
                 /* See explanation in prvCheckValidSessionAndModule for this exception. */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 if( xIsPrivate == ( CK_BBOOL ) CK_FALSE )
@@ -856,6 +862,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
             case ( CKA_SIGN ):
             case ( CKA_VALUE ):
+
                 /* See explanation in prvCheckValidSessionAndModule for this exception. */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
@@ -1181,7 +1188,7 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
         xResult = prvAppendEmptyECDerKey( pxDerKey, ulDerBufSize, lDerKeyLength, &ulActualKeyLength );
     }
 
-    if( ( xResult == CKR_OK ) && ( lDerKeyLength < ulDerBufSize ) && ( lDerKeyLength > 0) )
+    if( ( xResult == CKR_OK ) && ( lDerKeyLength < ulDerBufSize ) && ( lDerKeyLength > 0 ) )
     {
         xPalHandle = PKCS11_PAL_SaveObject( pxLabel,
                                             pxDerKey + ( ulDerBufSize - ( uint32_t ) lDerKeyLength ),
@@ -4273,6 +4280,7 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_KEY_TYPE ):
+
             if( pxAttribute->ulValueLen == sizeof( CK_ULONG ) )
             {
                 ( void ) memcpy( &xTemp, pxAttribute->pValue, sizeof( CK_ULONG ) );
@@ -4288,6 +4296,7 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_SIGN ):
+
             if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
             {
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
@@ -4307,6 +4316,7 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_PRIVATE ):
+
             if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
             {
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
@@ -4326,6 +4336,7 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_TOKEN ):
+
             if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
             {
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
@@ -4383,6 +4394,7 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_KEY_TYPE ):
+
             if( pxAttribute->ulValueLen == sizeof( CK_KEY_TYPE ) )
             {
                 ( void ) memcpy( &xKeyType, ( CK_KEY_TYPE * ) pxAttribute->pValue, sizeof( CK_KEY_TYPE ) );
@@ -4414,6 +4426,7 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_VERIFY ):
+
             if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
             {
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
@@ -4433,6 +4446,7 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
             break;
 
         case ( CKA_TOKEN ):
+
             if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
             {
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
