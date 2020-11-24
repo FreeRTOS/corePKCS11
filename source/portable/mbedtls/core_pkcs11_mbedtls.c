@@ -502,8 +502,6 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
         case ( CKA_VALUE ):
             *ppxCertificateValue = pxAttribute->pValue;
             *pxCertificateLength = pxAttribute->ulValueLen;
-            LogDebug( ( "Found CKA_VALUE attribute. Certificate value length was: %lu.",
-                        ( unsigned long int ) pxAttribute->ulValueLen ) );
             break;
 
         case ( CKA_LABEL ):
@@ -577,7 +575,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 {
     CK_RV xResult = CKR_OK;
     int32_t lMbedTLSResult = 0;
-    CK_BBOOL xBool;
+    CK_BBOOL xBool = CK_FALSE;
 
     switch( pxAttribute->type )
     {
@@ -586,7 +584,6 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
         case ( CKA_LABEL ):
             /* Do nothing. These values were parsed previously. */
             break;
-
         case ( CKA_SIGN ):
         case ( CKA_TOKEN ):
             if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
@@ -661,8 +658,6 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             break;
 
         default:
-            LogError( ( "Failed to parse RSA private key template. Unknown attribute type 0x%0lX "
-                        "found for RSA private key.", ( unsigned long int ) pxAttribute->type ) );
             xResult = CKR_ATTRIBUTE_TYPE_INVALID;
             break;
     }
@@ -808,12 +803,9 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             case ( CKA_CLASS ):
             case ( CKA_KEY_TYPE ):
             case ( CKA_LABEL ):
-                LogDebug( ( "Received attribute type 0x%0lX and ignored it.", ( unsigned long int ) pxAttribute->type ) );
-                /* Do nothing. These attribute types were checked previously. */
                 break;
 
             case ( CKA_TOKEN ):
-                LogDebug( ( "Found CKA_TOKEN." ) );
                 pxEcBoolAtt = ( CK_BBOOL * ) pxAttribute->pValue;
                 if( pxAttribute->ulValueLen >= sizeof( CK_BBOOL ) )
                 {
@@ -831,7 +823,6 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                 break;
 
             case ( CKA_EC_PARAMS ):
-                LogDebug( ( "Found CKA_EC_PARAMS." ) );
                 pxEcAttVal = ( CK_BYTE * ) pxAttribute->pValue;
 
                 if( pxAttribute->ulValueLen == sizeof( pxEcCurve ) )
@@ -847,8 +838,6 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
             case ( CKA_VERIFY ):
             case ( CKA_EC_POINT ):
-                LogDebug( ( "Found CKA_EC_POINT or CKA_VERIFY." ) );
-
                 /* See explanation in prvCheckValidSessionAndModule for this exception. */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 if( xIsPrivate == ( CK_BBOOL ) CK_FALSE )
@@ -867,8 +856,6 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
             case ( CKA_SIGN ):
             case ( CKA_VALUE ):
-                LogDebug( ( "Found CKA_SIGN or CKA_VALUE." ) );
-
                 /* See explanation in prvCheckValidSessionAndModule for this exception. */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
@@ -4283,7 +4270,6 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
         case ( CKA_LABEL ):
             *ppxLabel = pxAttribute;
             *pulAttributeMap |= LABEL_IN_TEMPLATE;
-            LogDebug( ( "CKA_LABEL was in template." ) );
             break;
 
         case ( CKA_KEY_TYPE ):
@@ -4384,7 +4370,7 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
                                                     uint32_t * pulAttributeMap )
 {
     CK_RV xResult = CKR_OK;
-    CK_BBOOL xBool;
+    CK_BBOOL xBool = CK_TRUE;
     CK_KEY_TYPE xKeyType;
     const CK_BYTE pxEcParams[] = pkcs11DER_ENCODED_OID_P256;
     const CK_BYTE * pxEcAttVal;
@@ -4394,7 +4380,6 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
         case ( CKA_LABEL ):
             *ppxLabel = pxAttribute;
             *pulAttributeMap |= LABEL_IN_TEMPLATE;
-            LogDebug( ( "CKA_LABEL was in template." ) );
             break;
 
         case ( CKA_KEY_TYPE ):
@@ -4425,8 +4410,6 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
                 }
             }
 
-            LogDebug( ( "CKA_EC_PARAMS was in public key template." ) );
-
             *pulAttributeMap |= EC_PARAMS_IN_TEMPLATE;
             break;
 
@@ -4446,8 +4429,6 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
                 xResult = CKR_TEMPLATE_INCONSISTENT;
             }
 
-            LogDebug( ( "CKA_VERIFY was in public key template." ) );
-
             *pulAttributeMap |= VERIFY_IN_TEMPLATE;
             break;
 
@@ -4461,9 +4442,6 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
-                LogError( ( "Failed parsing public key template. Generating "
-                            "public keys that are false for attribute CKA_TOKEN "
-                            "is not supported." ) );
                 xResult = CKR_TEMPLATE_INCONSISTENT;
             }
 
@@ -4471,8 +4449,6 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
 
         default:
             xResult = CKR_TEMPLATE_INCONSISTENT;
-            LogError( ( "Failed parsing public key template. Found an unknown "
-                        "attribute type." ) );
             break;
     }
 
