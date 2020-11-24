@@ -918,31 +918,22 @@ static void prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
                                          CK_BYTE_PTR * ppcLabel,
                                          CK_ULONG_PTR pxLabelLength )
 {
-<<<<<<< HEAD
     CK_OBJECT_HANDLE ulIndex = xAppHandle - ( ( CK_OBJECT_HANDLE ) 1 );
 
-=======
-    CK_OBJECT_HANDLE ulIndex = 0;
->>>>>>> c264411... Add CBMC proof for C_SignInit.
     *ppcLabel = NULL;
     *pxLabelLength = 0;
     *pxPalHandle = CK_INVALID_HANDLE;
-    
-    if( xAppHandle >= 1 )
+
+    if( ulIndex < pkcs11configMAX_NUM_OBJECTS )
     {
-        ulIndex = xAppHandle - 1UL;
-        if( ulIndex < pkcs11configMAX_NUM_OBJECTS )
+        if( xP11Context.xObjectList.xObjects[ ulIndex ].xHandle != CK_INVALID_HANDLE )
         {
-            if( xP11Context.xObjectList.xObjects[ ulIndex ].xHandle != CK_INVALID_HANDLE )
-            {
-                LogDebug( ( "Found object in list by handle." ) );
-                *ppcLabel = xP11Context.xObjectList.xObjects[ ulIndex ].xLabel;
-                *pxLabelLength = xP11Context.xObjectList.xObjects[ ulIndex ].xLabelSize;
-                *pxPalHandle = xP11Context.xObjectList.xObjects[ ulIndex ].xHandle;
-            }
+            LogDebug( ( "Found object in list by handle." ) );
+            *ppcLabel = xP11Context.xObjectList.xObjects[ ulIndex ].xLabel;
+            *pxLabelLength = xP11Context.xObjectList.xObjects[ ulIndex ].xLabelSize;
+            *pxPalHandle = xP11Context.xObjectList.xObjects[ ulIndex ].xHandle;
         }
     }
-
 }
 
 /**
@@ -3919,13 +3910,9 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
             if( xResult != CKR_OK )
             {
                 LogError( ( "Failed to initialize verify operation. Unable to "
-<<<<<<< HEAD
                             "retrieve value of private key for signing 0x%0lX.",
                             ( unsigned long int ) xResult ) );
-=======
-                            "retrieve value of private key for signing 0x%0lX.", xResult ) );
                 xResult = CKR_KEY_HANDLE_INVALID;
->>>>>>> c264411... Add CBMC proof for C_SignInit.
             }
         }
         else
