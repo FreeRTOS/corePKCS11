@@ -75,6 +75,7 @@ findobject
 findobjects
 findobjectsfinal
 findobjectsinit
+fopen
 freertos
 gen
 generatekey
@@ -113,6 +114,7 @@ iot
 keil
 keypair
 len
+linux
 lookedup
 malloc
 mbed
