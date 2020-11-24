@@ -82,6 +82,10 @@ jobs:
       - name: Check spelling
         run: |
           PATH=$PATH:$PWD/tools/spell
+          # Modifies `find` command used in spell checker to ignore the test and dependency directory
+          # The command looks like this `extract-comments `find $DIRNAME -name \*.[ch]` should the line change and the sed command will
+          # append "-not path {val added below}" for each of the directories mentioned.
+          # https://github.com/aws/aws-iot-device-sdk-embedded-C/blob/ad28ed355df4f82b77f48028e24bd6fc9e63bc54/tools/spell/find-unknown-comment-words#L86
           sed -i 's/find $DIRNAME/find $DIRNAME -not -path '*test*' -not -path '*dependency*'/g' tools/spell/find-unknown-comment-words
           find-unknown-comment-words --directory libraries/standard/corePKCS11
           if [ "$?" = "0" ]; then
