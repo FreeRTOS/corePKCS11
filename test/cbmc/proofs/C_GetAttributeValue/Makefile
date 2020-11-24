@@ -15,8 +15,8 @@ TEMPLATE_SIZE=9
 UNWIND_SIZE=10
 
 DEFINES += -DTEMPLATE_SIZE=$(TEMPLATE_SIZE)
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls/include
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY +=
 
