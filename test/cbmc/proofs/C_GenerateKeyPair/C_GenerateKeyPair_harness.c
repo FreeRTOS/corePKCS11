@@ -44,20 +44,20 @@
  */
 typedef struct P11Session
 {
-    CK_ULONG ulState;                            
-    CK_BBOOL xOpened;                            
-    CK_MECHANISM_TYPE xOperationDigestMechanism; 
-    CK_BYTE * pxFindObjectLabel;                 
-    CK_ULONG xFindObjectLabelLen;                
-    CK_MECHANISM_TYPE xOperationVerifyMechanism; 
-    mbedtls_threading_mutex_t xVerifyMutex;      
-    CK_OBJECT_HANDLE xVerifyKeyHandle;           
-    mbedtls_pk_context xVerifyKey;               
-    CK_MECHANISM_TYPE xOperationSignMechanism;   
-    mbedtls_threading_mutex_t xSignMutex;        
-    CK_OBJECT_HANDLE xSignKeyHandle;             
-    mbedtls_pk_context xSignKey;                 
-    mbedtls_sha256_context xSHA256Context;       
+    CK_ULONG ulState;
+    CK_BBOOL xOpened;
+    CK_MECHANISM_TYPE xOperationDigestMechanism;
+    CK_BYTE * pxFindObjectLabel;
+    CK_ULONG xFindObjectLabelLen;
+    CK_MECHANISM_TYPE xOperationVerifyMechanism;
+    mbedtls_threading_mutex_t xVerifyMutex;
+    CK_OBJECT_HANDLE xVerifyKeyHandle;
+    mbedtls_pk_context xVerifyKey;
+    CK_MECHANISM_TYPE xOperationSignMechanism;
+    mbedtls_threading_mutex_t xSignMutex;
+    CK_OBJECT_HANDLE xSignKeyHandle;
+    mbedtls_pk_context xSignKey;
+    mbedtls_sha256_context xSHA256Context;
 } P11Session_t;
 
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( const P11Session_t * pxSession )
@@ -78,34 +78,34 @@ void harness()
 
     __CPROVER_assume( ulPrivKeyAttrLen > 0 && ulPubKeyAttrLen < TEMPLATE_SIZE );
     pxPublicKey = malloc( sizeof( CK_ATTRIBUTE ) * ulPubKeyAttrLen );
-    __CPROVER_assume( pxPublicKey  != NULL );
+    __CPROVER_assume( pxPublicKey != NULL );
 
     __CPROVER_assume( ulPrivKeyAttrLen > 0 && ulPrivKeyAttrLen < TEMPLATE_SIZE );
     pxPrivateKey = malloc( sizeof( CK_ATTRIBUTE ) * ulPrivKeyAttrLen );
     __CPROVER_assume( pxPrivateKey != NULL );
 
-    for(int i = 0; i< ulPubKeyAttrLen; i++)
+    for( int i = 0; i < ulPubKeyAttrLen; i++ )
     {
-        __CPROVER_assume( pxPublicKey[i].ulValueLen <= 300 );
-        pxPublicKey[i].pValue = malloc( pxPublicKey[i].ulValueLen );
-        __CPROVER_assume( pxPublicKey[i].pValue != NULL );
+        __CPROVER_assume( pxPublicKey[ i ].ulValueLen <= 300 );
+        pxPublicKey[ i ].pValue = malloc( pxPublicKey[ i ].ulValueLen );
+        __CPROVER_assume( pxPublicKey[ i ].pValue != NULL );
     }
 
-    for(int i = 0; i< ulPrivKeyAttrLen; i++)
+    for( int i = 0; i < ulPrivKeyAttrLen; i++ )
     {
         /* Currently a 2048 bit RSA private key is the largest supported object. */
-        __CPROVER_assume( pxPrivateKey[i].ulValueLen <= 1200 );
-        pxPrivateKey[i].pValue = malloc( pxPrivateKey[i].ulValueLen );
-        __CPROVER_assume( pxPrivateKey[i].pValue != NULL );
+        __CPROVER_assume( pxPrivateKey[ i ].ulValueLen <= 1200 );
+        pxPrivateKey[ i ].pValue = malloc( pxPrivateKey[ i ].ulValueLen );
+        __CPROVER_assume( pxPrivateKey[ i ].pValue != NULL );
     }
 
-     __CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
-    ( void ) C_GenerateKeyPair( xSession, 
-                                 &xMechanism, 
-                                 pxPublicKey,
-                                 ulPubKeyAttrLen,
-                                 pxPrivateKey, 
-                                 ulPrivKeyAttrLen,
-                                 &xPubKeyHandle, 
-                                 &xPrivKeyHandle );
+    __CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
+    ( void ) C_GenerateKeyPair( xSession,
+                                &xMechanism,
+                                pxPublicKey,
+                                ulPubKeyAttrLen,
+                                pxPrivateKey,
+                                ulPrivKeyAttrLen,
+                                &xPubKeyHandle,
+                                &xPrivKeyHandle );
 }

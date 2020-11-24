@@ -45,20 +45,20 @@
  */
 typedef struct P11Session
 {
-    CK_ULONG ulState;                            
-    CK_BBOOL xOpened;                            
-    CK_MECHANISM_TYPE xOperationDigestMechanism; 
-    CK_BYTE * pxFindObjectLabel;                 
-    CK_ULONG xFindObjectLabelLen;                
-    CK_MECHANISM_TYPE xOperationVerifyMechanism; 
-    mbedtls_threading_mutex_t xVerifyMutex;      
-    CK_OBJECT_HANDLE xVerifyKeyHandle;           
-    mbedtls_pk_context xVerifyKey;               
-    CK_MECHANISM_TYPE xOperationSignMechanism;   
-    mbedtls_threading_mutex_t xSignMutex;        
-    CK_OBJECT_HANDLE xSignKeyHandle;             
-    mbedtls_pk_context xSignKey;                 
-    mbedtls_sha256_context xSHA256Context;       
+    CK_ULONG ulState;
+    CK_BBOOL xOpened;
+    CK_MECHANISM_TYPE xOperationDigestMechanism;
+    CK_BYTE * pxFindObjectLabel;
+    CK_ULONG xFindObjectLabelLen;
+    CK_MECHANISM_TYPE xOperationVerifyMechanism;
+    mbedtls_threading_mutex_t xVerifyMutex;
+    CK_OBJECT_HANDLE xVerifyKeyHandle;
+    mbedtls_pk_context xVerifyKey;
+    CK_MECHANISM_TYPE xOperationSignMechanism;
+    mbedtls_threading_mutex_t xSignMutex;
+    CK_OBJECT_HANDLE xSignKeyHandle;
+    mbedtls_pk_context xSignKey;
+    mbedtls_sha256_context xSHA256Context;
 } P11Session_t;
 
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( const P11Session_t * pxSession )
@@ -68,7 +68,6 @@ CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( 
 
 void harness()
 {
-
     CK_RV xResult;
     CK_OBJECT_HANDLE xObject;
     CK_SESSION_HANDLE xSession;
@@ -76,19 +75,19 @@ void harness()
 
     __CPROVER_assume( ulCount > 0 && ulCount < TEMPLATE_SIZE );
     CK_ATTRIBUTE_PTR xTemplate = malloc( sizeof( CK_ATTRIBUTE ) * ulCount );
-    __CPROVER_assume( xTemplate  != NULL );
+    __CPROVER_assume( xTemplate != NULL );
 
-    for(int i = 0; i< ulCount; i++)
+    for( int i = 0; i < ulCount; i++ )
     {
         /* 1200 is current largest possible object size that is a valid input. */
-        __CPROVER_assume( xTemplate[i].ulValueLen <= 1200 );
-        xTemplate[i].pValue = malloc( xTemplate[i].ulValueLen );
-        __CPROVER_assume( xTemplate[i].pValue != NULL );
+        __CPROVER_assume( xTemplate[ i ].ulValueLen <= 1200 );
+        xTemplate[ i ].pValue = malloc( xTemplate[ i ].ulValueLen );
+        __CPROVER_assume( xTemplate[ i ].pValue != NULL );
     }
 
-     __CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
+    __CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
     ( void ) C_CreateObject( xSession,
-                          ( CK_ATTRIBUTE_PTR ) xTemplate,
-                          ulCount,
-                          &xObject );
+                             ( CK_ATTRIBUTE_PTR ) xTemplate,
+                             ulCount,
+                             &xObject );
 }
