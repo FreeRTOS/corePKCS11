@@ -43,34 +43,35 @@
  */
 typedef struct P11Session
 {
-    CK_ULONG ulState;                            
-    CK_BBOOL xOpened;                            
-    CK_MECHANISM_TYPE xOperationDigestMechanism; 
-    CK_BYTE * pxFindObjectLabel;                 
-    CK_ULONG xFindObjectLabelLen;                
-    CK_MECHANISM_TYPE xOperationVerifyMechanism; 
-    mbedtls_threading_mutex_t xVerifyMutex;      
-    CK_OBJECT_HANDLE xVerifyKeyHandle;           
-    mbedtls_pk_context xVerifyKey;               
-    CK_MECHANISM_TYPE xOperationSignMechanism;   
-    mbedtls_threading_mutex_t xSignMutex;        
-    CK_OBJECT_HANDLE xSignKeyHandle;             
-    mbedtls_pk_context xSignKey;                 
-    mbedtls_sha256_context xSHA256Context;       
+    CK_ULONG ulState;
+    CK_BBOOL xOpened;
+    CK_MECHANISM_TYPE xOperationDigestMechanism;
+    CK_BYTE * pxFindObjectLabel;
+    CK_ULONG xFindObjectLabelLen;
+    CK_MECHANISM_TYPE xOperationVerifyMechanism;
+    mbedtls_threading_mutex_t xVerifyMutex;
+    CK_OBJECT_HANDLE xVerifyKeyHandle;
+    mbedtls_pk_context xVerifyKey;
+    CK_MECHANISM_TYPE xOperationSignMechanism;
+    mbedtls_threading_mutex_t xSignMutex;
+    CK_OBJECT_HANDLE xSignKeyHandle;
+    mbedtls_pk_context xSignKey;
+    mbedtls_sha256_context xSHA256Context;
 } P11Session_t;
- 
+
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( const P11Session_t * pxSession )
 {
     __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
     return CKR_OK;
 }
 
-void  __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
-                                         CK_OBJECT_HANDLE_PTR pxPalHandle,
-                                         CK_BYTE_PTR * ppcLabel,
-                                         CK_ULONG_PTR pxLabelLength )
+void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
+                                                                             CK_OBJECT_HANDLE_PTR pxPalHandle,
+                                                                             CK_BYTE_PTR * ppcLabel,
+                                                                             CK_ULONG_PTR pxLabelLength )
 {
     CK_OBJECT_HANDLE handle;
+
     __CPROVER_assert( pxPalHandle != NULL, "ppcLabel was NULL." );
     __CPROVER_assert( ppcLabel != NULL, "ppcLabel was NULL." );
     __CPROVER_assert( pxLabelLength != NULL, "ppcLabel was NULL." );
@@ -90,16 +91,15 @@ void harness()
     CK_ATTRIBUTE_PTR pTemplate = malloc( sizeof( CK_ATTRIBUTE ) * ulCount );
     __CPROVER_assume( pTemplate != NULL );
 
-    for(int i = 0; i< ulCount; i++)
+    for( int i = 0; i < ulCount; i++ )
     {
-        __CPROVER_assume( pTemplate[i].ulValueLen <= 256 );
-        pTemplate[i].pValue = malloc( pTemplate[i].ulValueLen );
+        __CPROVER_assume( pTemplate[ i ].ulValueLen <= 256 );
+        pTemplate[ i ].pValue = malloc( pTemplate[ i ].ulValueLen );
     }
 
-
-    /* 0 is an invalid session handle according to the spec. 
+    /* 0 is an invalid session handle according to the spec.
      * This assumption is checked in prvSessionPointerFromHandle.
      */
     __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
-  ( void ) C_GetAttributeValue( hSession, xObject, pTemplate, ulCount );
+    ( void ) C_GetAttributeValue( hSession, xObject, pTemplate, ulCount );
 }

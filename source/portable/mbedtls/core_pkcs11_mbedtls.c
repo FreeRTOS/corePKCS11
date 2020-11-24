@@ -2866,7 +2866,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                         {
                             xResult = CKR_BUFFER_TOO_SMALL;
                         }
-                       
 
                         if( ( xResult == CKR_OK ) && ( lMbedTLSResult < 0 ) )
                         {
