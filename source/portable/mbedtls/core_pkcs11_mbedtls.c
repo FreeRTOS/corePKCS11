@@ -173,7 +173,7 @@
  * 32 points of 2 bytes each + 1 point length byte, 1 length byte, and
  * 1 type (uncompressed) byte
  */
-#define pkcs11EC_POINT_LENGTH                 ( ( 32 * 2 ) + 1 + 1 + 1 )
+#define pkcs11EC_POINT_LENGTH                 ( ( 32UL * 2UL ) + 1UL + 1UL + 1UL )
 
 /**
  * @ingroup pkcs11_macros
