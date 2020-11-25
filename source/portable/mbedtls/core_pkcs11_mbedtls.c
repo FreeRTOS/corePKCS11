@@ -464,17 +464,16 @@ static CK_RV prvGetObjectClass( const CK_ATTRIBUTE * pxTemplate,
 {
     CK_RV xResult = CKR_TEMPLATE_INCOMPLETE;
     CK_ULONG ulIndex = 0;
-    CK_ATTRIBUTE_PTR pxAttribute = NULL;
 
     /* Search template for class attribute. */
     for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
     {
-        pxAttribute = &pxTemplate[ ulIndex ];
-
-        if( ( pxAttribute->type == CKA_CLASS ) && ( pxAttribute->ulValueLen == sizeof( CK_OBJECT_CLASS ) ) )
+        if( ( pxTemplate[ ulIndex ].type == CKA_CLASS ) 
+                && ( pxTemplate[ ulIndex ].ulValueLen == sizeof( CK_OBJECT_CLASS ) ) )
         {
             LogDebug( ( "Successfully found object class attribute." ) );
-            ( void ) memcpy( pxClass, pxAttribute->pValue, sizeof( CK_OBJECT_CLASS ) );
+            ( void ) memcpy( pxClass, pxTemplate[ ulIndex ].pValue, 
+                    sizeof( CK_OBJECT_CLASS ) );
             xResult = CKR_OK;
             break;
         }
@@ -577,7 +576,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 {
     CK_RV xResult = CKR_OK;
     int32_t lMbedTLSResult = 0;
-    CK_BBOOL xBool = CK_FALSE;
+    CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
 
     switch( pxAttribute->type )
     {
@@ -1188,7 +1187,7 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
         xResult = prvAppendEmptyECDerKey( pxDerKey, ulDerBufSize, lDerKeyLength, &ulActualKeyLength );
     }
 
-    if( ( xResult == CKR_OK ) && ( lDerKeyLength < ulDerBufSize ) && ( lDerKeyLength > 0 ) )
+    if( ( xResult == CKR_OK ) && ( lDerKeyLength > 0 ) && ( ( uint32_t ) lDerKeyLength < ulDerBufSize ) )
     {
         xPalHandle = PKCS11_PAL_SaveObject( pxLabel,
                                             pxDerKey + ( ulDerBufSize - ( uint32_t ) lDerKeyLength ),
@@ -4269,8 +4268,8 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
                                                      uint32_t * pulAttributeMap )
 {
     CK_RV xResult = CKR_OK;
-    CK_BBOOL xBool;
-    CK_ULONG xTemp;
+    CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
+    CK_ULONG xTemp = 0;
 
     switch( pxAttribute->type )
     {
@@ -4381,10 +4380,10 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
                                                     uint32_t * pulAttributeMap )
 {
     CK_RV xResult = CKR_OK;
-    CK_BBOOL xBool = CK_TRUE;
-    CK_KEY_TYPE xKeyType;
+    CK_BBOOL xBool = ( CK_BBOOL ) CK_TRUE;
+    CK_KEY_TYPE xKeyType = 0xFFFFFFFFUL;
     const CK_BYTE pxEcParams[] = pkcs11DER_ENCODED_OID_P256;
-    const CK_BYTE * pxEcAttVal;
+    const CK_BYTE * pxEcAttVal = NULL;
 
     switch( pxAttribute->type )
     {
