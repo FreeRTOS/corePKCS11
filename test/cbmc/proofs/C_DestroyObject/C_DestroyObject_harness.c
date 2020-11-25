@@ -93,12 +93,14 @@ void harness()
 {
     CK_SESSION_HANDLE hSession;
     CK_OBJECT_HANDLE hObject;
+    CK_RV xResult;
 
     /* We need to populate the PKCS module with mutexes. Rather than stubbing out
      * some critical paths, we can just initialize the module.
      */
-    ( void ) C_Initialize( NULL );
+    xResult = C_Initialize( NULL );
+    __CPROVER_assume( xResult == CKR_OK );
 
     __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
-    C_DestroyObject( hSession, hObject );
+    ( void ) C_DestroyObject( hSession, hObject );
 }

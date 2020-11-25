@@ -3483,7 +3483,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
         }
     }
 
-    if( ( xResult != CKR_OK ) && ( xResult != CKR_BUFFER_TOO_SMALL ) &&
+    if( ( xResult != CKR_OK ) && ( xResult != CKR_DATA_LEN_RANGE ) &&
         ( xResult != CKR_SESSION_HANDLE_INVALID ) &&
         ( xResult != CKR_OPERATION_NOT_INITIALIZED ) )
     {
