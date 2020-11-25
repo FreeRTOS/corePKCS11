@@ -969,9 +969,7 @@ static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
 {
     CK_RV xResult = CKR_OK;
     int32_t lGotSemaphore = ( int32_t ) 0;
-    CK_OBJECT_HANDLE ulIndex = CK_INVALID_HANDLE;
-
-    ulIndex = xAppHandle - ( ( CK_OBJECT_HANDLE ) 1 );
+    CK_OBJECT_HANDLE ulIndex = xAppHandle - ( ( CK_OBJECT_HANDLE ) 1 );
 
     lGotSemaphore = mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex );
 

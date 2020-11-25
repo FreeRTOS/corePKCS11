@@ -109,21 +109,22 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group * grp,
     return nondet_bool() ? 0 : -1;
 }
 
-void mbedtls_sha256_init( mbedtls_sha256_context *ctx )
+void mbedtls_sha256_init( mbedtls_sha256_context * ctx )
 {
     __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
     return nondet_bool() ? 0 : -1;
 }
 
-int mbedtls_sha256_starts_ret( mbedtls_sha256_context *ctx, int is224 )
+int mbedtls_sha256_starts_ret( mbedtls_sha256_context * ctx,
+                               int is224 )
 {
     __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
     __CPROVER_assert( is224 == 0, "We are only doing sha256 currently." );
     return nondet_bool() ? 0 : -1;
 }
 
-int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx,
-                               unsigned char output[32] )
+int mbedtls_sha256_finish_ret( mbedtls_sha256_context * ctx,
+                               unsigned char output[ 32 ] )
 {
     __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
     __CPROVER_assert( output != NULL, "Received an unexpected NULL pointer." );

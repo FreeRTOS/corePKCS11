@@ -80,25 +80,25 @@ void harness()
     CK_BYTE_PTR pPart;
 
     __CPROVER_assume( ulPartlen <= 1024 );
-     pPart = malloc( ulPartlen );
+    pPart = malloc( ulPartlen );
 
-__CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
-  xResult = C_DigestFinal( hSession, NULL, &ulRequestedSizeLen );
-  if( xResult == CKR_OK )
-  {
-       __CPROVER_assert( ulRequestedSizeLen == 32, "A NULL buffer pointer indicates a request for the needed"
-               "buffer output size. Since we only do SHA-256, it should always be 32 bytes." );
-  }
+    __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
+    xResult = C_DigestFinal( hSession, NULL, &ulRequestedSizeLen );
 
-   xResult = C_DigestFinal( hSession, pPart, &ulPartlen );
     if( xResult == CKR_OK )
     {
-       __CPROVER_assert( ulPartlen == 32, "A NULL buffer pointer indicates a request for the needed"
-               "buffer output size. Since we only do SHA-256, it should always be 32 bytes." );
-
+        __CPROVER_assert( ulRequestedSizeLen == 32, "A NULL buffer pointer indicates a request for the needed"
+                                                    "buffer output size. Since we only do SHA-256, it should always be 32 bytes." );
     }
-   xResult = C_DigestFinal( hSession, pPart, NULL );
-   __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "A NULL length pointer is a bad argument." );
 
-  
+    xResult = C_DigestFinal( hSession, pPart, &ulPartlen );
+
+    if( xResult == CKR_OK )
+    {
+        __CPROVER_assert( ulPartlen == 32, "A NULL buffer pointer indicates a request for the needed"
+                                           "buffer output size. Since we only do SHA-256, it should always be 32 bytes." );
+    }
+
+    xResult = C_DigestFinal( hSession, pPart, NULL );
+    __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "A NULL length pointer is a bad argument." );
 }

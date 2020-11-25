@@ -87,7 +87,6 @@ void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_
         *ppcLabel = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
         *pxLabelLength = sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS );
     }
-
 }
 
 void harness()
@@ -100,6 +99,6 @@ void harness()
      */
     ( void ) C_Initialize( NULL );
 
-__CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
-  C_DestroyObject( hSession, hObject );
+    __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
+    C_DestroyObject( hSession, hObject );
 }

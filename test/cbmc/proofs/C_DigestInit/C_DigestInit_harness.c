@@ -77,7 +77,7 @@ void harness()
     CK_RV xResult;
 
     __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
-  ( void ) C_DigestInit( hSession, &xMech );
-   xResult = C_DigestInit( hSession, NULL );
-   __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "A NULL mechanism is considered a bad argument." );
+    ( void ) C_DigestInit( hSession, &xMech );
+    xResult = C_DigestInit( hSession, NULL );
+    __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "A NULL mechanism is considered a bad argument." );
 }
