@@ -436,6 +436,40 @@ static CK_RV prvCreateEcPriv( CK_SESSION_HANDLE_PTR pxSession,
 }
 
 /*!
+ * @brief Helper function to create an RSA Private Key.
+ *
+ */
+static CK_RV prvCreateRsaPriv( CK_SESSION_HANDLE_PTR pxSession,
+                               CK_OBJECT_HANDLE_PTR pxObject )
+{
+    CK_RV xResult = CKR_OK;
+    CK_KEY_TYPE xPrivateKeyType = CKK_RSA;
+    CK_OBJECT_CLASS xPrivateKeyClass = CKO_PRIVATE_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    char * pucLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
+    RsaParams_t xRsaParams = { 0 };
+    CK_ATTRIBUTE xPrivateKeyTemplate[] = RSA_PRIV_KEY_INITIALIZER;
+
+    mbedtls_pk_init_CMockIgnore();
+    mock_osal_calloc_Stub( pvPkcs11CallocCb );
+    mbedtls_rsa_init_CMockIgnore();
+    mbedtls_rsa_import_raw_IgnoreAndReturn( 0 );
+    mbedtls_mpi_read_binary_IgnoreAndReturn( 0 );
+    mbedtls_pk_write_key_der_IgnoreAndReturn( 1 );
+    mbedtls_pk_free_Stub( vMbedPkFree );
+    PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
+    mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+    mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
+    mock_osal_free_Stub( vPkcs11FreeCb );
+    xResult = C_CreateObject( *pxSession,
+                              ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
+                              sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                              pxObject );
+
+    return xResult;
+}
+
+/*!
  * @brief Helper function to create a EC Public Key.
  *
  */
@@ -3006,6 +3040,9 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
 
     if( TEST_PROTECT() )
     {
+        xResult = prvCreateEcPriv( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
         xResult = C_SignInit( xSession, NULL, xKey );
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 
@@ -3015,27 +3052,27 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
         mbedtls_strerror_highlevel_IgnoreAndReturn( NULL );
         mbedtls_strerror_lowlevel_IgnoreAndReturn( NULL );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
 
-        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
 
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
         mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
-        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_KEY_TYPE_INCONSISTENT, xResult );
 
         xMechanism.mechanism = CKM_RSA_PKCS;
 
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
         mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
-        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_KEY_TYPE_INCONSISTENT, xResult );
 
         xMechanism.mechanism = CKM_RSA_X9_31;
 
-        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_MECHANISM_INVALID, xResult );
 
         xMechanism.mechanism = CKM_ECDSA;
@@ -3082,23 +3119,26 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
 void test_pkcs11_C_SignECDSA( void )
 {
     CK_RV xResult = CKR_OK;
-    CK_SESSION_HANDLE xSession = 0;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
     CK_MECHANISM xMechanism = { 0 };
     mbedtls_pk_context xSignAndVerifyKey;
 
-    xSignAndVerifyKey.pk_ctx = &xResult;
-
-    xMechanism.mechanism = CKM_ECDSA;
-    CK_OBJECT_HANDLE xKey = 0;
     CK_BYTE pxDummyData[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
     CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
     CK_BYTE pxDummySignature[ pkcs11ECDSA_P256_SIGNATURE_LENGTH ] = { 0xAA };
     CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
 
+    xSignAndVerifyKey.pk_ctx = &xResult;
+    xMechanism.mechanism = CKM_ECDSA;
+
     prvCommonInitStubs();
 
     if( TEST_PROTECT() )
     {
+        xResult = prvCreateEcPriv( &xSession, &xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
         PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
         mbedtls_pk_free_CMockIgnore();
         mbedtls_pk_init_CMockIgnore();
@@ -3142,6 +3182,9 @@ void test_pkcs11_C_SignRSA( void )
 
     if( TEST_PROTECT() )
     {
+        xResult = prvCreateRsaPriv( &xSession, &xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
         PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
         mbedtls_pk_free_CMockIgnore();
         mbedtls_pk_init_CMockIgnore();
@@ -3193,14 +3236,14 @@ void test_pkcs11_C_SignNoInit( void )
 void test_pkcs11_C_SignBadArgs( void )
 {
     CK_RV xResult = CKR_OK;
-    CK_SESSION_HANDLE xSession = 0;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
     CK_MECHANISM xMechanism = { 0 };
     mbedtls_pk_context xSignAndVerifyKey;
 
     xSignAndVerifyKey.pk_ctx = &xResult;
 
     xMechanism.mechanism = CKM_ECDSA;
-    CK_OBJECT_HANDLE xKey = 0;
+    CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
     CK_BYTE pxDummyData[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
     CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
     CK_BYTE pxDummySignature[ pkcs11ECDSA_P256_SIGNATURE_LENGTH ] = { 0xAA };
@@ -3210,6 +3253,9 @@ void test_pkcs11_C_SignBadArgs( void )
 
     if( TEST_PROTECT() )
     {
+        xResult = prvCreateEcPriv( &xSession, &xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
         PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
         mbedtls_pk_free_CMockIgnore();
         mbedtls_pk_init_CMockIgnore();
