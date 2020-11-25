@@ -76,12 +76,29 @@ void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_
 
     __CPROVER_assume( handle < 4 );
     *pxPalHandle = handle;
+
+    if( nondet_bool() )
+    {
+        *ppcLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
+        *pxLabelLength = sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS );
+    }
+    else
+    {
+        *ppcLabel = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
+        *pxLabelLength = sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS );
+    }
+
 }
 
 void harness()
 {
     CK_SESSION_HANDLE hSession;
     CK_OBJECT_HANDLE hObject;
+
+    /* We need to populate the PKCS module with mutexes. Rather than stubbing out
+     * some critical paths, we can just initialize the module.
+     */
+    ( void ) C_Initialize( NULL );
 
 __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
   C_DestroyObject( hSession, hObject );

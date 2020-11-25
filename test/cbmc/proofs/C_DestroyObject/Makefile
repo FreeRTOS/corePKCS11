@@ -16,13 +16,14 @@ INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY += C_Finalize
 REMOVE_FUNCTION_BODY += C_GetFunctionList
-REMOVE_FUNCTION_BODY += PKCS11_PAL_Initialize
-REMOVE_FUNCTION_BODY +=	C_Initialize
-REMOVE_FUNCTION_BODY +=	C_Initialize
-REMOVE_FUNCTION_BODY +=	__CPROVER_file_local_core_pkcs11_mbedtls_c_prvMbedTLS_Initialize
-UNWINDSET +=
+
+# Same as max label size in the core_pkcs11_config.h
+UNWINDSET += strncmp.0:32
+UNWINDSET += strlen.0:32
+UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByLabel.0:2
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
+PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/mbedtls_stubs.c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/core_pkcs11_pal_stubs.c
 PROJECT_SOURCES += $(SRCDIR)/source/portable/mbedtls/core_pkcs11_mbedtls.c
 
