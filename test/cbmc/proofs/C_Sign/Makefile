@@ -9,13 +9,24 @@ HARNESS_FILE = C_Sign_harness
 PROOF_UID = C_Sign
 
 DEFINES +=
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls/include
-INCLUDES += -I$(SRCDIR)/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
-REMOVE_FUNCTION_BODY +=
+REMOVE_FUNCTION_BODY += C_Initialize
+REMOVE_FUNCTION_BODY += C_OpenSession
+REMOVE_FUNCTION_BODY += C_Finalize
+REMOVE_FUNCTION_BODY += C_GetFunctionList
+REMOVE_FUNCTION_BODY += PKCS11_PAL_Initialize
+REMOVE_FUNCTION_BODY += mbedtls_ctr_drbg_init
+REMOVE_FUNCTION_BODY += mbedtls_ctr_drbg_seed
+REMOVE_FUNCTION_BODY += mbedtls_entropy_free
+REMOVE_FUNCTION_BODY += mbedtls_entropy_init
+REMOVE_FUNCTION_BODY += mbedtls_ctr_drbg_free
+REMOVE_FUNCTION_BODY += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvMbedTLS_Initialize
 UNWINDSET +=
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
+PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/core_pki_utils_stubs.c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/mbedtls_stubs.c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/core_pkcs11_pal_stubs.c
 PROJECT_SOURCES += $(SRCDIR)/source/portable/mbedtls/core_pkcs11_mbedtls.c

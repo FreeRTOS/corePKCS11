@@ -28,45 +28,94 @@
  * @brief Implements the proof harness for C_Sign function.
  */
 
+#include <stdbool.h>
 #include <stddef.h>
+#include "mbedtls/ecp.h"
+#include "mbedtls/oid.h"
+#include "mbedtls/sha256.h"
+#include "mbedtls/pk.h"
+#include "core_pkcs11_config.h"
 #include "core_pkcs11.h"
+#include "core_pki_utils.h"
+
+/* Internal struct for corePKCS11 mbed TLS implementation, but we don't really care what it contains
+ * in this proof.
+ *
+ * It is just copied over from "core_pkcs11_mbedtls.c" so the structure is correct.
+ */
+typedef struct P11Session
+{
+    CK_ULONG ulState;
+    CK_BBOOL xOpened;
+    CK_MECHANISM_TYPE xOperationDigestMechanism;
+    CK_BYTE * pxFindObjectLabel;
+    CK_ULONG xFindObjectLabelLen;
+    CK_MECHANISM_TYPE xOperationVerifyMechanism;
+    mbedtls_threading_mutex_t xVerifyMutex;
+    CK_OBJECT_HANDLE xVerifyKeyHandle;
+    mbedtls_pk_context xVerifyKey;
+    CK_MECHANISM_TYPE xOperationSignMechanism;
+    mbedtls_threading_mutex_t xSignMutex;
+    CK_OBJECT_HANDLE xSignKeyHandle;
+    mbedtls_pk_context xSignKey;
+    mbedtls_sha256_context xSHA256Context;
+} P11Session_t;
+
+static bool xRsaOperation = nondet_bool();
+
+CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( P11Session_t * pxSession )
+{
+    pxSession->xOperationSignMechanism = xRsaOperation ? CKM_RSA_PKCS : CKM_ECDSA;
+    __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
+    return CKR_OK;
+}
+
+CK_BBOOL __CPROVER_file_local_core_pkcs11_mbedtls_c_prvOperationActive( const P11Session_t * pxSession )
+{
+    __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
+    return CK_FALSE;
+}
+
+void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
+                                                                             CK_OBJECT_HANDLE_PTR pxPalHandle,
+                                                                             CK_BYTE_PTR * ppcLabel,
+                                                                             CK_ULONG_PTR pxLabelLength )
+{
+    CK_OBJECT_HANDLE handle;
+
+    __CPROVER_assert( pxPalHandle != NULL, "ppcLabel was NULL." );
+    __CPROVER_assert( ppcLabel != NULL, "ppcLabel was NULL." );
+    __CPROVER_assert( pxLabelLength != NULL, "ppcLabel was NULL." );
+
+    __CPROVER_assume( handle < 4 );
+    *pxPalHandle = handle;
+}
+
 
 void harness()
 {
-
-    CK_RV xResult;
-    CK_FLAGS xFlags;
+    CK_SESSION_HANDLE xSession;
     CK_MECHANISM xMechanism;
-    CK_OBJECT_HANDLE hKey;
     CK_ULONG ulDataLen;
     CK_ULONG ulSignatureLen;
 
-    CK_SESSION_HANDLE xSession;
-    __CPROVER_assume( ulDataLen == pkcs11SHA256_DIGEST_LENGTH );
+    if( xRsaOperation )
+    {
+        __CPROVER_assume( ulDataLen == pkcs11RSA_SIGNATURE_INPUT_LENGTH );
+        __CPROVER_assume( ulSignatureLen == pkcs11RSA_2048_SIGNATURE_LENGTH );
+    }
+    else
+    {
+        __CPROVER_assume( ulDataLen == pkcs11SHA256_DIGEST_LENGTH );
+        __CPROVER_assume( ulSignatureLen == pkcs11ECDSA_P256_SIGNATURE_LENGTH );
+    }
 
     CK_BYTE_PTR pData = malloc( sizeof( CK_BYTE ) * ulDataLen );
-     CK_BYTE_PTR pSignature = malloc( sizeof( CK_BYTE ) * pkcs11ECDSA_P256_SIGNATURE_LENGTH );
+    CK_BYTE_PTR pSignature = malloc( sizeof( CK_BYTE ) * ulSignatureLen );
+    __CPROVER_assume( pData != NULL );
+    __CPROVER_assume( pSignature != NULL );
 
-    xResult = C_Initialize( NULL );
-    __CPROVER_assert( xResult == CKR_OK, "PKCS #11 module needs to be initialized"
-                                         " to be uninitialized." );
-
-    xResult = C_OpenSession( 0, xFlags, NULL, 0, &xSession );
-
-    C_Create
-
-    if( xResult == CKR_OK )
-    {
-      xResult =  C_SignInit( xSession, &xMechanism, hKey );
-    }
-    
-    if( xResult == CKR_OK )
-    {
-      xResult = C_Sign( xSession, pData, ulDataLen, NULL, &ulSignatureLen );
-    }
-
-    if( xResult == CKR_OK )
-    {
-      ( void ) C_Sign( xSession, pData, ulDataLen, pSignature, &ulSignatureLen );
-    }
+    __CPROVER_assume( ( xSession > 0 ) && ( xSession <= pkcs11configMAX_SESSIONS ) );
+    ( void ) C_Sign( xSession, pData, ulDataLen, NULL, &ulSignatureLen );
+    ( void ) C_Sign( xSession, pData, ulDataLen, pSignature, &ulSignatureLen );
 }
