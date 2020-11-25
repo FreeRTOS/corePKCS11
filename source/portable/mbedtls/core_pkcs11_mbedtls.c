@@ -468,12 +468,12 @@ static CK_RV prvGetObjectClass( const CK_ATTRIBUTE * pxTemplate,
     /* Search template for class attribute. */
     for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
     {
-        if( ( pxTemplate[ ulIndex ].type == CKA_CLASS ) 
-                && ( pxTemplate[ ulIndex ].ulValueLen == sizeof( CK_OBJECT_CLASS ) ) )
+        if( ( pxTemplate[ ulIndex ].type == CKA_CLASS ) &&
+            ( pxTemplate[ ulIndex ].ulValueLen == sizeof( CK_OBJECT_CLASS ) ) )
         {
             LogDebug( ( "Successfully found object class attribute." ) );
-            ( void ) memcpy( pxClass, pxTemplate[ ulIndex ].pValue, 
-                    sizeof( CK_OBJECT_CLASS ) );
+            ( void ) memcpy( pxClass, pxTemplate[ ulIndex ].pValue,
+                             sizeof( CK_OBJECT_CLASS ) );
             xResult = CKR_OK;
             break;
         }
