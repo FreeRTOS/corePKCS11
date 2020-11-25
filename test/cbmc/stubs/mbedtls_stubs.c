@@ -122,6 +122,16 @@ int mbedtls_sha256_starts_ret( mbedtls_sha256_context *ctx, int is224 )
     return nondet_bool() ? 0 : -1;
 }
 
+int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx,
+                               unsigned char output[32] )
+{
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( output != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( __CPROVER_OBJECT_SIZE( output ) == 32UL, "SHA256 output buffers must be 32 bytes." );
+
+    return 32;
+}
+
 int mbedtls_pk_verify( mbedtls_pk_context * ctx,
                        mbedtls_md_type_t md_alg,
                        const unsigned char * hash,

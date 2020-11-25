@@ -75,11 +75,14 @@ void harness()
 {
     CK_SESSION_HANDLE hSession;
     CK_ULONG ulPartlen;
+    CK_RV xResult;
 
     /* The length of the data doesn't really matter. */
     __CPROVER_assume( ulPartlen <= 1024 );
     CK_BYTE_PTR pPart = malloc( ulPartlen );
 
 __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
-  C_DigestUpdate( hSession, pPart, ulPartlen );
+  ( void ) C_DigestUpdate( hSession, pPart, ulPartlen );
+  xResult = C_DigestUpdate( hSession, NULL, ulPartlen );
+   __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "A NULL buffer is considered a bad argument." );
 }

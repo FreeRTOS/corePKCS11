@@ -3457,16 +3457,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
         }
         else
         {
-            if( *pulDigestLen < ( CK_ULONG ) pkcs11SHA256_DIGEST_LENGTH )
-            {
-                LogError( ( "Failed to finish digest operation. Received a "
-                            "buffer that was too small. Expected %lu and "
-                            "received %lu.",
-                            ( unsigned long int ) pkcs11SHA256_DIGEST_LENGTH,
-                            ( unsigned long int ) *pulDigestLen ) );
-                xResult = CKR_BUFFER_TOO_SMALL;
-            }
-            else
+            if( *pulDigestLen == ( CK_ULONG ) pkcs11SHA256_DIGEST_LENGTH )
             {
                 lMbedTLSResult = mbedtls_sha256_finish_ret( &pxSession->xSHA256Context, pDigest );
 
@@ -3481,6 +3472,15 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
                 }
 
                 pxSession->xOperationDigestMechanism = pkcs11NO_OPERATION;
+            }
+            else
+            {
+                LogError( ( "Failed to finish digest operation. Received a "
+                            "buffer that was an unexpected size. Expected %lu and "
+                            "received %lu.",
+                            ( unsigned long int ) pkcs11SHA256_DIGEST_LENGTH,
+                            ( unsigned long int ) *pulDigestLen ) );
+                xResult = CKR_DATA_LEN_RANGE;
             }
         }
     }
