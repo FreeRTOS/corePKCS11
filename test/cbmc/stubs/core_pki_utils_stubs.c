@@ -21,28 +21,15 @@
  */
 
 /**
- * @file core_pkcs11_pal_stubs.c
- * @brief Stubs to mock calls to core PKCS #11 PAL.
+ * @file core_pki_utils_stubs.c
+ * @brief Stubs to mock calls to core PKCS #11 utils.
  */
+#include "core_pki_utils.h"
 
-#include <stddef.h>
-
-#include "core_pkcs11.h"
-#include "core_pkcs11_pal.h"
-
-CK_RV PKCS11_PAL_Initialize( void )
+int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
+                                              const uint8_t * pxMbedSignature )
 {
-    return CKR_OK;
-}
-
-CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
-                                 CK_BYTE_PTR * ppucData,
-                                 CK_ULONG_PTR pulDataSize,
-                                 CK_BBOOL * pIsPrivate )
-{
-    __CPROVER_assert( ppucData != NULL, "ppucData was NULL." );
-    __CPROVER_assert( pulDataSize != NULL, "pulDataSize was NULL." );
-    __CPROVER_assert( pIsPrivate != NULL, "pIsPrivate was NULL." );
-    nondet_bool() ? ( *pIsPrivate = CK_TRUE ) : ( *pIsPrivate = CK_FALSE );
-    return CKR_OK;
+    __CPROVER_assert( __CPROVER_OBJECT_SIZE( pxSignaturePKCS ) == 64, "Signature was an incorrect size." );
+    __CPROVER_assert( __CPROVER_OBJECT_SIZE( pxMbedSignature ) == 72, "mbed return buffer was an incorrect size." );
+    return 0;
 }

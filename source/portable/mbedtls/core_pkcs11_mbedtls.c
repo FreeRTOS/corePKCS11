@@ -3572,6 +3572,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
         else
         {
             LogDebug( ( "Could not find PKCS #11 PAL Handle." ) );
+            xResult = CKR_KEY_HANDLE_INVALID;
         }
     }
 
@@ -3935,6 +3936,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
                 LogError( ( "Failed to initialize verify operation. Unable to "
                             "retrieve value of private key for signing 0x%0lX.",
                             ( unsigned long int ) xResult ) );
+                xResult = CKR_KEY_HANDLE_INVALID;
             }
         }
         else
