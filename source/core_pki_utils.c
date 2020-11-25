@@ -135,7 +135,7 @@ int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
                                               size_t * pxSigLen )
 {
     int8_t xReturn = 0;
-    uint8_t * pucSigPtr;
+    uint8_t * pucSigPtr = NULL;
     uint8_t ucTemp[ 64 ] = { 0 }; /* A temporary buffer for the pre-formatted signature. */
 
     if( ( pucSig == NULL ) || ( pxSigLen == NULL ) )
