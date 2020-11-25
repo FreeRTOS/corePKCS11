@@ -109,6 +109,19 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group * grp,
     return nondet_bool() ? 0 : -1;
 }
 
+void mbedtls_sha256_init( mbedtls_sha256_context *ctx )
+{
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    return nondet_bool() ? 0 : -1;
+}
+
+int mbedtls_sha256_starts_ret( mbedtls_sha256_context *ctx, int is224 )
+{
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( is224 == 0, "We are only doing sha256 currently." );
+    return nondet_bool() ? 0 : -1;
+}
+
 int mbedtls_pk_verify( mbedtls_pk_context * ctx,
                        mbedtls_md_type_t md_alg,
                        const unsigned char * hash,
@@ -121,6 +134,8 @@ int mbedtls_pk_verify( mbedtls_pk_context * ctx,
     __CPROVER_assert( sig != NULL, "Received an unexpected NULL pointer." );
     return nondet_bool() ? 0 : -1;
 }
+
+
 
 static void threading_mutex_init( mbedtls_threading_mutex_t * mutex )
 {
