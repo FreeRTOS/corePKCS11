@@ -523,7 +523,7 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
 
         case ( CKA_CERTIFICATE_TYPE ):
 
-            if( pxAttribute->ulValueLen >= sizeof( CK_CERTIFICATE_TYPE ) )
+            if( pxAttribute->ulValueLen == sizeof( CK_CERTIFICATE_TYPE ) )
             {
                 ( void ) memcpy( pxCertificateType, pxAttribute->pValue, sizeof( CK_CERTIFICATE_TYPE ) );
             }
@@ -539,7 +539,7 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
 
         case ( CKA_TOKEN ):
 
-            if( pxAttribute->ulValueLen >= sizeof( CK_BBOOL ) )
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
             {
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
@@ -695,7 +695,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         if( pxAttribute->type == CKA_SIGN )
         {
-            if( pxAttribute->ulValueLen >= sizeof( CK_BBOOL ) )
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
             {
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
@@ -813,7 +813,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             case ( CKA_TOKEN ):
                 pxEcBoolAtt = ( CK_BBOOL * ) pxAttribute->pValue;
 
-                if( pxAttribute->ulValueLen >= sizeof( CK_BBOOL ) )
+                if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
                 {
                     ( void ) memcpy( &xBool, pxEcBoolAtt, sizeof( CK_BBOOL ) );
                 }
@@ -2738,7 +2738,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                     }
                     else
                     {
-                        if( pTemplate[ iAttrib ].ulValueLen >= sizeof( CK_OBJECT_CLASS ) )
+                        if( pTemplate[ iAttrib ].ulValueLen == sizeof( CK_OBJECT_CLASS ) )
                         {
                             ( void ) memcpy( pTemplate[ iAttrib ].pValue, &xClass, sizeof( CK_OBJECT_CLASS ) );
                         }
