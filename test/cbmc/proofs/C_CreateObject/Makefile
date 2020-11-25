@@ -9,12 +9,12 @@ HARNESS_FILE = C_CreateObject_harness
 PROOF_UID = C_CreateObject
 
 # TEMPLATE_SIZE is bounded to reduce proof run time. A user can have an
-# arbitrarily large template size, but our library generally only cares about 
-# some attributes. Memory safety can be proven within a reasonable bound 
-# past what our stack cares about. It adds not value to the proof to input the 
+# arbitrarily large template size, but our library generally only cares about
+# some attributes. Memory safety can be proven within a reasonable bound
+# past what our stack cares about. It adds not value to the proof to input the
 # largest possible template of the maximum CK_ULONG size.
 #
-# Not recommended to increase this size, will lead to long proof times, with no 
+# Not recommended to increase this size, will lead to long proof times, with no
 # more increase in coverage.
 TEMPLATE_SIZE=6
 
