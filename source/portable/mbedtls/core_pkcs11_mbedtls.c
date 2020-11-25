@@ -576,6 +576,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 {
     CK_RV xResult = CKR_OK;
     int32_t lMbedTLSResult = 0;
+    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
 
     switch( pxAttribute->type )
@@ -4268,6 +4270,8 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
                                                      uint32_t * pulAttributeMap )
 {
     CK_RV xResult = CKR_OK;
+    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
     CK_ULONG xTemp = 0;
 
@@ -4380,6 +4384,8 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
                                                     uint32_t * pulAttributeMap )
 {
     CK_RV xResult = CKR_OK;
+    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_TRUE;
     CK_KEY_TYPE xKeyType = 0xFFFFFFFFUL;
     const CK_BYTE pxEcParams[] = pkcs11DER_ENCODED_OID_P256;
