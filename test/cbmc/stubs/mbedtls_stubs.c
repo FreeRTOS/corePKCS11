@@ -75,10 +75,14 @@ void mbedtls_ctr_drbg_free( mbedtls_ctr_drbg_context * ctx )
     __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
 }
 
-int mbedtls_pk_sign( mbedtls_pk_context *ctx, mbedtls_md_type_t md_alg,
-             const unsigned char *hash, size_t hash_len,
-             unsigned char *sig, size_t *sig_len,
-             int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
+int mbedtls_pk_sign( mbedtls_pk_context * ctx,
+                     mbedtls_md_type_t md_alg,
+                     const unsigned char * hash,
+                     size_t hash_len,
+                     unsigned char * sig,
+                     size_t * sig_len,
+                     int ( * f_rng )( void *, unsigned char *, size_t ),
+                     void * p_rng )
 {
     __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
     __CPROVER_assert( hash != NULL, "Received an unexpected NULL pointer." );
@@ -87,13 +91,14 @@ int mbedtls_pk_sign( mbedtls_pk_context *ctx, mbedtls_md_type_t md_alg,
     __CPROVER_assert( f_rng != NULL, "Received an unexpected NULL pointer." );
     __CPROVER_assert( p_rng != NULL, "Received an unexpected NULL pointer." );
     return nondet_bool() ? 0 : -1;
-
 }
 
-int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
-                          const unsigned char *buf, size_t blen,
-                          const mbedtls_ecp_point *Q, const mbedtls_mpi *r,
-                          const mbedtls_mpi *s)
+int mbedtls_ecdsa_verify( mbedtls_ecp_group * grp,
+                          const unsigned char * buf,
+                          size_t blen,
+                          const mbedtls_ecp_point * Q,
+                          const mbedtls_mpi * r,
+                          const mbedtls_mpi * s )
 {
     __CPROVER_assert( grp != NULL, "Received an unexpected NULL pointer." );
     __CPROVER_assert( buf != NULL, "Received an unexpected NULL pointer." );
@@ -104,9 +109,12 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
     return nondet_bool() ? 0 : -1;
 }
 
-int mbedtls_pk_verify( mbedtls_pk_context *ctx, mbedtls_md_type_t md_alg,
-               const unsigned char *hash, size_t hash_len,
-               const unsigned char *sig, size_t sig_len )
+int mbedtls_pk_verify( mbedtls_pk_context * ctx,
+                       mbedtls_md_type_t md_alg,
+                       const unsigned char * hash,
+                       size_t hash_len,
+                       const unsigned char * sig,
+                       size_t sig_len )
 {
     __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
     __CPROVER_assert( hash != NULL, "Received an unexpected NULL pointer." );

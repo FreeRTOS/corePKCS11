@@ -29,7 +29,6 @@
 int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
                                               const uint8_t * pxMbedSignature )
 {
-
     __CPROVER_assert( __CPROVER_OBJECT_SIZE( pxSignaturePKCS ) == 64, "Signature was an incorrect size." );
     __CPROVER_assert( __CPROVER_OBJECT_SIZE( pxMbedSignature ) == 72, "mbed return buffer was an incorrect size." );
     return 0;

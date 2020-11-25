@@ -93,5 +93,5 @@ void harness()
     CK_SESSION_HANDLE xSession;
 
     __CPROVER_assume( ( xSession > 0 ) && ( xSession <= pkcs11configMAX_SESSIONS ) );
-     ( void ) C_VerifyInit( xSession, &xMechanism, hKey );
+    ( void ) C_VerifyInit( xSession, &xMechanism, hKey );
 }

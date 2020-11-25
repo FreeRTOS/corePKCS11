@@ -67,7 +67,7 @@ CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( 
 {
     /* The verify key just has to be not NULL for the proof to progress. */
     pxSession->xVerifyKey.pk_ctx = &xRsaOperation;
-    pxSession->xOperationVerifyMechanism = xRsaOperation ? CKM_RSA_X_509 : CKM_ECDSA ;
+    pxSession->xOperationVerifyMechanism = xRsaOperation ? CKM_RSA_X_509 : CKM_ECDSA;
     __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
     return CKR_OK;
 }
