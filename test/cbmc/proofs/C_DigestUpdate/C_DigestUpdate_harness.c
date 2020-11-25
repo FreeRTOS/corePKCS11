@@ -24,8 +24,8 @@
  */
 
 /**
- * @file C_DigestInit_harness.c
- * @brief Implements the proof harness for C_DigestInit function.
+ * @file C_DigestUpdate_harness.c
+ * @brief Implements the proof harness for C_DigestUpdate function.
  */
 
 #include "mbedtls/ecp.h"
@@ -58,9 +58,10 @@ typedef struct P11Session
     mbedtls_sha256_context xSHA256Context;
 } P11Session_t;
 
-CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( const P11Session_t * pxSession )
+CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( P11Session_t * pxSession )
 {
     __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
+    pxSession->xOperationDigestMechanism = nondet_bool() ? CKM_SHA256 : CKM_SHA224;
     return CKR_OK;
 }
 
@@ -73,11 +74,12 @@ CK_BBOOL __CPROVER_file_local_core_pkcs11_mbedtls_c_prvOperationActive( const P1
 void harness()
 {
     CK_SESSION_HANDLE hSession;
-    CK_MECHANISM xMech;
-    CK_RV xResult;
+    CK_ULONG ulPartlen;
 
-    __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
-  ( void ) C_DigestInit( hSession, &xMech );
-   xResult = C_DigestInit( hSession, NULL );
-   __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "A NULL mechanism is considered a bad argument." );
+    /* The length of the data doesn't really matter. */
+    __CPROVER_assume( ulPartlen <= 1024 );
+    CK_BYTE_PTR pPart = malloc( ulPartlen );
+
+__CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
+  C_DigestUpdate( hSession, pPart, ulPartlen );
 }
