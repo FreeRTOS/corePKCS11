@@ -2749,7 +2749,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                         {
                             LogError( ( "Failed to parse attribute template. "
                                         "Received a buffer smaller than CK_OBJECT_CLASS." ) );
-                            xResult = CKR_BUFFER_TOO_SMALL;
+                            xResult = CKR_DATA_LEN_RANGE;
                         }
                     }
 
