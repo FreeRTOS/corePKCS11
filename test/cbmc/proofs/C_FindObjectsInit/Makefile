@@ -21,6 +21,5 @@ UNWINDSET += harness.0:$(TEMPLATE_SIZE)
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
 PROJECT_SOURCES += $(SRCDIR)/source/portable/mbedtls/core_pkcs11_mbedtls.c
-PROJECT_SOURCES += $(SRCDIR)/source/portable/mbedtls/core_pkcs11_mbedtls.c
 
 include ../Makefile.common
