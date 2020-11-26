@@ -82,6 +82,7 @@ void harness()
     CK_BYTE_PTR pPart = malloc( ulPartlen );
 
     __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
+
     /* There is no return value to check, since we are checking multiple branch paths, and there is no
      * output to compare the return value to. */
     ( void ) C_DigestUpdate( hSession, pPart, ulPartlen );
