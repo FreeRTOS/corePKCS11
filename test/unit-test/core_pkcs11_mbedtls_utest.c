@@ -1855,7 +1855,7 @@ void test_pkcs11_C_CreateObjectCertificateTooLongLabel( void )
                                   ( CK_ATTRIBUTE_PTR ) &xCertificateTemplate,
                                   sizeof( xCertificateTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
-        TEST_ASSERT_EQUAL( CKR_DATA_LEN_RANGE, xResult );
+        TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
     }
 
     prvCommonDeinitStubs();
@@ -3293,10 +3293,7 @@ void test_pkcs11_C_SignBadArgs( void )
 
         ulDummySignatureLen = sizeof( pxDummySignature );
         xResult = C_Sign( xSession, pxDummyData, 0, pxDummySignature, &ulDummySignatureLen );
-        TEST_ASSERT_EQUAL( CKR_DATA_LEN_RANGE, xResult );
-
-        xResult = C_SignInit( xSession, &xMechanism, xKey );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+        TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
 
         ulDummySignatureLen = sizeof( pxDummySignature );
         mock_osal_mutex_lock_Stub( NULL );
@@ -3663,7 +3660,7 @@ void test_pkcs11_C_VerifyBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         xResult = C_Verify( xSession, pxDummyData, 0, pxDummySignature, ulDummySignatureLen );
-        TEST_ASSERT_EQUAL( CKR_DATA_LEN_RANGE, xResult );
+        TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
 
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
@@ -3715,7 +3712,7 @@ void test_pkcs11_C_VerifyBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         xResult = C_Verify( xSession, pxDummyData, 0, pxDummySignature, pkcs11RSA_2048_SIGNATURE_LENGTH );
-        TEST_ASSERT_EQUAL( CKR_DATA_LEN_RANGE, xResult );
+        TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
 
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
