@@ -514,7 +514,7 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
                             "Consider updating pkcs11configMAX_LABEL_LENGTH.",
                             ( unsigned long int ) pxAttribute->ulValueLen,
                             ( unsigned long int ) pkcs11configMAX_LABEL_LENGTH ) );
-                xResult = CKR_DATA_LEN_RANGE;
+                xResult = CKR_BUFFER_TOO_SMALL;
             }
 
             break;
@@ -3483,7 +3483,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
         }
     }
 
-    if( ( xResult != CKR_OK ) && ( xResult != CKR_DATA_LEN_RANGE ) &&
+    if( ( xResult != CKR_OK ) && ( xResult != CKR_BUFFER_TOO_SMALL ) &&
         ( xResult != CKR_SESSION_HANDLE_INVALID ) &&
         ( xResult != CKR_OPERATION_NOT_INITIALIZED ) )
     {
@@ -3783,7 +3783,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                                 "%lu bytes.",
                                 ( unsigned long int ) xExpectedInputLength,
                                 ( unsigned long int ) ulDataLen ) );
-                    xResult = CKR_DATA_LEN_RANGE;
+                    xResult = CKR_BUFFER_TOO_SMALL;
                 }
             }
 
@@ -4111,7 +4111,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
             {
                 LogError( ( "Failed verify operation. Data Length was too "
                             "short for pkcs11RSA_2048_SIGNATURE_LENGTH." ) );
-                xResult = CKR_DATA_LEN_RANGE;
+                xResult = CKR_BUFFER_TOO_SMALL;
             }
 
             if( ulSignatureLen != pkcs11RSA_2048_SIGNATURE_LENGTH )
@@ -4129,7 +4129,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
             {
                 LogError( ( "Failed verify operation. Data Length was too "
                             "short for pkcs11SHA256_DIGEST_LENGTH." ) );
-                xResult = CKR_DATA_LEN_RANGE;
+                xResult = CKR_BUFFER_TOO_SMALL;
             }
 
             if( ulSignatureLen != pkcs11ECDSA_P256_SIGNATURE_LENGTH )
