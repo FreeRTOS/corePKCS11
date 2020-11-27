@@ -1696,10 +1696,14 @@ void test_pkcs11_C_CreateObjectRSAPrivKeyBadAtt( void )
 void test_pkcs11_C_CreateObjectRSAPubKey( void )
 {
     CK_RV xResult = CKR_OK;
-    CK_SESSION_HANDLE xSession = 0;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
     CK_KEY_TYPE xPublicKeyType = CKK_RSA;
-    CK_OBJECT_CLASS xPublicKeyClass = CKO_PUBLIC_KEY;
-    CK_OBJECT_HANDLE xObject = 0;
+    CK_OBJECT_CLASS xClass = CKO_PUBLIC_KEY;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_BYTE xPublicExponent[] = { 0x01, 0x00, 0x01 };
+    CK_BYTE xModulus[ MODULUS_LENGTH + 1 ] = { 0 };
+    CK_BYTE pucPublicKeyLabel[] = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
 
     prvCommonInitStubs();
 
@@ -1707,17 +1711,31 @@ void test_pkcs11_C_CreateObjectRSAPubKey( void )
     {
         CK_ATTRIBUTE xPublicKeyTemplate[] =
         {
-            { CKA_CLASS,    &xPublicKeyClass, sizeof( CK_OBJECT_CLASS ) },
-            { CKA_KEY_TYPE, &xPublicKeyType,  sizeof( CK_KEY_TYPE )     },
+            { CKA_CLASS,           &xClass,           sizeof( CK_OBJECT_CLASS )                    },
+            { CKA_KEY_TYPE,        &xPublicKeyType,   sizeof( CK_KEY_TYPE )                        },
+            { CKA_TOKEN,           &xTrue,            sizeof( xTrue )                              },
+            { CKA_MODULUS,         &xModulus + 1,     MODULUS_LENGTH                               },
+            { CKA_VERIFY,          &xTrue,            sizeof( xTrue )                              },
+            { CKA_PUBLIC_EXPONENT, xPublicExponent,   sizeof( xPublicExponent )                    },
+            { CKA_LABEL,           pucPublicKeyLabel, strlen( ( const char * ) pucPublicKeyLabel ) }
         };
 
         mbedtls_pk_init_CMockIgnore();
+        mock_osal_calloc_Stub( pvPkcs11CallocCb );
+        mbedtls_rsa_init_CMockIgnore();
+        mbedtls_rsa_import_raw_IgnoreAndReturn( 0 );
+        mbedtls_pk_write_pubkey_der_IgnoreAndReturn( 1 );
+        mbedtls_pk_free_Stub( vMbedPkFree );
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
+        mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
+        mock_osal_free_Stub( vPkcs11FreeCb );
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
                                   sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
 
-        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_TYPE_INVALID, xResult );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
     prvCommonDeinitStubs();

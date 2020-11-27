@@ -593,7 +593,7 @@ static CK_RV prvRsaPrivKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
     }
     else
     {
-            xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+        xResult = CKR_ATTRIBUTE_TYPE_INVALID;
     }
 
     return xResult;
@@ -626,7 +626,7 @@ static CK_RV prvRsaPubKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
     }
     else
     {
-            xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+        xResult = CKR_ATTRIBUTE_TYPE_INVALID;
     }
 
     return xResult;
@@ -636,10 +636,11 @@ static CK_RV prvRsaPubKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
  * @brief Parses attribute values for an RSA key an puts them in the mbed TLS context.
  */
 static CK_RV prvRsaContextParse( const CK_ATTRIBUTE * pxAttribute,
-                                mbedtls_rsa_context * pxRsaContext )
+                                 mbedtls_rsa_context * pxRsaContext )
 {
     CK_RV xResult = CKR_OK;
     int32_t lMbedTLSResult = 0;
+
     switch( pxAttribute->type )
     {
         case ( CKA_MODULUS ):
@@ -752,6 +753,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             break;
 
         case ( CKA_VERIFY ):
+
             if( xIsPrivate == ( CK_BBOOL ) CK_FALSE )
             {
                 xResult = prvRsaPubKeyAttParse( pxAttribute );
@@ -760,8 +762,11 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             {
                 xResult = CKR_ATTRIBUTE_VALUE_INVALID;
             }
+
             break;
+
         case ( CKA_SIGN ):
+
             if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
             {
                 xResult = prvRsaPrivKeyAttParse( pxAttribute );
@@ -770,7 +775,9 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             {
                 xResult = CKR_ATTRIBUTE_VALUE_INVALID;
             }
+
             break;
+
         case ( CKA_MODULUS ):
         case ( CKA_PUBLIC_EXPONENT ):
         case ( CKA_PRIME_1 ):
@@ -781,6 +788,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
         case ( CKA_COEFFICIENT ):
             xResult = prvRsaContextParse( pxAttribute, pxRsaContext );
             break;
+
         default:
             xResult = CKR_ATTRIBUTE_TYPE_INVALID;
             break;
@@ -2404,9 +2412,9 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
  * @param[in] pxObject PKCS #11 object handle.
  */
 static CK_RV prvCreateRsaKey( CK_ATTRIBUTE * pxTemplate,
-                                     CK_ULONG ulCount,
-                                     CK_OBJECT_HANDLE_PTR pxObject,
-                                     CK_BBOOL xIsPrivate )
+                              CK_ULONG ulCount,
+                              CK_OBJECT_HANDLE_PTR pxObject,
+                              CK_BBOOL xIsPrivate )
 {
     CK_RV xResult = CKR_OK;
     mbedtls_pk_context xMbedContext = { 0 };
@@ -2486,9 +2494,9 @@ static CK_RV prvCreatePrivateKey( CK_ATTRIBUTE * pxTemplate,
     if( xKeyType == CKK_RSA )
     {
         xResult = prvCreateRsaKey( pxTemplate,
-                                          ulCount,
-                                          pxObject,
-                                          CK_TRUE );
+                                   ulCount,
+                                   pxObject,
+                                   CK_TRUE );
     }
 
     #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
@@ -2527,14 +2535,6 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
 {
     CK_KEY_TYPE xKeyType = 0;
     CK_RV xResult = CKR_OK;
-    mbedtls_pk_context xMbedContext = { 0 };
-    /* mbedtls_rsa_context must be malloc'ed to use with mbedtls_pk_free function. */
-    mbedtls_rsa_context * pxRsaCtx = mbedtls_calloc( 1, sizeof( mbedtls_rsa_context ) );
-
-    #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM == 1 )
-        /* Suppress unused parameter warning if ECDSA is suppressed. */
-        ( void ) pxObject;
-    #endif /* if ( pkcs11configSUPPRESS_ECDSA_MECHANISM == 1 ) */
 
     prvGetKeyType( &xKeyType, pxTemplate, ulCount );
 
