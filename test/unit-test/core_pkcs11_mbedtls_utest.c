@@ -1210,8 +1210,6 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
 
         xPrivateKeyTemplate[ 4 ].pValue = &xTrue;
         mbedtls_mpi_read_binary_IgnoreAndReturn( -1 );
-        mbedtls_strerror_highlevel_IgnoreAndReturn( NULL );
-        mbedtls_strerror_lowlevel_IgnoreAndReturn( NULL );
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
                                   sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
@@ -1335,8 +1333,6 @@ void test_pkcs11_C_CreateObjectECPrivKeyDerFail( void )
         mbedtls_mpi_read_binary_IgnoreAndReturn( 0 );
         mock_osal_calloc_Stub( pvPkcs11CallocCb );
         mbedtls_pk_write_key_der_IgnoreAndReturn( -1 );
-        mbedtls_strerror_lowlevel_IgnoreAndReturn( NULL );
-        mbedtls_strerror_highlevel_IgnoreAndReturn( NULL );
         mbedtls_pk_free_CMockIgnore();
         PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
         mock_osal_free_Stub( vPkcs11FreeCb );
@@ -1558,8 +1554,6 @@ void test_pkcs11_C_CreateObjectECPubKeyBadAtt( void )
         xPublicKeyTemplate[ 3 ].type = CKA_VERIFY;
         xPublicKeyTemplate[ 3 ].pValue = &xTrue;
         mbedtls_ecp_point_read_binary_IgnoreAndReturn( -1 );
-        mbedtls_strerror_highlevel_IgnoreAndReturn( NULL );
-        mbedtls_strerror_lowlevel_IgnoreAndReturn( NULL );
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
                                   sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
@@ -1628,6 +1622,7 @@ void test_pkcs11_C_CreateObjectRSAPrivKeyBadAtt( void )
     CK_KEY_TYPE xPrivateKeyType = CKK_RSA;
     CK_OBJECT_CLASS xPrivateKeyClass = CKO_PRIVATE_KEY;
     CK_BBOOL xTrue = CK_TRUE;
+    CK_BBOOL xFalse = CK_FALSE;
     char * pucLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
     CK_OBJECT_HANDLE xObject = 0;
 
@@ -1652,8 +1647,8 @@ void test_pkcs11_C_CreateObjectRSAPrivKeyBadAtt( void )
 
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_TYPE_INVALID, xResult );
 
-        xTrue = CK_FALSE;
         xPrivateKeyTemplate[ 4 ].type = CKA_SIGN;
+        xPrivateKeyTemplate[ 4 ].pValue = &xFalse;
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
                                   sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
@@ -1673,14 +1668,12 @@ void test_pkcs11_C_CreateObjectRSAPrivKeyBadAtt( void )
         xPrivateKeyTemplate[ 2 ].type = CKA_LABEL;
         xTrue = CK_TRUE;
         mbedtls_rsa_import_raw_IgnoreAndReturn( 1 );
-        mbedtls_strerror_highlevel_IgnoreAndReturn( NULL );
-        mbedtls_strerror_lowlevel_IgnoreAndReturn( NULL );
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
                                   sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
 
-        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
     prvCommonDeinitStubs();
@@ -1689,9 +1682,6 @@ void test_pkcs11_C_CreateObjectRSAPrivKeyBadAtt( void )
 /*
  *!
  * @brief C_CreateObject Creating an RSA Public key happy path.
- *
- * Note: This test will need to be updated should this port support RSA public keys.
- *
  */
 void test_pkcs11_C_CreateObjectRSAPubKey( void )
 {
@@ -1741,6 +1731,57 @@ void test_pkcs11_C_CreateObjectRSAPubKey( void )
     prvCommonDeinitStubs();
 }
 
+/*
+ *!
+ * @brief C_CreateObject Creating an RSA Public key bad attribute parameters.
+ */
+void test_pkcs11_C_CreateObjectRSAPubKeyBadAtts( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_KEY_TYPE xPublicKeyType = CKK_RSA;
+    CK_OBJECT_CLASS xClass = CKO_PUBLIC_KEY;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_BBOOL xFalse = CK_FALSE;
+    CK_BYTE xPublicExponent[] = { 0x01, 0x00, 0x01 };
+    CK_BYTE xModulus[ MODULUS_LENGTH + 1 ] = { 0 };
+    CK_BYTE pucPublicKeyLabel[] = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        CK_ATTRIBUTE xPublicKeyTemplate[] =
+        {
+            { CKA_CLASS,           &xClass,           sizeof( CK_OBJECT_CLASS )                    },
+            { CKA_KEY_TYPE,        &xPublicKeyType,   sizeof( CK_KEY_TYPE )                        },
+            { CKA_TOKEN,           &xTrue,            sizeof( xTrue )                              },
+            { CKA_MODULUS,         &xModulus + 1,     MODULUS_LENGTH                               },
+            { CKA_VERIFY,          &xFalse,            sizeof( xFalse )                              },
+            { CKA_PUBLIC_EXPONENT, xPublicExponent,   sizeof( xPublicExponent )                    },
+            { CKA_LABEL,           pucPublicKeyLabel, strlen( ( const char * ) pucPublicKeyLabel ) }
+        };
+
+        mbedtls_pk_init_CMockIgnore();
+        mock_osal_calloc_Stub( pvPkcs11CallocCb );
+        mbedtls_rsa_init_CMockIgnore();
+        mbedtls_rsa_import_raw_IgnoreAndReturn( 0 );
+        mbedtls_pk_write_pubkey_der_IgnoreAndReturn( 1 );
+        mbedtls_pk_free_Stub( vMbedPkFree );
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
+        mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
+        mock_osal_free_Stub( vPkcs11FreeCb );
+        xResult = C_CreateObject( xSession, ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
+                                  sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL(  CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
 /*
  *!
  * @brief C_CreateObject Creating a Certificate happy path.
@@ -3067,8 +3108,6 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
         mbedtls_pk_free_CMockIgnore();
         mbedtls_pk_init_CMockIgnore();
         mbedtls_pk_parse_key_IgnoreAndReturn( -1 );
-        mbedtls_strerror_highlevel_IgnoreAndReturn( NULL );
-        mbedtls_strerror_lowlevel_IgnoreAndReturn( NULL );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
         xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
@@ -3284,8 +3323,6 @@ void test_pkcs11_C_SignBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         mbedtls_pk_sign_IgnoreAndReturn( -1 );
-        mbedtls_strerror_highlevel_IgnoreAndReturn( NULL );
-        mbedtls_strerror_lowlevel_IgnoreAndReturn( NULL );
         xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 
@@ -3445,8 +3482,6 @@ void test_pkcs11_C_VerifyInitBadArgs( void )
         mbedtls_pk_init_CMockIgnore();
         mbedtls_pk_parse_public_key_IgnoreAndReturn( -1 );
         mbedtls_pk_parse_key_IgnoreAndReturn( -1 );
-        mbedtls_strerror_highlevel_IgnoreAndReturn( NULL );
-        mbedtls_strerror_lowlevel_IgnoreAndReturn( NULL );
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
 
@@ -3698,8 +3733,6 @@ void test_pkcs11_C_VerifyBadArgs( void )
 
         mbedtls_mpi_init_CMockIgnore();
         mbedtls_mpi_read_binary_IgnoreAndReturn( -1 );
-        mbedtls_strerror_highlevel_IgnoreAndReturn( NULL );
-        mbedtls_strerror_lowlevel_IgnoreAndReturn( NULL );
         mbedtls_ecdsa_verify_IgnoreAndReturn( 0 );
         mbedtls_mpi_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );

@@ -591,10 +591,6 @@ static CK_RV prvRsaPrivKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
             LogError( ( "Failed to parse RSA private key. Expected sign permissions to be supported." ) );
         }
     }
-    else
-    {
-        xResult = CKR_ATTRIBUTE_TYPE_INVALID;
-    }
 
     return xResult;
 }
@@ -623,10 +619,6 @@ static CK_RV prvRsaPubKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
             xResult = CKR_ATTRIBUTE_VALUE_INVALID;
             LogError( ( "Failed to parse RSA public key. Expected verify permissions to be supported." ) );
         }
-    }
-    else
-    {
-        xResult = CKR_ATTRIBUTE_TYPE_INVALID;
     }
 
     return xResult;

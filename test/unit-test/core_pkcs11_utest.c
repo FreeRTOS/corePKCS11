@@ -386,6 +386,42 @@ void test_IotPkcs11_xGetSlotListBadSlotList( void )
     TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }
 
+
+/*!
+ * @brief xGetSlotList NULL args.
+ *
+ */
+void test_IotPkcs11_xGetSlotListBadArgs( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SLOT_ID_PTR pxSlotId = NULL;
+    CK_ULONG xSlotCount = 0;
+
+    xResult = xGetSlotList( NULL, &xSlotCount );
+    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+
+    xResult = xGetSlotList( &pxSlotId, NULL );
+    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+}
+
+/*!
+ * @brief xGetSlotList C_GetSlotList not implemented.
+ *
+ */
+void test_IotPkcs11_xGetSlotListNoC_GetSlotList( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SLOT_ID_PTR pxSlotId = NULL;
+    CK_ULONG xSlotCount = 0;
+
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList );
+    prvP11FunctionList.C_GetSlotList = NULL;
+    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
+    prvP11FunctionList.C_GetSlotList = C_GetSlotList;
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+}
+
 /*!
  * @brief xGetSlotList free memory branch path.
  *

@@ -212,11 +212,6 @@ int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
         /* The total signature length is the length of the R and S integers plus 2 bytes for
          * the SEQUENCE and LENGTH wrapping the entire struct. */
         *pxSigLen += 2UL;
-
-        if( *pxSigLen >= 72UL )
-        {
-            xReturn = FAILURE;
-        }
     }
 
     return xReturn;
