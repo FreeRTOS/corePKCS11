@@ -2489,11 +2489,11 @@ static CK_RV prvCreatePrivateKey( CK_ATTRIBUTE * pxTemplate,
 
     if( xKeyType == CKK_RSA )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
-        /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = prvCreateRsaKey( pxTemplate,
                                    ulCount,
                                    pxObject,
+                                   /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                                   /* coverity[misra_c_2012_rule_10_5_violation] */
                                    ( CK_BBOOL ) CK_TRUE );
     }
 
