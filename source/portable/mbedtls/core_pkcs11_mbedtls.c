@@ -737,7 +737,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
-            if( ( xBool != ( CK_BBOOL ) CK_TRUE ) && ( xIsPrivate == CK_TRUE ) )
+            if( ( xBool != ( CK_BBOOL ) CK_TRUE ) && ( xIsPrivate == ( CK_BBOOL ) CK_TRUE ) )
             {
                 xResult = CKR_ATTRIBUTE_VALUE_INVALID;
             }
@@ -746,6 +746,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         case ( CKA_VERIFY ):
 
+            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xIsPrivate == ( CK_BBOOL ) CK_FALSE )
             {
                 xResult = prvRsaPubKeyAttParse( pxAttribute );
@@ -759,6 +761,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         case ( CKA_SIGN ):
 
+            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
             {
                 xResult = prvRsaPrivKeyAttParse( pxAttribute );
@@ -2488,7 +2492,7 @@ static CK_RV prvCreatePrivateKey( CK_ATTRIBUTE * pxTemplate,
         xResult = prvCreateRsaKey( pxTemplate,
                                    ulCount,
                                    pxObject,
-                                   CK_TRUE );
+                                   ( CK_BBOOL ) CK_TRUE );
     }
 
     #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
@@ -2532,7 +2536,7 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
 
     if( xKeyType == CKK_RSA )
     {
-        xResult = prvCreateRsaKey( pxTemplate, ulCount, pxObject, CK_FALSE );
+        xResult = prvCreateRsaKey( pxTemplate, ulCount, pxObject, ( CK_BBOOL ) CK_FALSE );
     }
 
     #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
