@@ -567,42 +567,81 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
 }
 
 /**
- * @brief Parses attribute values for a RSA Key.
+ * @brief Parses attribute values for an RSA public Key.
  */
-static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
+static CK_RV prvRsaPrivKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
+{
+    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* coverity[misra_c_2012_rule_10_5_violation] */
+    CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
+    CK_RV xResult = CKR_OK;
+
+    if( pxAttribute->type == CKA_SIGN )
+    {
+        if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+        {
+            ( void ) memcpy( &xBool, pxAttribute->pValue, pxAttribute->ulValueLen );
+        }
+
+        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* coverity[misra_c_2012_rule_10_5_violation] */
+        if( xBool == ( CK_BBOOL ) CK_FALSE )
+        {
+            xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+            LogError( ( "Failed to parse RSA private key. Expected sign permissions to be supported." ) );
+        }
+    }
+    else
+    {
+            xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Parses attribute values for an RSA public Key.
+ */
+static CK_RV prvRsaPubKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
+{
+    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* coverity[misra_c_2012_rule_10_5_violation] */
+    CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
+    CK_RV xResult = CKR_OK;
+
+    if( pxAttribute->type == CKA_VERIFY )
+    {
+        if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+        {
+            ( void ) memcpy( &xBool, pxAttribute->pValue, pxAttribute->ulValueLen );
+        }
+
+        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* coverity[misra_c_2012_rule_10_5_violation] */
+        if( xBool == ( CK_BBOOL ) CK_FALSE )
+        {
+            xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+            LogError( ( "Failed to parse RSA public key. Expected verify permissions to be supported." ) );
+        }
+    }
+    else
+    {
+            xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Parses attribute values for an RSA key an puts them in the mbed TLS context.
+ */
+static CK_RV prvRsaContextParse( const CK_ATTRIBUTE * pxAttribute,
                                 mbedtls_rsa_context * pxRsaContext )
 {
     CK_RV xResult = CKR_OK;
     int32_t lMbedTLSResult = 0;
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
-    /* coverity[misra_c_2012_rule_10_5_violation] */
-    CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
-
     switch( pxAttribute->type )
     {
-        case ( CKA_CLASS ):
-        case ( CKA_KEY_TYPE ):
-        case ( CKA_LABEL ):
-            /* Do nothing. These values were parsed previously. */
-            break;
-
-        case ( CKA_SIGN ):
-        case ( CKA_TOKEN ):
-
-            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
-            {
-                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
-            }
-
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
-            /* coverity[misra_c_2012_rule_10_5_violation] */
-            if( xBool != ( CK_BBOOL ) CK_TRUE )
-            {
-                xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-            }
-
-            break;
-
         case ( CKA_MODULUS ):
             lMbedTLSResult = mbedtls_rsa_import_raw( pxRsaContext,
                                                      pxAttribute->pValue, pxAttribute->ulValueLen, /* N */
@@ -671,6 +710,80 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                     mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                     mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
         xResult = CKR_FUNCTION_FAILED;
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Parses attribute values for a RSA Key.
+ */
+static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
+                                mbedtls_rsa_context * pxRsaContext,
+                                CK_BBOOL xIsPrivate )
+{
+    CK_RV xResult = CKR_OK;
+    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* coverity[misra_c_2012_rule_10_5_violation] */
+    CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
+
+    switch( pxAttribute->type )
+    {
+        case ( CKA_CLASS ):
+        case ( CKA_KEY_TYPE ):
+        case ( CKA_LABEL ):
+            /* Do nothing. These values were parsed previously. */
+            break;
+
+        case ( CKA_TOKEN ):
+
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            }
+
+            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* coverity[misra_c_2012_rule_10_5_violation] */
+            if( ( xBool != ( CK_BBOOL ) CK_TRUE ) && ( xIsPrivate == CK_TRUE ) )
+            {
+                xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+            }
+
+            break;
+
+        case ( CKA_VERIFY ):
+            if( xIsPrivate == ( CK_BBOOL ) CK_FALSE )
+            {
+                xResult = prvRsaPubKeyAttParse( pxAttribute );
+            }
+            else
+            {
+                xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+            }
+            break;
+        case ( CKA_SIGN ):
+            if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
+            {
+                xResult = prvRsaPrivKeyAttParse( pxAttribute );
+            }
+            else
+            {
+                xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+            }
+            break;
+        case ( CKA_MODULUS ):
+        case ( CKA_PUBLIC_EXPONENT ):
+        case ( CKA_PRIME_1 ):
+        case ( CKA_PRIME_2 ):
+        case ( CKA_PRIVATE_EXPONENT ):
+        case ( CKA_EXPONENT_1 ):
+        case ( CKA_EXPONENT_2 ):
+        case ( CKA_COEFFICIENT ):
+            xResult = prvRsaContextParse( pxAttribute, pxRsaContext );
+            break;
+        default:
+            xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+            break;
     }
 
     return xResult;
@@ -1130,7 +1243,6 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
         else
         {
             LogDebug( ( "Received RSA key type." ) );
-            /* RSA key type. */
             ulDerBufSize = pkcs11_MAX_PRIVATE_KEY_DER_SIZE;
         }
     }
@@ -1142,6 +1254,11 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
         {
             LogDebug( ( "Received EC key type." ) );
             ulDerBufSize = pkcs11_MAX_EC_PUBLIC_KEY_DER_SIZE;
+        }
+        else
+        {
+            LogDebug( ( "Received RSA key type." ) );
+            ulDerBufSize = pkcs11_PUBLIC_RSA_2048_DER_SIZE;
         }
     }
 
@@ -2286,9 +2403,10 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
  * @param[in] ulCount length of templates array.
  * @param[in] pxObject PKCS #11 object handle.
  */
-static CK_RV prvCreateRsaPrivateKey( CK_ATTRIBUTE * pxTemplate,
+static CK_RV prvCreateRsaKey( CK_ATTRIBUTE * pxTemplate,
                                      CK_ULONG ulCount,
-                                     CK_OBJECT_HANDLE_PTR pxObject )
+                                     CK_OBJECT_HANDLE_PTR pxObject,
+                                     CK_BBOOL xIsPrivate )
 {
     CK_RV xResult = CKR_OK;
     mbedtls_pk_context xMbedContext = { 0 };
@@ -2325,7 +2443,7 @@ static CK_RV prvCreateRsaPrivateKey( CK_ATTRIBUTE * pxTemplate,
         /* Parse template and collect the relevant parts. */
         for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
         {
-            xResult = prvRsaKeyAttParse( &pxTemplate[ ulIndex ], xMbedContext.pk_ctx );
+            xResult = prvRsaKeyAttParse( &pxTemplate[ ulIndex ], xMbedContext.pk_ctx, xIsPrivate );
 
             if( xResult != CKR_OK )
             {
@@ -2340,9 +2458,7 @@ static CK_RV prvCreateRsaPrivateKey( CK_ATTRIBUTE * pxTemplate,
                                       pxObject,
                                       pxLabel,
                                       CKK_RSA,
-                                      /* See explanation in prvCheckValidSessionAndModule for this exception. */
-                                      /* coverity[misra_c_2012_rule_10_5_violation] */
-                                      ( CK_BBOOL ) CK_TRUE );
+                                      xIsPrivate );
     }
 
     /* Clean up the mbedTLS key context. */
@@ -2369,9 +2485,10 @@ static CK_RV prvCreatePrivateKey( CK_ATTRIBUTE * pxTemplate,
 
     if( xKeyType == CKK_RSA )
     {
-        xResult = prvCreateRsaPrivateKey( pxTemplate,
+        xResult = prvCreateRsaKey( pxTemplate,
                                           ulCount,
-                                          pxObject );
+                                          pxObject,
+                                          CK_TRUE );
     }
 
     #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
@@ -2423,7 +2540,7 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
 
     if( xKeyType == CKK_RSA )
     {
-        xResult = prvCreateRsaPrivateKey( pxTemplate, ulCount, pxObject );
+        xResult = prvCreateRsaKey( pxTemplate, ulCount, pxObject, CK_FALSE );
     }
 
     #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
