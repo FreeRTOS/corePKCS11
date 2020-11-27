@@ -3015,8 +3015,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE hSession,
                 {
                     pxSession->xFindObjectLabelLen = pTemplate->ulValueLen;
                     pxSession->pxFindObjectLabel = pxFindObjectLabel;
-                    ( void ) memset( pxFindObjectLabel, 0, pTemplate->ulValueLen + 1UL );
-
                     ( void ) memcpy( pxSession->pxFindObjectLabel, xAttribute.pValue, xAttribute.ulValueLen );
                     xResult = CKR_OK;
                 }
