@@ -3478,7 +3478,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
                             "received %lu.",
                             ( unsigned long int ) pkcs11SHA256_DIGEST_LENGTH,
                             ( unsigned long int ) *pulDigestLen ) );
-                xResult = CKR_DATA_LEN_RANGE;
+                xResult = CKR_BUFFER_TOO_SMALL;
             }
         }
     }

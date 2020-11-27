@@ -2832,7 +2832,7 @@ void test_pkcs11_C_DigestFinalBadArgs( void )
 
         ulDigestLen = 0;
         xResult = C_DigestFinal( xSession, pxDummyData, &ulDigestLen );
-        TEST_ASSERT_EQUAL( CKR_DATA_LEN_RANGE, xResult );
+        TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
     }
 
     prvCommonDeinitStubs();
