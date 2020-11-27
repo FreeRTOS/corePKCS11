@@ -2410,6 +2410,9 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
 {
     CK_KEY_TYPE xKeyType = 0;
     CK_RV xResult = CKR_OK;
+    mbedtls_pk_context xMbedContext = { 0 };
+    /* mbedtls_rsa_context must be malloc'ed to use with mbedtls_pk_free function. */
+    mbedtls_rsa_context * pxRsaCtx = mbedtls_calloc( 1, sizeof( mbedtls_rsa_context ) );
 
     #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM == 1 )
         /* Suppress unused parameter warning if ECDSA is suppressed. */
@@ -2420,9 +2423,7 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
 
     if( xKeyType == CKK_RSA )
     {
-        LogError( ( "Failed to create public key. Currently this stack cannot "
-                    "create RSA keys." ) );
-        xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+        xResult = prvCreateRsaPrivateKey( pxTemplate, ulCount, pxObject );
     }
 
     #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
