@@ -62,15 +62,15 @@ typedef struct P11Session
 
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( P11Session_t * pxSession )
 {
-
-    if( nondet_bool())
+    if( nondet_bool() )
     {
-        pxSession->pxFindObjectLabel = malloc( sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) ); 
+        pxSession->pxFindObjectLabel = malloc( sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) );
         pxSession->xFindObjectLabelLen = sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS );
         __CPROVER_assume( pxSession->pxFindObjectLabel != NULL );
 
-        memcpy(pxSession->pxFindObjectLabel, pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS, sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) );
+        memcpy( pxSession->pxFindObjectLabel, pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS, sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) );
     }
+
     return CKR_OK;
 }
 
@@ -84,6 +84,6 @@ void harness()
 {
     CK_SESSION_HANDLE xSession;
 
-__CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
- ( void ) C_FindObjectsFinal( xSession );
+    __CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
+    ( void ) C_FindObjectsFinal( xSession );
 }

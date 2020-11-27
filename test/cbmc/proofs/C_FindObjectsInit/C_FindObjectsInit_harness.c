@@ -88,6 +88,6 @@ void harness()
         __CPROVER_assume( pxTemplate[ i ].pValue != NULL );
     }
 
-__CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
-  C_FindObjectsInit( xSession, pxTemplate, ulDataLen );
+    __CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
+    C_FindObjectsInit( xSession, pxTemplate, ulDataLen );
 }

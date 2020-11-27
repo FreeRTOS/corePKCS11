@@ -62,10 +62,9 @@ typedef struct P11Session
 
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( P11Session_t * pxSession )
 {
-    
-    pxSession->pxFindObjectLabel = malloc( sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) ); 
+    pxSession->pxFindObjectLabel = malloc( sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) );
     __CPROVER_assume( pxSession->pxFindObjectLabel != NULL );
-    memcpy(pxSession->pxFindObjectLabel, pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS, sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) );
+    memcpy( pxSession->pxFindObjectLabel, pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS, sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) );
     pxSession->xFindObjectLabelLen = sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS );
     return CKR_OK;
 }
@@ -80,22 +79,23 @@ void harness()
 {
     CK_RV xResult;
     CK_SESSION_HANDLE xSession;
-     CK_OBJECT_HANDLE hObject;
+    CK_OBJECT_HANDLE hObject;
     CK_ULONG ulMaxObjectCount;
     CK_ULONG ulObjectCount;
 
-__CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
+    __CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
 
     /* This port assumes seraching for max 1 object a time. */
     __CPROVER_assume( ulMaxObjectCount == 1 );
 
     /* We initialize here so the module can have valid mutexes. */
- xResult = C_Initialize( NULL );
+    xResult = C_Initialize( NULL );
     __CPROVER_assume( xResult == CKR_OK );
 
-  xResult = C_FindObjects( xSession, &hObject, ulMaxObjectCount, &ulObjectCount );
-  if( xResult == CKR_OK )
-  {
-    __CPROVER_assert( ( ( ulObjectCount == 1 ) || ( ulObjectCount == 0 ) ), "This port supports only finding one object." );
-  }
+    xResult = C_FindObjects( xSession, &hObject, ulMaxObjectCount, &ulObjectCount );
+
+    if( xResult == CKR_OK )
+    {
+        __CPROVER_assert( ( ( ulObjectCount == 1 ) || ( ulObjectCount == 0 ) ), "This port supports only finding one object." );
+    }
 }

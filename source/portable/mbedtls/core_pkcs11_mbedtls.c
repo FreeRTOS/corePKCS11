@@ -2997,42 +2997,43 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE hSession,
 
     /* Malloc space to save template information. */
     if( ( xResult == CKR_OK ) && ( pTemplate->ulValueLen <= pkcs11configMAX_LABEL_LENGTH ) )
-
-    /* Search template for label.
-     * NOTE: This port only supports looking up objects by CKA_LABEL and all
-     * other search attributes are ignored. */
-    if( xResult == CKR_OK )
     {
-        xResult = CKR_TEMPLATE_INCOMPLETE;
-
-        for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
+        /* Search template for label.
+         * NOTE: This port only supports looking up objects by CKA_LABEL and all
+         * other search attributes are ignored. */
+        if( xResult == CKR_OK )
         {
-            xAttribute = pTemplate[ ulIndex ];
+            xResult = CKR_TEMPLATE_INCOMPLETE;
 
-            if( ( xAttribute.type == CKA_LABEL ) && ( xAttribute.ulValueLen <= pxSession->xFindObjectLabelLen ) )
+            for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
             {
-                /* Plus one to leave room for a NULL terminator. */
-                pxFindObjectLabel = mbedtls_calloc( 1, pTemplate->ulValueLen + 1UL );
-                
-                if( pxFindObjectLabel != NULL )
-                {
-                    pxSession->xFindObjectLabelLen = pTemplate->ulValueLen;
-                    pxSession->pxFindObjectLabel = pxFindObjectLabel;
-                    ( void ) memset( pxFindObjectLabel, 0, pTemplate->ulValueLen + 1UL );
+                xAttribute = pTemplate[ ulIndex ];
 
-                    ( void ) memcpy( pxSession->pxFindObjectLabel, xAttribute.pValue, xAttribute.ulValueLen );
-                    xResult = CKR_OK;
+                if( ( xAttribute.type == CKA_LABEL ) && ( xAttribute.ulValueLen <= pxSession->xFindObjectLabelLen ) )
+                {
+                    /* Plus one to leave room for a NULL terminator. */
+                    pxFindObjectLabel = mbedtls_calloc( 1, pTemplate->ulValueLen + 1UL );
+
+                    if( pxFindObjectLabel != NULL )
+                    {
+                        pxSession->xFindObjectLabelLen = pTemplate->ulValueLen;
+                        pxSession->pxFindObjectLabel = pxFindObjectLabel;
+                        ( void ) memset( pxFindObjectLabel, 0, pTemplate->ulValueLen + 1UL );
+
+                        ( void ) memcpy( pxSession->pxFindObjectLabel, xAttribute.pValue, xAttribute.ulValueLen );
+                        xResult = CKR_OK;
+                    }
+                    else
+                    {
+                        LogError( ( "Failed to initialize find object operation. Failed to "
+                                    "allocate %lu bytes.", ( unsigned long int ) pTemplate->ulValueLen + 1UL ) );
+                        xResult = CKR_HOST_MEMORY;
+                    }
                 }
                 else
                 {
-                    LogError( ( "Failed to initialize find object operation. Failed to "
-                                "allocate %lu bytes.", ( unsigned long int ) pTemplate->ulValueLen + 1UL ) );
-                    xResult = CKR_HOST_MEMORY;
+                    LogDebug( ( "Search parameters other than label are ignored." ) );
                 }
-            }
-            else
-            {
-                LogDebug( ( "Search parameters other than label are ignored." ) );
             }
         }
     }

@@ -42,6 +42,7 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 {
     /* Random Data, the implementation is just going to check that the memory is not zeroed. */
     static CK_BYTE dummyDummyData[ 12 ] = { 0xAB };
+
     __CPROVER_assert( ppucData != NULL, "ppucData was NULL." );
     __CPROVER_assert( pulDataSize != NULL, "pulDataSize was NULL." );
     __CPROVER_assert( pIsPrivate != NULL, "pIsPrivate was NULL." );
