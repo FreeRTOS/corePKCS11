@@ -1758,7 +1758,7 @@ void test_pkcs11_C_CreateObjectRSAPubKeyBadAtts( void )
             { CKA_KEY_TYPE,        &xPublicKeyType,   sizeof( CK_KEY_TYPE )                        },
             { CKA_TOKEN,           &xTrue,            sizeof( xTrue )                              },
             { CKA_MODULUS,         &xModulus + 1,     MODULUS_LENGTH                               },
-            { CKA_VERIFY,          &xFalse,            sizeof( xFalse )                              },
+            { CKA_VERIFY,          &xFalse,           sizeof( xFalse )                             },
             { CKA_PUBLIC_EXPONENT, xPublicExponent,   sizeof( xPublicExponent )                    },
             { CKA_LABEL,           pucPublicKeyLabel, strlen( ( const char * ) pucPublicKeyLabel ) }
         };
@@ -1777,11 +1777,12 @@ void test_pkcs11_C_CreateObjectRSAPubKeyBadAtts( void )
                                   sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
 
-        TEST_ASSERT_EQUAL(  CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
     prvCommonDeinitStubs();
 }
+
 /*
  *!
  * @brief C_CreateObject Creating a Certificate happy path.
