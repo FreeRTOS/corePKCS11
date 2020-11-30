@@ -410,9 +410,7 @@ static CK_BBOOL prvOperationActive( const P11Session_t * pxSession )
 }
 
 /**
- * @brief Initialize mbedTLS
- * @note: Before prvMbedTLS_Initialize can be called, CRYPTO_Init()
- * must be called to initialize the mbedTLS mutex functions.
+ * @brief Initialize mbedTLS.
  */
 static CK_RV prvMbedTLS_Initialize( void )
 {
@@ -2567,6 +2565,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE hSession,
     const P11Session_t * pxSession = prvSessionPointerFromHandle( hSession );
     CK_RV xResult = prvCheckValidSessionAndModule( pxSession );
 
+    if( ( hObject < 1UL ) || ( hObject > pkcs11configMAX_NUM_OBJECTS ) )
+    {
+        xResult = CKR_OBJECT_HANDLE_INVALID;
+    }
+
     if( xResult == CKR_OK )
     {
         xResult = PKCS11_PAL_DestroyObject( hObject );
@@ -3444,16 +3447,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
         }
         else
         {
-            if( *pulDigestLen < ( CK_ULONG ) pkcs11SHA256_DIGEST_LENGTH )
-            {
-                LogError( ( "Failed to finish digest operation. Received a "
-                            "buffer that was too small. Expected %lu and "
-                            "received %lu.",
-                            ( unsigned long int ) pkcs11SHA256_DIGEST_LENGTH,
-                            ( unsigned long int ) *pulDigestLen ) );
-                xResult = CKR_BUFFER_TOO_SMALL;
-            }
-            else
+            if( *pulDigestLen == ( CK_ULONG ) pkcs11SHA256_DIGEST_LENGTH )
             {
                 lMbedTLSResult = mbedtls_sha256_finish_ret( &pxSession->xSHA256Context, pDigest );
 
@@ -3468,6 +3462,15 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
                 }
 
                 pxSession->xOperationDigestMechanism = pkcs11NO_OPERATION;
+            }
+            else
+            {
+                LogError( ( "Failed to finish digest operation. Received a "
+                            "buffer that was an unexpected size. Expected %lu and "
+                            "received %lu.",
+                            ( unsigned long int ) pkcs11SHA256_DIGEST_LENGTH,
+                            ( unsigned long int ) *pulDigestLen ) );
+                xResult = CKR_BUFFER_TOO_SMALL;
             }
         }
     }
