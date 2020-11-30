@@ -89,4 +89,6 @@ void harness()
 
     xResult = C_DigestUpdate( hSession, NULL, ulPartlen );
     __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "A NULL buffer is considered a bad argument." );
+
+    free( pPart );
 }

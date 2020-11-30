@@ -101,4 +101,6 @@ void harness()
 
     xResult = C_DigestFinal( hSession, pPart, NULL );
     __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "A NULL length pointer is a bad argument." );
+
+    free( pPart );
 }
