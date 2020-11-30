@@ -50,7 +50,7 @@ void mbedtls_ctr_drbg_init( mbedtls_ctr_drbg_context * ctx )
 }
 
 int mbedtls_ctr_drbg_seed( mbedtls_ctr_drbg_context * ctx,
-                           int ( * f_entropy )( void *, unsigned char *, size_t ),
+                           int ( *f_entropy )( void *, unsigned char *, size_t ),
                            void * p_entropy,
                            const unsigned char * custom,
                            size_t len )
@@ -81,7 +81,7 @@ int mbedtls_pk_sign( mbedtls_pk_context * ctx,
                      size_t hash_len,
                      unsigned char * sig,
                      size_t * sig_len,
-                     int ( * f_rng )( void *, unsigned char *, size_t ),
+                     int ( *f_rng )( void *, unsigned char *, size_t ),
                      void * p_rng )
 {
     __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
@@ -125,11 +125,13 @@ int mbedtls_pk_verify( mbedtls_pk_context * ctx,
 static void threading_mutex_init( mbedtls_threading_mutex_t * mutex )
 {
     __CPROVER_assert( mutex != NULL, "Received an unexpected NULL pointer." );
+    mutex = malloc( sizeof( mbedtls_threading_mutex_t ) );
 }
 
 static void threading_mutex_free( mbedtls_threading_mutex_t * mutex )
 {
     __CPROVER_assert( mutex != NULL, "Received an unexpected NULL pointer." );
+    free( mutex );
 }
 
 
