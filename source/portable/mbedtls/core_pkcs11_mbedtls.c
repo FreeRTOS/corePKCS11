@@ -3009,11 +3009,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE hSession,
             if( ( xAttribute.type == CKA_LABEL ) && ( xAttribute.ulValueLen <= pkcs11configMAX_LABEL_LENGTH ) )
             {
                 /* Plus one to leave room for a NULL terminator. */
-                pxFindObjectLabel = mbedtls_calloc( 1, pTemplate->ulValueLen + 1UL );
+                pxFindObjectLabel = mbedtls_calloc( 1, xAttribute.ulValueLen + 1UL );
 
                 if( pxFindObjectLabel != NULL )
                 {
-                    pxSession->xFindObjectLabelLen = pTemplate->ulValueLen;
+                    pxSession->xFindObjectLabelLen = xAttribute.ulValueLen;
                     pxSession->pxFindObjectLabel = pxFindObjectLabel;
                     ( void ) memcpy( pxSession->pxFindObjectLabel, xAttribute.pValue, xAttribute.ulValueLen );
                     xResult = CKR_OK;
@@ -3021,7 +3021,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE hSession,
                 else
                 {
                     LogError( ( "Failed to initialize find object operation. Failed to "
-                                "allocate %lu bytes.", ( unsigned long int ) pTemplate->ulValueLen + 1UL ) );
+                                "allocate %lu bytes.", ( unsigned long int ) xAttribute.ulValueLen + 1UL ) );
                     xResult = CKR_HOST_MEMORY;
                 }
             }
