@@ -319,7 +319,7 @@ CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
     {
         xTemplate[ 0 ].type = CKA_LABEL;
         xTemplate[ 0 ].pValue = ( CK_VOID_PTR ) pcLabelName;
-        xTemplate[ 0 ].ulValueLen = strnlen( pcLabelName, pkcs11configMAX_LABEL_LENGTH );
+        xTemplate[ 0 ].ulValueLen = strlen( pcLabelName );
 
         xTemplate[ 1 ].type = CKA_CLASS;
         xTemplate[ 1 ].pValue = &xClass;
