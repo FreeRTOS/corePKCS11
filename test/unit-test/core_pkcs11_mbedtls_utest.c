@@ -1477,11 +1477,11 @@ void test_pkcs11_C_CreateObjectECPubKeyBadAtt( void )
     CK_BBOOL xTrue = CK_TRUE;
     CK_BBOOL xFalse = CK_FALSE;
     char * pucPubLabel = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
-    size_t xLength = 67;
+    size_t xLength = pkcs11EC_POINT_LENGTH;
     /* DER-encoding of an ANSI X9.62 Parameters value */
     CK_BYTE pxEcPubParams[] = pkcs11DER_ENCODED_OID_P256;
     CK_OBJECT_HANDLE xObject = 0;
-    CK_BYTE pxEcPoint[ 67 ] = { 0 };
+    CK_BYTE pxEcPoint[ pkcs11EC_POINT_LENGTH ] = { 0 };
 
     CK_ATTRIBUTE xPublicKeyTemplate[] = EC_PUB_KEY_INITIALIZER;
 

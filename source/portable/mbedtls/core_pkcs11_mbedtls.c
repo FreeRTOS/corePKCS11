@@ -693,7 +693,9 @@ static CK_RV prvRsaContextParse( const CK_ATTRIBUTE * pxAttribute,
             break;
 
         default:
-            /* Unreachable */
+            /* This should never be reached, as the above types are what gets this function called.
+             * Nevertheless this is an error case, and MISRA requires a default statement. */
+            xResult = CKR_ATTRIBUTE_TYPE_INVALID;
             break;
     }
 
