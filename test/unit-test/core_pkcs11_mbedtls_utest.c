@@ -1477,11 +1477,11 @@ void test_pkcs11_C_CreateObjectECPubKeyBadAtt( void )
     CK_BBOOL xTrue = CK_TRUE;
     CK_BBOOL xFalse = CK_FALSE;
     char * pucPubLabel = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
-    size_t xLength = 256;
+    size_t xLength = 67;
     /* DER-encoding of an ANSI X9.62 Parameters value */
     CK_BYTE pxEcPubParams[] = pkcs11DER_ENCODED_OID_P256;
     CK_OBJECT_HANDLE xObject = 0;
-    CK_BYTE pxEcPoint[ 256 ] = { 0 };
+    CK_BYTE pxEcPoint[ 67 ] = { 0 };
 
     CK_ATTRIBUTE xPublicKeyTemplate[] = EC_PUB_KEY_INITIALIZER;
 
@@ -1532,17 +1532,26 @@ void test_pkcs11_C_CreateObjectECPubKeyBadAtt( void )
                                   &xObject );
 
         TEST_ASSERT_EQUAL( CKR_TEMPLATE_INCOMPLETE, xResult );
-
         xPublicKeyTemplate[ 0 ].type = CKA_CLASS;
         xPublicKeyTemplate[ 0 ].pValue = &xPublicKeyClass;
-        xPublicKeyTemplate[ 3 ].pValue = &xFalse;
+
         xPublicKeyTemplate[ 5 ].type = CKA_EC_POINT;
+        xPublicKeyTemplate[ 5 ].ulValueLen = 0;
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
                                   sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
-
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+        xPublicKeyTemplate[ 5 ].ulValueLen = xLength;
+
+        xPublicKeyTemplate[ 3 ].pValue = &xFalse;
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
+                                  sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+        xPublicKeyTemplate[ 5 ].ulValueLen = xLength;
+
 
         xPublicKeyTemplate[ 3 ].type = CKA_SIGN;
         xResult = C_CreateObject( xSession,
@@ -1656,6 +1665,14 @@ void test_pkcs11_C_CreateObjectRSAPrivKeyBadAtt( void )
 
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
 
+        xPrivateKeyTemplate[ 4 ].type = CKA_VERIFY;
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
+                                  sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+        xPrivateKeyTemplate[ 4 ].type = CKA_SIGN;
+
         xTrue = CK_FALSE;
         xPrivateKeyTemplate[ 2 ].type = CKA_EC_POINT;
         xResult = C_CreateObject( xSession,
@@ -1733,6 +1750,56 @@ void test_pkcs11_C_CreateObjectRSAPubKey( void )
 
 /*
  *!
+ * @brief C_CreateObject Creating an RSA Public key mbed TLS failure.
+ */
+void test_pkcs11_C_CreateObjectRSAPubKeyMbedFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_KEY_TYPE xPublicKeyType = CKK_RSA;
+    CK_OBJECT_CLASS xClass = CKO_PUBLIC_KEY;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_BYTE xPublicExponent[] = { 0x01, 0x00, 0x01 };
+    CK_BYTE xModulus[ MODULUS_LENGTH + 1 ] = { 0 };
+    CK_BYTE pucPublicKeyLabel[] = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        CK_ATTRIBUTE xPublicKeyTemplate[] =
+        {
+            { CKA_CLASS,           &xClass,           sizeof( CK_OBJECT_CLASS )                    },
+            { CKA_KEY_TYPE,        &xPublicKeyType,   sizeof( CK_KEY_TYPE )                        },
+            { CKA_TOKEN,           &xTrue,            sizeof( xTrue )                              },
+            { CKA_MODULUS,         &xModulus + 1,     MODULUS_LENGTH                               },
+            { CKA_VERIFY,          &xTrue,            sizeof( xTrue )                              },
+            { CKA_PUBLIC_EXPONENT, xPublicExponent,   sizeof( xPublicExponent )                    },
+            { CKA_LABEL,           pucPublicKeyLabel, strlen( ( const char * ) pucPublicKeyLabel ) }
+        };
+
+        mbedtls_pk_init_CMockIgnore();
+        mock_osal_calloc_Stub( pvPkcs11CallocCb );
+        mbedtls_rsa_init_CMockIgnore();
+        mbedtls_rsa_import_raw_IgnoreAndReturn( -1 );
+        mbedtls_pk_free_Stub( vMbedPkFree );
+        mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
+        mock_osal_free_Stub( vPkcs11FreeCb );
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
+                                  sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
+/*
+ *!
  * @brief C_CreateObject Creating an RSA Public key bad attribute parameters.
  */
 void test_pkcs11_C_CreateObjectRSAPubKeyBadAtts( void )
@@ -1776,7 +1843,20 @@ void test_pkcs11_C_CreateObjectRSAPubKeyBadAtts( void )
         xResult = C_CreateObject( xSession, ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
                                   sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
                                   &xObject );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+        xPublicKeyTemplate[ 4 ].pValue = &xTrue;
 
+        xPublicKeyTemplate[ 2 ].pValue = &xFalse;
+        xResult = C_CreateObject( xSession, ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
+                                  sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+        xPublicKeyTemplate[ 2 ].pValue = &xTrue;
+
+        xPublicKeyTemplate[ 2 ].type = CKA_SIGN;
+        xResult = C_CreateObject( xSession, ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
+                                  sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
@@ -2339,6 +2419,20 @@ void test_pkcs11_C_GetAttributeValuePrivKey( void )
         xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
+        xTemplate.type = CKA_EC_PARAMS;
+        xTemplate.pValue = &ulCount;
+        xTemplate.ulValueLen = 1;
+        mbedtls_pk_parse_key_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
+        TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
+
+        xTemplate.type = CKA_EC_POINT;
+        xTemplate.pValue = &ulCount;
+        xTemplate.ulValueLen = 72;
+        mbedtls_pk_parse_key_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
+        TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
+
         xTemplate.pValue = &xKeyType;
         xTemplate.ulValueLen = 0;
         mbedtls_pk_parse_key_ExpectAnyArgsAndReturn( 0 );
@@ -2373,7 +2467,7 @@ void test_pkcs11_C_GetAttributeBadArgs( void )
         xResult = C_GetAttributeValue( -1, xObject, ( CK_ATTRIBUTE_PTR ) &xResult, ulCount );
         TEST_ASSERT_EQUAL( CKR_SESSION_HANDLE_INVALID, xResult );
 
-        xResult = C_GetAttributeValue( xSession, CKR_OBJECT_HANDLE_INVALID, ( CK_ATTRIBUTE_PTR ) &xResult, ulCount );
+        xResult = C_GetAttributeValue( xSession, 0, ( CK_ATTRIBUTE_PTR ) &xResult, ulCount );
         TEST_ASSERT_EQUAL( CKR_OBJECT_HANDLE_INVALID, xResult );
 
         xResult = C_GetAttributeValue( xSession, pkcs11configMAX_NUM_OBJECTS + 2, ( CK_ATTRIBUTE_PTR ) &xResult, ulCount );
@@ -3100,6 +3194,9 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
 
     if( TEST_PROTECT() )
     {
+        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
+
         xResult = prvCreateEcPriv( &xSession, &xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
@@ -4520,6 +4617,27 @@ void test_pkcs11_C_DestroyObjectNullLabel( void )
         mock_osal_free_Stub( vPkcs11FreeCb );
         xResult = C_DestroyObject( xSession, xObject );
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
+/*!
+ * @brief C_DestroyObject invalid object handle is passed to C_DestroyObject
+ *
+ */
+void test_pkcs11_C_DestroyObjectBadHandle( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = ( CK_OBJECT_HANDLE ) -1;
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        xResult = C_DestroyObject( xSession, xObject );
+        TEST_ASSERT_EQUAL( CKR_OBJECT_HANDLE_INVALID, xResult );
     }
 
     prvCommonDeinitStubs();

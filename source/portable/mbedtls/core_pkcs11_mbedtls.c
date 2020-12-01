@@ -693,7 +693,7 @@ static CK_RV prvRsaContextParse( const CK_ATTRIBUTE * pxAttribute,
             break;
 
         default:
-            xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+            /* Unreachable */
             break;
     }
 
@@ -737,7 +737,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
-            if( ( xBool != ( CK_BBOOL ) CK_TRUE ) && ( xIsPrivate == ( CK_BBOOL ) CK_TRUE ) )
+            if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
                 xResult = CKR_ATTRIBUTE_VALUE_INVALID;
             }
