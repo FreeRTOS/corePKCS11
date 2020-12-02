@@ -248,6 +248,7 @@ ucsigcomponentlength
 uctemp
 uint
 ul
+ulLabelNameLen
 ulcount
 uldatalen
 uldatasize

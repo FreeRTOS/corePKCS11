@@ -823,7 +823,7 @@ void test_IotPkcs11_xFindObjectWithLabelAndClassNoObjectsFound( void )
     xResult = xFindObjectWithLabelAndClass( xHandle,
                                             pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
                                             strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
-                                            CKO_PRIVATE_KEY, 
+                                            CKO_PRIVATE_KEY,
                                             &xPrivateKeyHandle );
 
     TEST_ASSERT_EQUAL( CKR_OK, xResult );
