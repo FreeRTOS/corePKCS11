@@ -1421,12 +1421,12 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
             if( 0 == strncmp( xLabel.pValue, pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS, xLabel.ulValueLen ) )
             {
                 /* Remove NULL terminator in comparison. */
-                prvFindObjectInListByLabel( pxPubKeyLabel, strlen( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) - 1UL, &xPalHandle, &xAppHandle2 );
+                prvFindObjectInListByLabel( pxPubKeyLabel, sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ), &xPalHandle, &xAppHandle2 );
             }
             else if( 0 == strncmp( xLabel.pValue, pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS, xLabel.ulValueLen ) )
             {
                 /* Remove NULL terminator in comparison. */
-                prvFindObjectInListByLabel( pxPrivKeyLabel, strlen( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) - 1UL, &xPalHandle, &xAppHandle2 );
+                prvFindObjectInListByLabel( pxPrivKeyLabel, sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ), &xPalHandle, &xAppHandle2 );
             }
             else
             {

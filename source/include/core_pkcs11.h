@@ -285,6 +285,7 @@ CK_RV xInitializePkcs11Token( void );
 /* @[declare_pkcs11_core_xfindobjectwithlabelandclass] */
 CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
                                     char * pcLabelName,
+                                    CK_ULONG ulLabelNameLen,
                                     CK_OBJECT_CLASS xClass,
                                     CK_OBJECT_HANDLE_PTR pxHandle );
 /* @[declare_pkcs11_core_xfindobjectwithlabelandclass] */

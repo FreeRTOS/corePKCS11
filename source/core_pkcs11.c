@@ -303,6 +303,7 @@ CK_RV xInitializePkcs11Session( CK_SESSION_HANDLE * pxSession )
 
 CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
                                     char * pcLabelName,
+                                    CK_ULONG ulLabelNameLen,
                                     CK_OBJECT_CLASS xClass,
                                     CK_OBJECT_HANDLE_PTR pxHandle )
 {
@@ -319,7 +320,7 @@ CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
     {
         xTemplate[ 0 ].type = CKA_LABEL;
         xTemplate[ 0 ].pValue = ( CK_VOID_PTR ) pcLabelName;
-        xTemplate[ 0 ].ulValueLen = strlen( pcLabelName );
+        xTemplate[ 0 ].ulValueLen = ulLabelNameLen;
 
         xTemplate[ 1 ].type = CKA_CLASS;
         xTemplate[ 1 ].pValue = &xClass;
