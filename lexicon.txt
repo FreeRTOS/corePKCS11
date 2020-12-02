@@ -138,7 +138,7 @@ palfile
 papplication
 param
 params
-pcLabelName
+pclabelname
 pcfilename
 pclabel
 pclabelname
@@ -249,7 +249,7 @@ ucsigcomponentlength
 uctemp
 uint
 ul
-ulLabelNameLen
+ullabelnamelen
 ulcount
 uldatalen
 uldatasize
