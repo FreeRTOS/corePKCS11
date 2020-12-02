@@ -271,6 +271,7 @@ CK_RV xInitializePkcs11Token( void );
  *
  *   \param[in]  xSession       An open PKCS #11 session.
  *   \param[in]  pcLabelName    A pointer to the object's label (CKA_LABEL).
+ *   \param[in]  ulLabelNameLen The size (in bytes) of pcLabelName.
  *   \param[in]  xClass         The class (CKA_CLASS) of the object.
  *                              ex: CKO_PUBLIC_KEY, CKO_PRIVATE_KEY, CKO_CERTIFICATE
  *   \param[out] pxHandle       Pointer to the location where the handle of
@@ -285,6 +286,7 @@ CK_RV xInitializePkcs11Token( void );
 /* @[declare_pkcs11_core_xfindobjectwithlabelandclass] */
 CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
                                     char * pcLabelName,
+                                    CK_ULONG ulLabelNameLen,
                                     CK_OBJECT_CLASS xClass,
                                     CK_OBJECT_HANDLE_PTR pxHandle );
 /* @[declare_pkcs11_core_xfindobjectwithlabelandclass] */
