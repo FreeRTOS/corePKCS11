@@ -160,7 +160,6 @@ int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
         pucSig[ 0 ] = 0x30; /* Sequence. */
         pucSig[ 1 ] = 0x44; /* The minimum length the signature could be. */
         pucSig[ 2 ] = 0x02; /* Integer. */
-        *pxSigLen = 0UL;    /* Set signature length output to 0. */
 
         /*************** R Component. *******************/
 
@@ -170,7 +169,6 @@ int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
         {
             pucSig[ 1 ]++;                               /* Increment the length of the structure to account for the 0x00 pad. */
             pucSig[ 3 ] = 0x21;                          /* Increment the length of the R value to account for the 0x00 pad. */
-            *pxSigLen += 0x21UL;                         /* Add R length to the signature length. */
             pucSig[ 4 ] = 0x0;                           /* Write the 0x00 pad. */
             ( void ) memcpy( &pucSig[ 5 ], ucTemp, 32 ); /* Copy the 32-byte R value. */
             pucSigPtr = pucSig + 33;                     /* Increment the pointer to compensate for padded R length.    */
@@ -178,7 +176,6 @@ int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
         else
         {
             pucSig[ 3 ] = 0x20;                          /* R length with be 32 bytes. */
-            *pxSigLen += 0x20UL;                         /* Add R length to the signature length. */
             ( void ) memcpy( &pucSig[ 4 ], ucTemp, 32 ); /* Copy 32 bytes of R into the signature buffer. */
             pucSigPtr = pucSig + 32;                     /* Increment the pointer for 32 byte R length. */
         }
@@ -195,7 +192,6 @@ int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
         {
             pucSig[ 1 ]++;                                   /* Increment the length of the structure to account for the 0x00 pad. */
             pucSigPtr[ 0 ] = 0x21;                           /* Increment the length of the S value to account for the 0x00 pad. */
-            *pxSigLen += 0x21UL;                             /* Add S length to the signature length. */
             pucSigPtr[ 1 ] = 0x00;                           /* Write the 0x00 pad. */
             pucSigPtr += 2;                                  /* pucSigPtr was pointing at the S-length.  Increment by 2 to hop over length and 0 padding. */
 
@@ -204,19 +200,13 @@ int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
         else
         {
             pucSigPtr[ 0 ] = 0x20;                           /* S length will be 32 bytes. */
-            *pxSigLen += 0x20UL;                             /* Add S length to the signature length. */
             pucSigPtr++;                                     /* Hop pointer over the length byte. */
             ( void ) memcpy( pucSigPtr, &ucTemp[ 32 ], 32 ); /* Copy the S value. */
         }
 
         /* The total signature length is the length of the R and S integers plus 2 bytes for
          * the SEQUENCE and LENGTH wrapping the entire struct. */
-        *pxSigLen += 2UL;
-
-        if( *pxSigLen >= 72UL )
-        {
-            xReturn = FAILURE;
-        }
+        *pxSigLen = pucSig[ 1 ] + 2UL;
     }
 
     return xReturn;

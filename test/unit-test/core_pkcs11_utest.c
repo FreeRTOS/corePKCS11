@@ -386,6 +386,42 @@ void test_IotPkcs11_xGetSlotListBadSlotList( void )
     TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }
 
+
+/*!
+ * @brief xGetSlotList NULL args.
+ *
+ */
+void test_IotPkcs11_xGetSlotListBadArgs( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SLOT_ID_PTR pxSlotId = NULL;
+    CK_ULONG xSlotCount = 0;
+
+    xResult = xGetSlotList( NULL, &xSlotCount );
+    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+
+    xResult = xGetSlotList( &pxSlotId, NULL );
+    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+}
+
+/*!
+ * @brief xGetSlotList C_GetSlotList not implemented.
+ *
+ */
+void test_IotPkcs11_xGetSlotListNoC_GetSlotList( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SLOT_ID_PTR pxSlotId = NULL;
+    CK_ULONG xSlotCount = 0;
+
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList );
+    prvP11FunctionList.C_GetSlotList = NULL;
+    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
+    prvP11FunctionList.C_GetSlotList = C_GetSlotList;
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+}
+
 /*!
  * @brief xGetSlotList free memory branch path.
  *
@@ -764,6 +800,7 @@ void test_IotPkcs11_xFindObjectWithLabelAndClass( void )
     C_FindObjectsFinal_IgnoreAndReturn( CKR_OK );
     xResult = xFindObjectWithLabelAndClass( xHandle,
                                             pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
+                                            strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
                                             CKO_PRIVATE_KEY, &xPrivateKeyHandle );
 
     TEST_ASSERT_EQUAL( CKR_OK, xResult );
@@ -785,7 +822,9 @@ void test_IotPkcs11_xFindObjectWithLabelAndClassNoObjectsFound( void )
     C_FindObjectsFinal_IgnoreAndReturn( CKR_OK );
     xResult = xFindObjectWithLabelAndClass( xHandle,
                                             pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
-                                            CKO_PRIVATE_KEY, &xPrivateKeyHandle );
+                                            strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
+                                            CKO_PRIVATE_KEY,
+                                            &xPrivateKeyHandle );
 
     TEST_ASSERT_EQUAL( CKR_OK, xResult );
     TEST_ASSERT_EQUAL( CK_INVALID_HANDLE, xPrivateKeyHandle );
@@ -802,12 +841,12 @@ void test_IotPkcs11_xFindObjectWithLabelAndClassNullArgs( void )
     CK_OBJECT_HANDLE xPrivateKeyHandle = { 0 };
 
     /* NULL label name. */
-    xResult = xFindObjectWithLabelAndClass( xHandle, NULL, CKO_PRIVATE_KEY, &xPrivateKeyHandle );
+    xResult = xFindObjectWithLabelAndClass( xHandle, NULL, 0, CKO_PRIVATE_KEY, &xPrivateKeyHandle );
 
     TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 
     /* NULL object handle. */
-    xResult = xFindObjectWithLabelAndClass( xHandle, pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS, CKO_PRIVATE_KEY, NULL );
+    xResult = xFindObjectWithLabelAndClass( xHandle, pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS, strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ), CKO_PRIVATE_KEY, NULL );
 
     TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 }
@@ -823,7 +862,7 @@ void test_IotPkcs11_xFindObjectWithLabelAndClassBadFunctionList( void )
     CK_OBJECT_HANDLE xPrivateKeyHandle = { 0 };
 
     C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
-    xResult = xFindObjectWithLabelAndClass( xHandle, pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS, CKO_PRIVATE_KEY, &xPrivateKeyHandle );
+    xResult = xFindObjectWithLabelAndClass( xHandle, pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS, strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ), CKO_PRIVATE_KEY, &xPrivateKeyHandle );
 
     TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }

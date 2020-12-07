@@ -39,8 +39,8 @@ void harness()
     char * pcLabel = "Random Label.";
     CK_RV xResult;
 
-    xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, xClass, &xHandle );
+    xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, strlen( pcLabel ), xClass, &xHandle );
 
-    xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, xClass, NULL );
+    xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, strlen( pcLabel ), xClass, NULL );
     __CPROVER_assert( xResult != CKR_OK, "NULL arguments should fail." );
 }
