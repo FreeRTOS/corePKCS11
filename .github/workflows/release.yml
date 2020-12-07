@@ -24,14 +24,14 @@ jobs:
             git config --global user.name "Release Workflow"
       - name: Tag Commit and Push to remote
         run: |
-          git tag ${{ github.event.inputs.version_number }} -a -m "coreMQTT Library ${{ github.event.inputs.version_number }}"
+          git tag ${{ github.event.inputs.version_number }} -a -m "corePKCS11 Library ${{ github.event.inputs.version_number }}"
           git push origin --tags
       - name: Verify tag on remote
         run: |
           git tag -d ${{ github.event.inputs.version_number }}
           git remote update
           git checkout tags/${{ github.event.inputs.version_number }}
-          git diff origin/${{ github.event.inputs.commit_id }} tags/${{ github.event.inputs.version_number }}
+          git diff ${{ github.event.inputs.commit_id }} tags/${{ github.event.inputs.version_number }}
   create-zip:
     needs: tag-commit
     name: Create ZIP and verify package for release asset.
@@ -43,28 +43,28 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.inputs.commit_id }}
-          path: coreMQTT
+          path: corePKCS11
           submodules: recursive
       - name: Checkout disabled submodules
         run: |
-          cd coreMQTT
+          cd corePKCS11
           git submodule update --init --checkout --recursive
       - name: Create ZIP
         run: |
-          zip -r coreMQTT-${{ github.event.inputs.version_number }}.zip coreMQTT -x "*.git*"
+          zip -r corePKCS11-${{ github.event.inputs.version_number }}.zip corePKCS11 -x "*.git*"
           ls ./
       - name: Validate created ZIP
         run: |
           mkdir zip-check
-          mv coreMQTT-${{ github.event.inputs.version_number }}.zip zip-check
+          mv corePKCS11-${{ github.event.inputs.version_number }}.zip zip-check
           cd zip-check
-          unzip coreMQTT-${{ github.event.inputs.version_number }}.zip -d coreMQTT-${{ github.event.inputs.version_number }}
-          ls coreMQTT-${{ github.event.inputs.version_number }}
-          diff -r -x "*.git*" coreMQTT-${{ github.event.inputs.version_number }}/coreMQTT/ ../coreMQTT/
+          unzip corePKCS11-${{ github.event.inputs.version_number }}.zip -d corePKCS11-${{ github.event.inputs.version_number }}
+          ls corePKCS11-${{ github.event.inputs.version_number }}
+          diff -r -x "*.git*" corePKCS11-${{ github.event.inputs.version_number }}/corePKCS11/ ../corePKCS11/
           cd ../
       - name: Build
         run: |
-          cd zip-check/coreMQTT-${{ github.event.inputs.version_number }}/coreMQTT
+          cd zip-check/corePKCS11-${{ github.event.inputs.version_number }}/corePKCS11
           sudo apt-get install -y lcov
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
@@ -74,14 +74,14 @@ jobs:
           make -C build/ all
       - name: Test
         run: |
-          cd zip-check/coreMQTT-${{ github.event.inputs.version_number }}/coreMQTT/build/
+          cd zip-check/corePKCS11-${{ github.event.inputs.version_number }}/corePKCS11/build/
           ctest -E system --output-on-failure
           cd ..
       - name: Create artifact of ZIP
         uses: actions/upload-artifact@v2
         with:
-          name: coreMQTT-${{ github.event.inputs.version_number }}.zip
-          path: zip-check/coreMQTT-${{ github.event.inputs.version_number }}.zip
+          name: corePKCS11-${{ github.event.inputs.version_number }}.zip
+          path: zip-check/corePKCS11-${{ github.event.inputs.version_number }}.zip
   create-release:
     needs: create-zip
     name: Create Release and Upload Release Asset
@@ -95,13 +95,13 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version_number }}
           release_name: ${{ github.event.inputs.version_number }}
-          body: Release ${{ github.event.inputs.version_number }} of the coreMQTT Library.
+          body: Release ${{ github.event.inputs.version_number }} of the corePKCS11 Library.
           draft: false
           prerelease: false
       - name: Download ZIP artifact
         uses: actions/download-artifact@v2
         with:
-          name: coreMQTT-${{ github.event.inputs.version_number }}.zip
+          name: corePKCS11-${{ github.event.inputs.version_number }}.zip
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -109,6 +109,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./coreMQTT-${{ github.event.inputs.version_number }}.zip
-          asset_name: coreMQTT-${{ github.event.inputs.version_number }}.zip
+          asset_path: ./corePKCS11-${{ github.event.inputs.version_number }}.zip
+          asset_name: corePKCS11-${{ github.event.inputs.version_number }}.zip
           asset_content_type: application/zip
