@@ -1,5 +1,5 @@
 /*
- * corePKCS11 V2.0.0
+ * corePKCS11 V3.0.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -43,7 +43,6 @@
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/sha256.h"
-#include "mbedtls/base64.h"
 #include "mbedtls/platform.h"
 #include "mbedtls/threading.h"
 
@@ -2261,11 +2260,6 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
             }
 
             PKCS11_PAL_GetObjectValueCleanup( pucData, ulDataLength );
-        }
-        else
-        {
-            LogError( ( "Failed to get existing object value. Could not get "
-                        "object value from PKCS #11 PAL." ) );
         }
 
         if( lMbedTLSResult != 0 )
