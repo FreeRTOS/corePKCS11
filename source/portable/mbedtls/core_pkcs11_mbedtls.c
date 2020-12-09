@@ -43,7 +43,6 @@
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/sha256.h"
-#include "mbedtls/base64.h"
 #include "mbedtls/platform.h"
 #include "mbedtls/threading.h"
 
