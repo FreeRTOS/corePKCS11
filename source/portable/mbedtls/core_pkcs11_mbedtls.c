@@ -2262,11 +2262,6 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
 
             PKCS11_PAL_GetObjectValueCleanup( pucData, ulDataLength );
         }
-        else
-        {
-            LogError( ( "Failed to get existing object value. Could not get "
-                        "object value from PKCS #11 PAL." ) );
-        }
 
         if( lMbedTLSResult != 0 )
         {
