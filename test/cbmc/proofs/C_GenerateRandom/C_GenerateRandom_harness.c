@@ -30,7 +30,39 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include "mbedtls/ecp.h"
+#include "mbedtls/oid.h"
+#include "mbedtls/sha256.h"
+#include "mbedtls/pk.h"
 #include "core_pkcs11.h"
+
+/* Internal struct for corePKCS11 mbed TLS implementation, but we don't really care what it contains
+ * in this proof.
+ *
+ * It is just copied over from "core_pkcs11_mbedtls.c" so the structure is correct.
+ */
+typedef struct P11Session
+{
+    CK_ULONG ulState;
+    CK_BBOOL xOpened;
+    CK_MECHANISM_TYPE xOperationDigestMechanism;
+    CK_BYTE * pxFindObjectLabel;
+    CK_ULONG xFindObjectLabelLen;
+    CK_MECHANISM_TYPE xOperationVerifyMechanism;
+    mbedtls_threading_mutex_t xVerifyMutex;
+    CK_OBJECT_HANDLE xVerifyKeyHandle;
+    mbedtls_pk_context xVerifyKey;
+    CK_MECHANISM_TYPE xOperationSignMechanism;
+    mbedtls_threading_mutex_t xSignMutex;
+    CK_OBJECT_HANDLE xSignKeyHandle;
+    mbedtls_pk_context xSignKey;
+    mbedtls_sha256_context xSHA256Context;
+} P11Session_t;
+
+CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( const P11Session_t * pxSession )
+{
+    return CKR_OK;
+}
 
 void harness()
 {
@@ -38,18 +70,8 @@ void harness()
     CK_FLAGS xFlags;
     CK_BYTE_PTR pucRandData;
     CK_ULONG ulRandLen;
-
     CK_SESSION_HANDLE xSession;
 
-    xResult = C_Initialize( NULL );
-    __CPROVER_assert( xResult == CKR_OK, "PKCS #11 module needs to be initialized"
-                                         " to be uninitialized." );
-    xResult = C_OpenSession( 0, xFlags, NULL, 0, &xSession );
-
-    if( xResult == CKR_OK )
-    {
-        pucRandData = malloc( ( sizeof( CK_BYTE ) ) * ulRandLen );
-        ( void ) C_GenerateRandom( xSession, pucRandData, ulRandLen );
-        free( pucRandData );
-    }
+    pucRandData = malloc( ( sizeof( CK_BYTE ) ) * ulRandLen );
+    ( void ) C_GenerateRandom( xSession, pucRandData, ulRandLen );
 }

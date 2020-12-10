@@ -32,12 +32,6 @@
 void harness()
 {
     CK_SESSION_HANDLE xSession;
-    CK_RV xResult;
 
-    xResult = xInitializePkcs11Session( &xSession );
-
-    if( xResult == CKR_OK )
-    {
-        __CPROVER_assert( xSession != CK_INVALID_HANDLE, "Received no error code, but session handle was not invalid." );
-    }
+    ( void ) xInitializePkcs11Session( &xSession );
 }

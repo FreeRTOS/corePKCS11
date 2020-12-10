@@ -38,13 +38,14 @@ void harness()
     CK_SESSION_HANDLE xSession;
 
     xResult = C_Initialize( NULL );
-    __CPROVER_assert( xResult == CKR_OK, "PKCS #11 module needs to be initialized"
-                                         " to be uninitialized." );
-
-    xResult = C_OpenSession( 0, xFlags, NULL, 0, &xSession );
 
     if( xResult == CKR_OK )
     {
-        ( void ) C_CloseSession( xSession );
+        xResult = C_OpenSession( 0, xFlags, NULL, 0, &xSession );
+
+        if( xResult == CKR_OK )
+        {
+            ( void ) C_CloseSession( xSession );
+        }
     }
 }

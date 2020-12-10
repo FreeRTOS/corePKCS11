@@ -39,8 +39,13 @@ void harness()
 
     xResult = C_Initialize( NULL );
 
-    __CPROVER_assert( xResult == CKR_OK, "PKCS #11 module needs to be initialized"
-                                         " to be uninitialized." );
+    if( xResult == CKR_OK )
+    {
+        xResult = C_OpenSession( 0, xFlags, NULL, 0, &xSession );
 
-    ( void ) C_OpenSession( 0, xFlags, NULL, 0, &xSession );
+        if( xResult == CKR_OK )
+        {
+            __CPROVER_assert( xSession != CK_INVALID_HANDLE, "Handle must be valid if CKR_OK is returned." );
+        }
+    }
 }
