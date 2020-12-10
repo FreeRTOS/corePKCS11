@@ -124,7 +124,6 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
         {
             xResult = CKR_HOST_MEMORY;
         }
-
     }
 
     if( xResult == CKR_OK )

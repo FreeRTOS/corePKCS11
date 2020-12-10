@@ -70,12 +70,13 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetSlotList )( CK_BBOOL tokenPresent,
                                              CK_ULONG_PTR pulCount )
 {
     int32_t ulCount = nondet_int32();
+
     /* Most slot lists are less than 10, as it represents an individual HSM. corePKCS11 only
      * has 1 slot (This is allowed and many implementations do this. */
-    __CPROVER_assume( ( ulCount > 0) );
+    __CPROVER_assume( ( ulCount > 0 ) );
     __CPROVER_assert( pulCount != NULL, "The count pointer can never be NULL." );
 
-     CK_SLOT_ID * pxSlot = malloc( ulCount );
+    CK_SLOT_ID * pxSlot = malloc( ulCount );
     __CPROVER_assume( pxSlot != NULL );
 
     if( pSlotList != NULL )
