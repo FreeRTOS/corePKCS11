@@ -107,16 +107,22 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
 
     if( xResult == CKR_OK )
     {
-        /* Allocate memory for the slot list. */
-        pxSlotId = PKCS11_MALLOC( sizeof( CK_SLOT_ID ) * ( *pxSlotCount ) );
-
-        if( pxSlotId == NULL )
+        if( *pxSlotCount == ( ( sizeof( CK_SLOT_ID ) * ( *pxSlotCount ) ) / ( sizeof( CK_SLOT_ID ) ) ) )
         {
-            xResult = CKR_HOST_MEMORY;
+            pxSlotId = PKCS11_MALLOC( sizeof( CK_SLOT_ID ) * ( *pxSlotCount ) );
+
+            if( pxSlotId == NULL )
+            {
+                xResult = CKR_HOST_MEMORY;
+            }
+            else
+            {
+                *ppxSlotId = pxSlotId;
+            }
         }
         else
         {
-            *ppxSlotId = pxSlotId;
+            xResult = CKR_HOST_MEMORY;
         }
     }
 

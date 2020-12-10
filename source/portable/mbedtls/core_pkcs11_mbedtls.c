@@ -623,6 +623,7 @@ static CK_RV prvRsaPubKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
     return xResult;
 }
 
+
 /**
  * @brief Parses attribute values for an RSA key an puts them in the mbed TLS context.
  */
@@ -1539,6 +1540,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pReserved )
         mbedtls_entropy_free( &xP11Context.xMbedEntropyContext );
         mbedtls_ctr_drbg_free( &xP11Context.xMbedDrbgCtx );
         mbedtls_mutex_free( &xP11Context.xObjectList.xMutex );
+        mbedtls_mutex_free( &xP11Context.xSessionMutex );
 
         /* See explanation in prvCheckValidSessionAndModule for this exception. */
         /* coverity[misra_c_2012_rule_10_5_violation] */

@@ -35,8 +35,8 @@ void harness()
 {
     CK_RV xResult = C_Initialize( NULL );
 
-    __CPROVER_assert( xResult == CKR_OK, "PKCS #11 module needs to be initialized"
-                                         " to be uninitialized." );
-
-    ( void ) C_Finalize( NULL );
+    if( xResult == CKR_OK )
+    {
+        ( void ) C_Finalize( NULL );
+    }
 }

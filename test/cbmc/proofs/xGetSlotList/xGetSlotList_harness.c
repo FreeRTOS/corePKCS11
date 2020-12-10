@@ -32,14 +32,8 @@
 
 void harness()
 {
-    CK_SLOT_ID * pxSlotId;
-    CK_ULONG xSlotCount;
-    CK_RV xResult;
+    CK_SLOT_ID ** ppxSlotId;
+    CK_ULONG ulSlotCount;
 
-
-    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
-
-    xResult = xGetSlotList( &pxSlotId, NULL );
-
-    __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "NULL pointer should be a bad argument." );
+    ( void ) xGetSlotList( ppxSlotId, &ulSlotCount );
 }
