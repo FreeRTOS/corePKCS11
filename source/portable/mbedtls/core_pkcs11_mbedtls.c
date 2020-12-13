@@ -1430,7 +1430,6 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
             }
             else
             {
-                /* TODO: Update this case for certificate. */
                 LogWarn( ( "Trying to destroy an object with an unknown label." ) );
             }
 
