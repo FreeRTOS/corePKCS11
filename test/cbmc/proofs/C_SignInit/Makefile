@@ -8,7 +8,11 @@ HARNESS_FILE = C_SignInit_harness
 # Litani dashboard. It can be human-readable and contain spaces if you wish.
 PROOF_UID = C_SignInit
 
-DEFINES +=
+# Defined in `core_pkcs11_config.h`
+# Should be one more than the total number of objects in the PKCS stack.
+MAX_OBJECT_NUM=2
+
+DEFINES += -DMAX_OBJECT_NUM=$(MAX_OBJECT_NUM)
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 

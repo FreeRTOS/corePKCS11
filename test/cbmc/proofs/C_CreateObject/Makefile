@@ -18,7 +18,23 @@ PROOF_UID = C_CreateObject
 # more increase in coverage.
 TEMPLATE_SIZE=6
 
+# TEMPLATE_ATTRIBUTE_MAX_SIZE is a define for bounding the largest attribute value
+# size that can be expected. 1200 is much larger than what is expected from any attribute,
+# but if this should change, make sure to update this assumption to match the code.
+#
+# 1200 is derived from the macro pkcs11_PRIVATE_RSA_2048_DER_SIZE, found in
+# "core_pkcs11_mbedtls.c", as the current largest object size that can be imported.
+TEMPLATE_ATTRIBUTE_MAX_SIZE=1200
+
+# Defined in `core_pkcs11_config.h`
+MAX_LABEL_SIZE=32
+
+# Defined in `core_pkcs11_config.h`
+# Should be one more than the total number of objects in the PKCS stack.
+MAX_OBJECT_NUM=2
+
 DEFINES += -DTEMPLATE_SIZE=$(TEMPLATE_SIZE)
+DEFINES += -DTEMPLATE_ATTRIBUTE_MAX_SIZE=$(TEMPLATE_ATTRIBUTE_MAX_SIZE)
 
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
@@ -32,6 +48,8 @@ REMOVE_FUNCTION_BODY += mbedtls_ctr_drbg_init
 REMOVE_FUNCTION_BODY += mbedtls_ctr_drbg_seed
 REMOVE_FUNCTION_BODY += mbedtls_entropy_free
 REMOVE_FUNCTION_BODY +=	mbedtls_entropy_init
+REMOVE_FUNCTION_BODY +=	threading_mutex_free
+REMOVE_FUNCTION_BODY +=	threading_mutex_init
 REMOVE_FUNCTION_BODY += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvMbedTLS_Initialize
 
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCreateCertificate.0:$(TEMPLATE_SIZE)
@@ -40,10 +58,10 @@ UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvGetObjectClass.0:$(TE
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCreateECKey.0:$(TEMPLATE_SIZE)
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvGetLabel.0:$(TEMPLATE_SIZE)
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCreateRsaKey.0:$(TEMPLATE_SIZE)
-UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvAddObjectToList.0:2
+UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvAddObjectToList.0:$(MAX_OBJECT_NUM)
 UNWINDSET += harness.0:$(TEMPLATE_SIZE)
-UNWINDSET += memcmp.0:32
-UNWINDSET += strncmp.0:32
+UNWINDSET += memcmp.0:$(MAX_LABEL_SIZE)
+UNWINDSET += strncmp.0:$(MAX_LABEL_SIZE)
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/mbedtls_stubs.c

@@ -30,6 +30,8 @@
 
 #include "core_pki_utils.h"
 
+#define mbedtlsEncodedBufferLen    72
+
 void harness()
 {
     int8_t ucReturn;
@@ -37,15 +39,13 @@ void harness()
     uint32_t ulSigLen;
     size_t ulReturnLen;
 
-    __CPROVER_assume( ulSigLen == 72 );
+    __CPROVER_assume( ulSigLen >= mbedtlsEncodedBufferLen );
     pucSig = malloc( ulSigLen * sizeof( uint8_t ) );
 
     ucReturn = PKI_pkcs11SignatureTombedTLSSignature( pucSig, &ulReturnLen );
 
     if( ucReturn != -1 )
     {
-        __CPROVER_assert( ulReturnLen <= 72, "The signature was larger than expected." );
+        __CPROVER_assert( ulReturnLen <= mbedtlsEncodedBufferLen, "The signature was larger than expected." );
     }
-
-    free( pucSig );
 }

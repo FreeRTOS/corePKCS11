@@ -15,6 +15,9 @@ INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 # This proof doesn't care about these stubs
 REMOVE_FUNCTION_BODY += C_Finalize
 REMOVE_FUNCTION_BODY += C_GetFunctionList
+REMOVE_FUNCTION_BODY += threading_mutex_free
+REMOVE_FUNCTION_BODY += threading_mutex_lock
+REMOVE_FUNCTION_BODY +=	threading_mutex_unlock
 UNWINDSET +=
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c

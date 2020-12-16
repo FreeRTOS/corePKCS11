@@ -32,7 +32,6 @@ COMPILE_FLAGS += -DMBEDTLS_CONFIG_FILE="<mbedtls_config.h>"
 INCLUDES += -I$(SRCDIR)/source/include
 INCLUDES += -I$(CBMC_ROOT)/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/pkcs11
-INCLUDES += -I$(CBMC_ROOT)/proofs/config
 
 # Preprocessor definitions -D...
 # DEFINES =

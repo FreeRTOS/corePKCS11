@@ -29,8 +29,6 @@
  */
 
 #include <stddef.h>
-#include "mbedtls/ecp.h"
-#include "mbedtls/oid.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/pk.h"
 #include "core_pkcs11_config.h"
@@ -61,8 +59,10 @@ typedef struct P11Session
 
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( const P11Session_t * pxSession )
 {
+    CK_RV xResult;
+
     __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
-    return CKR_OK;
+    return xResult;
 }
 
 void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
@@ -76,7 +76,7 @@ void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_
     __CPROVER_assert( ppcLabel != NULL, "ppcLabel was NULL." );
     __CPROVER_assert( pxLabelLength != NULL, "ppcLabel was NULL." );
 
-    __CPROVER_assume( handle < 4 );
+    __CPROVER_assume( handle < MAX_OBJECT_NUM );
     *pxPalHandle = handle;
 }
 
@@ -87,19 +87,17 @@ void harness()
     CK_ULONG ulCount;
     CK_RV xResult;
 
-    __CPROVER_assume( ulCount <= TEMPLATE_SIZE && ulCount >= 1 );
+    __CPROVER_assume( ulCount <= TEMPLATE_SIZE && ulCount > 0 );
     CK_ATTRIBUTE_PTR pTemplate = malloc( sizeof( CK_ATTRIBUTE ) * ulCount );
-    __CPROVER_assume( pTemplate != NULL );
 
-    for( int i = 0; i < ulCount; i++ )
+    if( pTemplate != NULL )
     {
-        __CPROVER_assume( pTemplate[ i ].ulValueLen <= 256 );
-        pTemplate[ i ].pValue = malloc( pTemplate[ i ].ulValueLen );
+        for( int i = 0; i < ulCount; i++ )
+        {
+            pTemplate[ i ].pValue = malloc( pTemplate[ i ].ulValueLen );
+        }
     }
 
-    /* 0 is an invalid session handle according to the spec.
-     * This assumption is checked in prvSessionPointerFromHandle.
-     */
-    __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
+    __CPROVER_assume( hSession > CK_INVALID_HANDLE && hSession <= pkcs11configMAX_SESSIONS );
     ( void ) C_GetAttributeValue( hSession, xObject, pTemplate, ulCount );
 }

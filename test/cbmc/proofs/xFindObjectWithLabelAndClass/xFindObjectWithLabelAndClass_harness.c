@@ -35,12 +35,12 @@ void harness()
 {
     CK_SESSION_HANDLE xSession;
     CK_OBJECT_CLASS xClass;
-    CK_OBJECT_HANDLE xHandle;
-    char * pcLabel = "Random Label.";
-    CK_RV xResult;
+    CK_OBJECT_HANDLE * xHandle = malloc( sizeof( CK_OBJECT_HANDLE ) );
+    CK_ULONG ulLabelSize;
 
-    xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, strlen( pcLabel ), xClass, &xHandle );
+    __CPROVER_assume( ulLabelSize < MAX_LABEL_SIZE );
+    char * pcLabel = malloc( ulLabelSize );
 
-    xResult = xFindObjectWithLabelAndClass( xSession, pcLabel, strlen( pcLabel ), xClass, NULL );
-    __CPROVER_assert( xResult != CKR_OK, "NULL arguments should fail." );
+
+    ( void ) xFindObjectWithLabelAndClass( xSession, pcLabel, ulLabelSize, xClass, &xHandle );
 }

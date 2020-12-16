@@ -32,7 +32,9 @@
 
 CK_RV PKCS11_PAL_Initialize( void )
 {
-    return CKR_OK;
+    CK_RV xResult;
+
+    return xResult;
 }
 
 CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,

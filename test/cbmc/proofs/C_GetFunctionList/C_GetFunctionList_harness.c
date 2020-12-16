@@ -33,8 +33,7 @@
 
 void harness()
 {
-    CK_FUNCTION_LIST_PTR pFunctionList;
+    CK_FUNCTION_LIST_PTR pxFunctionList = malloc( sizeof( CK_FUNCTION_LIST ) );
 
-    ( void ) C_GetFunctionList( &pFunctionList );
-    ( void ) C_GetFunctionList( NULL ); /* Unhappy path. */
+    ( void ) C_GetFunctionList( pxFunctionList );
 }

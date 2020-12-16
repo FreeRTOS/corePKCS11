@@ -30,8 +30,6 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include "mbedtls/ecp.h"
-#include "mbedtls/oid.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/pk.h"
 #include "core_pkcs11.h"
@@ -61,13 +59,13 @@ typedef struct P11Session
 
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( const P11Session_t * pxSession )
 {
-    return CKR_OK;
+    CK_RV xResult;
+
+    return xResult;
 }
 
 void harness()
 {
-    CK_RV xResult;
-    CK_FLAGS xFlags;
     CK_BYTE_PTR pucRandData;
     CK_ULONG ulRandLen;
     CK_SESSION_HANDLE xSession;

@@ -89,7 +89,7 @@
  * @brief Maximum number of sessions that can be stored
  * by the PKCS #11 module.
  */
-#define pkcs11configMAX_SESSIONS                           1
+#define pkcs11configMAX_SESSIONS                           2
 
 /**
  * @brief Set to 1 if a PAL destroy object is implemented.

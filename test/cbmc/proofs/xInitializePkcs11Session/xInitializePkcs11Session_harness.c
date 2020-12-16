@@ -31,7 +31,7 @@
 
 void harness()
 {
-    CK_SESSION_HANDLE xSession;
+    CK_SESSION_HANDLE * pxSession = malloc( sizeof( CK_SESSION_HANDLE ) );
 
-    ( void ) xInitializePkcs11Session( &xSession );
+    ( void ) xInitializePkcs11Session( pxSession );
 }

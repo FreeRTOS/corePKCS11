@@ -30,22 +30,33 @@
 
 #include <stddef.h>
 #include "core_pkcs11.h"
+#include "core_pkcs11_config.h"
 
 void harness()
 {
     CK_RV xResult;
     CK_FLAGS xFlags;
-    CK_SESSION_HANDLE xSession;
+    CK_SESSION_HANDLE * pxSession = malloc( sizeof( CK_SESSION_HANDLE ) );
+
+    /* Cover the case when the corePKCS11 module is not already initialized. */
+    if( pxSession != NULL )
+    {
+        ( void ) C_CloseSession( *pxSession );
+    }
 
     xResult = C_Initialize( NULL );
+    __CPROVER_assume( xResult == CKR_OK );
+
+    xResult = C_OpenSession( 0, xFlags, NULL, 0, pxSession );
 
     if( xResult == CKR_OK )
     {
-        xResult = C_OpenSession( 0, xFlags, NULL, 0, &xSession );
+        __CPROVER_assert( *pxSession > CK_INVALID_HANDLE && *pxSession <= pkcs11configMAX_SESSIONS, "For the C_OpenSession result to "
+                                                                                                    "be CKR_OK, we expect the session handle to be a valid value." );
+    }
 
-        if( xResult == CKR_OK )
-        {
-            ( void ) C_CloseSession( xSession );
-        }
+    if( pxSession != NULL )
+    {
+        ( void ) C_CloseSession( *pxSession );
     }
 }

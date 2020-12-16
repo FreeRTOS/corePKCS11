@@ -30,13 +30,10 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "mbedtls/ecp.h"
-#include "mbedtls/oid.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/pk.h"
 #include "core_pkcs11_config.h"
 #include "core_pkcs11.h"
-#include "core_pki_utils.h"
 
 /* Internal struct for corePKCS11 mbed TLS implementation, but we don't really care what it contains
  * in this proof.
@@ -61,19 +58,23 @@ typedef struct P11Session
     mbedtls_sha256_context xSHA256Context;
 } P11Session_t;
 
-static bool xRsaOperation = nondet_bool();
-
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( P11Session_t * pxSession )
 {
-    pxSession->xOperationSignMechanism = xRsaOperation ? CKM_RSA_PKCS : CKM_ECDSA;
+    CK_RV xResult;
+    CK_MECHANISM_TYPE xOpp;
+
     __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
-    return CKR_OK;
+
+    pxSession->xOperationSignMechanism = xOpp;
+    return xResult;
 }
 
 CK_BBOOL __CPROVER_file_local_core_pkcs11_mbedtls_c_prvOperationActive( const P11Session_t * pxSession )
 {
+    CK_BBOOL xBool;
+
     __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
-    return CK_FALSE;
+    return xBool;
 }
 
 void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
@@ -87,7 +88,7 @@ void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_
     __CPROVER_assert( ppcLabel != NULL, "ppcLabel was NULL." );
     __CPROVER_assert( pxLabelLength != NULL, "ppcLabel was NULL." );
 
-    __CPROVER_assume( handle < 4 );
+    __CPROVER_assume( handle < MAX_OBJECT_NUM );
     *pxPalHandle = handle;
 }
 
@@ -97,25 +98,15 @@ void harness()
     CK_SESSION_HANDLE xSession;
     CK_MECHANISM xMechanism;
     CK_ULONG ulDataLen;
-    CK_ULONG ulSignatureLen;
-
-    if( xRsaOperation )
-    {
-        __CPROVER_assume( ulDataLen == pkcs11RSA_SIGNATURE_INPUT_LENGTH );
-        __CPROVER_assume( ulSignatureLen == pkcs11RSA_2048_SIGNATURE_LENGTH );
-    }
-    else
-    {
-        __CPROVER_assume( ulDataLen == pkcs11SHA256_DIGEST_LENGTH );
-        __CPROVER_assume( ulSignatureLen == pkcs11ECDSA_P256_SIGNATURE_LENGTH );
-    }
-
+    CK_ULONG * pulSignatureLen = malloc( sizeof( CK_ULONG ) );
     CK_BYTE_PTR pData = malloc( sizeof( CK_BYTE ) * ulDataLen );
-    CK_BYTE_PTR pSignature = malloc( sizeof( CK_BYTE ) * ulSignatureLen );
-    __CPROVER_assume( pData != NULL );
-    __CPROVER_assume( pSignature != NULL );
+    CK_BYTE_PTR pSignature;
 
-    __CPROVER_assume( ( xSession > 0 ) && ( xSession <= pkcs11configMAX_SESSIONS ) );
-    ( void ) C_Sign( xSession, pData, ulDataLen, NULL, &ulSignatureLen );
-    ( void ) C_Sign( xSession, pData, ulDataLen, pSignature, &ulSignatureLen );
+    if( pulSignatureLen != NULL )
+    {
+        pSignature = malloc( sizeof( CK_BYTE ) * ( *pulSignatureLen ) );
+    }
+
+    __CPROVER_assume( ( xSession > CK_INVALID_HANDLE ) && ( xSession <= pkcs11configMAX_SESSIONS ) );
+    ( void ) C_Sign( xSession, pData, ulDataLen, pSignature, pulSignatureLen );
 }
