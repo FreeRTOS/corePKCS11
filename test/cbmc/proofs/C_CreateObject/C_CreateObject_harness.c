@@ -73,16 +73,16 @@ void harness()
     CK_SESSION_HANDLE xSession;
     CK_ULONG ulCount;
 
-    __CPROVER_assume( ulCount > 0 && ulCount < TEMPLATE_SIZE );
+    __CPROVER_assume( ulCount < TEMPLATE_SIZE );
     CK_ATTRIBUTE_PTR xTemplate = malloc( sizeof( CK_ATTRIBUTE ) * ulCount );
 
-    __CPROVER_assume( xTemplate != NULL );
-
-    for( int i = 0; i < ulCount; i++ )
+    if( xTemplate != NULL )
     {
-        __CPROVER_assume( xTemplate[ i ].ulValueLen <= TEMPLATE_ATTRIBUTE_MAX_SIZE );
-        xTemplate[ i ].pValue = malloc( xTemplate[ i ].ulValueLen );
-        __CPROVER_assume( xTemplate[ i ].pValue != NULL );
+        for( int i = 0; i < ulCount; i++ )
+        {
+            xTemplate[ i ].pValue = malloc( xTemplate[ i ].ulValueLen );
+            __CPROVER_assume( xTemplate[ i ].pValue != NULL );
+        }
     }
 
     __CPROVER_assume( xSession > CK_INVALID_HANDLE && xSession <= pkcs11configMAX_SESSIONS );

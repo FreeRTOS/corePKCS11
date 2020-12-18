@@ -18,14 +18,6 @@ PROOF_UID = C_CreateObject
 # more increase in coverage.
 TEMPLATE_SIZE=6
 
-# TEMPLATE_ATTRIBUTE_MAX_SIZE is a define for bounding the largest attribute value
-# size that can be expected. 1200 is much larger than what is expected from any attribute,
-# but if this should change, make sure to update this assumption to match the code.
-#
-# 1200 is derived from the macro pkcs11_PRIVATE_RSA_2048_DER_SIZE, found in
-# "core_pkcs11_mbedtls.c", as the current largest object size that can be imported.
-TEMPLATE_ATTRIBUTE_MAX_SIZE=1200
-
 # Defined in `core_pkcs11_config.h`
 MAX_LABEL_SIZE=32
 
