@@ -20,32 +20,32 @@ This PKCS #11 library implements a subset of the PKCS #11 API required to establ
 
 <table>
     <tr>
-        <td colspan="4"><center><b>Code Size of corePKCS11 library files (sizes generated with [GCC for ARM Cortex-M toolchain 20181213](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads/8-2018-q4-major))</b></center></td>
+        <td colspan="3"><center><b>Code Size of corePKCS11  (example generated with GCC for ARM Cortex-M)</b></center></td>
     </tr>
     <tr>
         <td><b>File</b></td>
-        <td><b>With -O1 Optimization</b></td>
-        <td><b>With -Os Optimization</b></td>
+        <td><b><center>With -O1 Optimization</center></b></td>
+        <td><b><center>With -Os Optimization</center></b></td>
     </tr>
     <tr>
         <td>core_pkcs11.c</td>
-        <td>0.7K</td>
-        <td>0.6K</td>
+        <td><center>0.8K</center></td>
+        <td><center>0.7K</center></td>
     </tr>
     <tr>
         <td>core_pki_utils.c</td>
-        <td>0.4K</td>
-        <td>0.3K</td>
+        <td><center>0.5K</center></td>
+        <td><center>0.3K</center></td>
     </tr>
     <tr>
         <td>core_pkcs11_mbedtls.c</td>
-        <td>6.7K</td>
-        <td>6.0K</td>
+        <td><center>7.3K</center></td>
+        <td><center>6.3K</center></td>
     </tr>
     <tr>
         <td><b>Total estimates</b></td>
-        <td>31.2K</td>
-        <td>11.5K</td>
+        <td><b><center>8.6K</center></b></td>
+        <td><b><center>7.3K</center></b></td>
     </tr>
 </table>
 */
