@@ -44,84 +44,45 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup
-        run: sudo apt-get install complexity
-      - name: Complexity
-        run: |
-          find source/ -iname '*.c' -not -path 'source/portable/windows/*' -not -path 'source/dependency*' |\
-          xargs complexity --scores --threshold=0 --horrid-threshold=8
+      - name: Check complexity
+        uses: FreeRTOS/CI-CD-Github-Actions/complexity@main
+        with:
+          path: ./
   doxygen:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - name: Install Doxygen
-        run: |
-          wget -qO- "http://doxygen.nl/files/doxygen-1.8.20.linux.bin.tar.gz" | sudo tar --strip-components=1 -xz -C /usr/local
-          sudo apt-get install -y libclang-9-dev graphviz
-      - name: Run Doxygen And Verify Stdout Is Empty
-        run: |
-          doxygen docs/doxygen/config.doxyfile 2>&1 | tee doxyoutput.txt
-          if [[ "$(wc -c < doxyoutput.txt | bc)" = "0" ]]; then exit 0; else exit 1; fi
+      - name: Run doxygen build
+        uses: FreeRTOS/CI-CD-Github-Actions/doxygen@main
+        with:
+          path: ./
   spell-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Parent Repo
-        uses: actions/checkout@v2
-        with:
-          ref: main
-          repository: aws/aws-iot-device-sdk-embedded-C
-      - run: rm -r libraries/standard/corePKCS11
       - name: Clone This Repo
         uses: actions/checkout@v2
+      - name: Run spellings check
+        uses: FreeRTOS/CI-CD-Github-Actions/spellings@main
         with:
-          path: libraries/standard/corePKCS11
-      - name: Install spell
-        run: |
-          sudo apt-get install spell
-          sudo apt-get install util-linux
-      - name: Check spelling
-        run: |
-          PATH=$PATH:$PWD/tools/spell
-          # Modifies `find` command used in spell checker to ignore the test and dependency directory
-          # The command looks like this `extract-comments `find $DIRNAME -name \*.[ch]` should the line change and the sed command will
-          # append "-not path {val added below}" for each of the directories mentioned.
-          # https://github.com/aws/aws-iot-device-sdk-embedded-C/blob/ad28ed355df4f82b77f48028e24bd6fc9e63bc54/tools/spell/find-unknown-comment-words#L86
-          sed -i 's/find $DIRNAME/find $DIRNAME -not -path '*test*' -not -path '*dependency*'/g' tools/spell/find-unknown-comment-words
-          find-unknown-comment-words --directory libraries/standard/corePKCS11
-          if [ "$?" = "0" ]; then
-            exit 0
-          else
-            exit 1
-          fi
+          path: ./
   formatting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Uncrustify
-        run: sudo apt-get install uncrustify
-      - name: Run Uncrustify
-        run: find . -iname "*.[hc]" -exec uncrustify --check -c tools/uncrustify.cfg {} +
-      - name: Check For Trailing Whitespace
-        run: |
-          set +e
-          grep --exclude="README.md" -rnI -e "[[:blank:]]$" .
-          if [ "$?" = "0" ]; then
-            echo "Files have trailing whitespace."
-            exit 1
-          else
-            exit 0
-          fi
-            url-check:
+      - name: Check formatting
+        uses: FreeRTOS/CI-CD-Github-Actions/formatting@main
+        with:
+          path: ./
   url-check:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
         uses: actions/checkout@v2
         with:
-            path: ./kernel
+            path: ./corePKCS11
       - name: URL Checker
         run: |
-            bash kernel/.github/actions/url_verifier.sh kernel
+            bash corePKCS11/.github/actions/url_verifier.sh kernel
   git-secrets:
     runs-on: ubuntu-latest
     steps:
