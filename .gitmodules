@@ -14,7 +14,6 @@
 	path = test/cbmc/aws-templates-for-cbmc-proofs
 	url = https://github.com/awslabs/aws-templates-for-cbmc-proofs
 	update = none
-[submodule "test/cbmc/aws-build-accumulator"]
-	path = test/cbmc/aws-build-accumulator
+[submodule "test/cbmc/litani"]
+	path = test/cbmc/litani
 	url = https://github.com/awslabs/aws-build-accumulator.git
-	update = none
