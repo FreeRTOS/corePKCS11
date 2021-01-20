@@ -30,6 +30,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include "mbedtls/ecp.h"
 #include "mbedtls/oid.h"
 #include "mbedtls/sha256.h"
