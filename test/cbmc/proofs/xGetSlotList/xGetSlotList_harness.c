@@ -33,7 +33,7 @@
 void harness()
 {
     CK_SLOT_ID ** ppxSlotId = malloc( sizeof( CK_SLOT_ID * ) );
-    CK_ULONG ulSlotCount;
+    CK_ULONG * pulSlotCount = malloc( sizeof( CK_ULONG ) );
 
-    ( void ) xGetSlotList( ppxSlotId, &ulSlotCount );
+    ( void ) xGetSlotList( ppxSlotId, pulSlotCount );
 }

@@ -29,10 +29,6 @@
  */
 
 #include <stddef.h>
-#include <string.h>
-#include <stdlib.h>
-#include "mbedtls/ecp.h"
-#include "mbedtls/oid.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/pk.h"
 #include "core_pkcs11_config.h"
@@ -63,31 +59,35 @@ typedef struct P11Session
 
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( const P11Session_t * pxSession )
 {
-    return CKR_OK;
+    CK_RV xResult;
+
+    __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
+
+    return xResult;
 }
 
 void harness()
 {
     CK_RV xResult;
-    CK_OBJECT_HANDLE xObject;
+    CK_OBJECT_HANDLE * pxObject = malloc( sizeof( CK_OBJECT_HANDLE ) );
     CK_SESSION_HANDLE xSession;
     CK_ULONG ulCount;
 
-    __CPROVER_assume( ulCount > 0 && ulCount < TEMPLATE_SIZE );
+    __CPROVER_assume( ulCount < TEMPLATE_SIZE );
     CK_ATTRIBUTE_PTR xTemplate = malloc( sizeof( CK_ATTRIBUTE ) * ulCount );
-    __CPROVER_assume( xTemplate != NULL );
 
-    for( int i = 0; i < ulCount; i++ )
+    if( xTemplate != NULL )
     {
-        /* 1200 is current largest possible object size that is a valid input. */
-        __CPROVER_assume( xTemplate[ i ].ulValueLen <= 1200 );
-        xTemplate[ i ].pValue = malloc( xTemplate[ i ].ulValueLen );
-        __CPROVER_assume( xTemplate[ i ].pValue != NULL );
+        for( int i = 0; i < ulCount; i++ )
+        {
+            xTemplate[ i ].pValue = malloc( xTemplate[ i ].ulValueLen );
+            __CPROVER_assume( xTemplate[ i ].pValue != NULL );
+        }
     }
 
-    __CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
+    __CPROVER_assume( xSession > CK_INVALID_HANDLE && xSession <= pkcs11configMAX_SESSIONS );
     ( void ) C_CreateObject( xSession,
                              ( CK_ATTRIBUTE_PTR ) xTemplate,
                              ulCount,
-                             &xObject );
+                             pxObject );
 }

@@ -12,7 +12,13 @@ DEFINES +=
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
-REMOVE_FUNCTION_BODY +=
+REMOVE_FUNCTION_BODY += C_Finalize
+REMOVE_FUNCTION_BODY += C_GetFunctionList
+REMOVE_FUNCTION_BODY += mbedtls_ctr_drbg_free
+REMOVE_FUNCTION_BODY += mbedtls_entropy_free
+REMOVE_FUNCTION_BODY += mbedtls_mutex_free
+REMOVE_FUNCTION_BODY += mbedtls_mutex_lock
+REMOVE_FUNCTION_BODY += mbedtls_mutex_unlock
 UNWINDSET +=
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c

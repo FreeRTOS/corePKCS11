@@ -14,7 +14,12 @@ TEMPLATE_SIZE=9
 # Needs to be one bigger than TEMPLATE_SIZE
 UNWIND_SIZE=10
 
+# Defined in `core_pkcs11_config.h`
+# Should be one more than the total number of objects in the PKCS stack.
+MAX_OBJECT_NUM=2
+
 DEFINES += -DTEMPLATE_SIZE=$(TEMPLATE_SIZE)
+DEFINES += -DMAX_OBJECT_NUM=$(MAX_OBJECT_NUM)
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 

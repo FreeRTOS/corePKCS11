@@ -28,10 +28,8 @@
  * @brief Implements the proof harness for C_DigestInit function.
  */
 
-#include "mbedtls/ecp.h"
-#include "mbedtls/oid.h"
-#include "mbedtls/sha256.h"
 #include "mbedtls/pk.h"
+#include "mbedtls/sha256.h"
 #include "core_pkcs11_config.h"
 #include "core_pkcs11.h"
 
@@ -73,11 +71,8 @@ CK_BBOOL __CPROVER_file_local_core_pkcs11_mbedtls_c_prvOperationActive( const P1
 void harness()
 {
     CK_SESSION_HANDLE hSession;
-    CK_MECHANISM xMech;
-    CK_RV xResult;
+    CK_MECHANISM * pxMech = malloc( sizeof( CK_MECHANISM ) );
 
-    __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
-    ( void ) C_DigestInit( hSession, &xMech );
-    xResult = C_DigestInit( hSession, NULL );
-    __CPROVER_assert( xResult == CKR_ARGUMENTS_BAD, "A NULL mechanism is considered a bad argument." );
+    __CPROVER_assume( ( hSession > CK_INVALID_HANDLE ) && ( hSession <= pkcs11configMAX_SESSIONS ) );
+    ( void ) C_DigestInit( hSession, pxMech );
 }

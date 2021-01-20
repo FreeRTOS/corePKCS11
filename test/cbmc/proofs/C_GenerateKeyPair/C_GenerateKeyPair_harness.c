@@ -29,9 +29,6 @@
  */
 
 #include <stddef.h>
-#include <stdlib.h>
-#include "mbedtls/ecp.h"
-#include "mbedtls/oid.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/pk.h"
 #include "core_pkcs11_config.h"
@@ -70,9 +67,9 @@ void harness()
     CK_SESSION_HANDLE xSession;
     CK_ATTRIBUTE_PTR pxPublicKey;
     CK_ATTRIBUTE_PTR pxPrivateKey;
-    CK_OBJECT_HANDLE xPrivKeyHandle;
-    CK_OBJECT_HANDLE xPubKeyHandle;
-    CK_MECHANISM xMechanism;
+    CK_OBJECT_HANDLE * pxPrivKeyHandle = malloc( sizeof( CK_OBJECT_HANDLE ) );
+    CK_OBJECT_HANDLE * pxPubKeyHandle = malloc( sizeof( CK_OBJECT_HANDLE ) );
+    CK_MECHANISM * pxMechanism = malloc( sizeof( CK_MECHANISM ) );
     CK_ULONG ulPubKeyAttrLen;
     CK_ULONG ulPrivKeyAttrLen;
 
@@ -86,26 +83,23 @@ void harness()
 
     for( int i = 0; i < ulPubKeyAttrLen; i++ )
     {
-        __CPROVER_assume( pxPublicKey[ i ].ulValueLen <= 300 );
         pxPublicKey[ i ].pValue = malloc( pxPublicKey[ i ].ulValueLen );
         __CPROVER_assume( pxPublicKey[ i ].pValue != NULL );
     }
 
     for( int i = 0; i < ulPrivKeyAttrLen; i++ )
     {
-        /* Currently a 2048 bit RSA private key is the largest supported object. */
-        __CPROVER_assume( pxPrivateKey[ i ].ulValueLen <= 1200 );
         pxPrivateKey[ i ].pValue = malloc( pxPrivateKey[ i ].ulValueLen );
         __CPROVER_assume( pxPrivateKey[ i ].pValue != NULL );
     }
 
-    __CPROVER_assume( xSession >= 1 && xSession <= pkcs11configMAX_SESSIONS );
+    __CPROVER_assume( xSession > CK_INVALID_HANDLE && xSession <= pkcs11configMAX_SESSIONS );
     ( void ) C_GenerateKeyPair( xSession,
-                                &xMechanism,
+                                pxMechanism,
                                 pxPublicKey,
                                 ulPubKeyAttrLen,
                                 pxPrivateKey,
                                 ulPrivKeyAttrLen,
-                                &xPubKeyHandle,
-                                &xPrivKeyHandle );
+                                pxPubKeyHandle,
+                                pxPrivKeyHandle );
 }

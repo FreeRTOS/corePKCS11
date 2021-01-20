@@ -29,8 +29,6 @@
  */
 
 #include <stddef.h>
-#include "mbedtls/ecp.h"
-#include "mbedtls/oid.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/pk.h"
 #include "core_pkcs11_config.h"
@@ -61,14 +59,18 @@ typedef struct P11Session
 
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( const P11Session_t * pxSession )
 {
+    CK_RV xResult;
+
     __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
-    return CKR_OK;
+    return xResult;
 }
 
 CK_BBOOL __CPROVER_file_local_core_pkcs11_mbedtls_c_prvOperationActive( const P11Session_t * pxSession )
 {
+    CK_BBOOL xBool;
+
     __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
-    return CK_FALSE;
+    return xBool;
 }
 
 void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
@@ -82,16 +84,16 @@ void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_
     __CPROVER_assert( ppcLabel != NULL, "ppcLabel was NULL." );
     __CPROVER_assert( pxLabelLength != NULL, "ppcLabel was NULL." );
 
-    __CPROVER_assume( handle < 4 );
+    __CPROVER_assume( handle < MAX_OBJECT_NUM );
     *pxPalHandle = handle;
 }
 
 void harness()
 {
-    CK_MECHANISM xMechanism;
+    CK_MECHANISM * pxMechanism = malloc( sizeof( CK_MECHANISM ) );
     CK_OBJECT_HANDLE hKey;
     CK_SESSION_HANDLE xSession;
 
-    __CPROVER_assume( ( xSession > 0 ) && ( xSession <= pkcs11configMAX_SESSIONS ) );
-    ( void ) C_SignInit( xSession, &xMechanism, hKey );
+    __CPROVER_assume( ( xSession > CK_INVALID_HANDLE ) && ( xSession <= pkcs11configMAX_SESSIONS ) );
+    ( void ) C_SignInit( xSession, pxMechanism, hKey );
 }

@@ -8,8 +8,13 @@ HARNESS_FILE = C_DestroyObject_harness
 # Litani dashboard. It can be human-readable and contain spaces if you wish.
 PROOF_UID = C_DestroyObject
 
-DEFINES +=
-INCLUDES +=
+# Defined in `core_pkcs11_config.h`
+MAX_OBJECT_NUM=2
+
+# Defined in `core_pkcs11_config.h`
+MAX_LABEL_SIZE=32
+
+DEFINES += -DMAX_OBJECT_NUM=$(MAX_OBJECT_NUM)
 
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
@@ -18,9 +23,11 @@ REMOVE_FUNCTION_BODY += C_Finalize
 REMOVE_FUNCTION_BODY += C_GetFunctionList
 
 # Same as max label size in the core_pkcs11_config.h
-UNWINDSET += strncmp.0:32
-UNWINDSET += strlen.0:32
-UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByLabel.0:2
+UNWINDSET += strncmp.0:$(MAX_LABEL_SIZE)
+UNWINDSET += strlen.0:$(MAX_LABEL_SIZE)
+
+UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByLabel.0:$(MAX_OBJECT_NUM)
+
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/mbedtls_stubs.c

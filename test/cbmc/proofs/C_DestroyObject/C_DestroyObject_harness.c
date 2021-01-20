@@ -59,8 +59,10 @@ typedef struct P11Session
 
 CK_RV __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCheckValidSessionAndModule( const P11Session_t * pxSession )
 {
+    CK_RV xResult;
+
     __CPROVER_assert( pxSession != NULL, "pxSession was NULL." );
-    return CKR_OK;
+    return xResult;
 }
 
 void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
@@ -69,24 +71,17 @@ void __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByHandle( CK_
                                                                              CK_ULONG_PTR pxLabelLength )
 {
     CK_OBJECT_HANDLE handle;
+    CK_ULONG xLen;
 
     __CPROVER_assert( pxPalHandle != NULL, "ppcLabel was NULL." );
     __CPROVER_assert( ppcLabel != NULL, "ppcLabel was NULL." );
     __CPROVER_assert( pxLabelLength != NULL, "ppcLabel was NULL." );
 
-    __CPROVER_assume( handle < 4 );
+    __CPROVER_assume( handle < MAX_OBJECT_NUM );
     *pxPalHandle = handle;
 
-    if( nondet_bool() )
-    {
-        *ppcLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
-        *pxLabelLength = sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS );
-    }
-    else
-    {
-        *ppcLabel = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
-        *pxLabelLength = sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS );
-    }
+    *ppcLabel = malloc( xLen );
+    *pxLabelLength = xLen;
 }
 
 void harness()
@@ -101,6 +96,7 @@ void harness()
     xResult = C_Initialize( NULL );
     __CPROVER_assume( xResult == CKR_OK );
 
-    __CPROVER_assume( hSession >= 1 && hSession <= pkcs11configMAX_SESSIONS );
+    __CPROVER_assume( ( hSession > CK_INVALID_HANDLE ) &&
+                      ( hSession <= pkcs11configMAX_SESSIONS ) );
     ( void ) C_DestroyObject( hSession, hObject );
 }

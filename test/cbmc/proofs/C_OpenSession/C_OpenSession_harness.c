@@ -35,17 +35,15 @@ void harness()
 {
     CK_RV xResult;
     CK_FLAGS xFlags;
-    CK_SESSION_HANDLE xSession;
+    CK_SESSION_HANDLE * pxSession = malloc( sizeof( CK_SESSION_HANDLE ) );
 
     xResult = C_Initialize( NULL );
+    __CPROVER__assume( xResult == CKR_OK );
+
+    xResult = C_OpenSession( 0, xFlags, NULL, 0, pxSession );
 
     if( xResult == CKR_OK )
     {
-        xResult = C_OpenSession( 0, xFlags, NULL, 0, &xSession );
-
-        if( xResult == CKR_OK )
-        {
-            __CPROVER_assert( xSession != CK_INVALID_HANDLE, "Handle must be valid if CKR_OK is returned." );
-        }
+        __CPROVER_assert( *pxSession != CK_INVALID_HANDLE, "Handle must be valid if CKR_OK is returned." );
     }
 }
