@@ -4726,13 +4726,16 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
 
             if( xResult != CKR_OK )
             {
-                ( void ) PKCS11_PAL_DestroyObject( *phPrivateKey );
-                LogDebug( ( "Destroyed %lu private key handle due to errors.", ( unsigned long int ) *phPrivateKey ) );
+                ( void ) PKCS11_PAL_DestroyObject( xPalPrivate );
+                ( void ) PKCS11_PAL_DestroyObject( xPalPublic );
+                LogError( ( "Could not add private key to object list. Cleaning up PAL objects." ) );
             }
         }
         else
         {
-            LogDebug( ( "Could not add private key to object list." ) );
+            ( void ) PKCS11_PAL_DestroyObject( xPalPrivate );
+            ( void ) PKCS11_PAL_DestroyObject( xPalPublic );
+            LogError( ( "Could not add private key to object list. Cleaning up PAL objects." ) );
         }
     }
 
