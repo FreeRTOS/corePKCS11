@@ -389,7 +389,7 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 @snippet core_pkcs11_pal.h declare_pkcs11_pal_saveobject
 
 @page pkcs11_pal_destroyobject PKCS11_PAL_DestroyObject
-@snippet core_pkcs11_mbedtls.c declare_pkcs11_pal_destroyobject
+@snippet core_pkcs11_pal.h declare_pkcs11_pal_destroyobject
 
 @page pkcs11_pal_findobject PKCS11_PAL_FindObject
 @snippet core_pkcs11_pal.h declare_pkcs11_pal_findobject
