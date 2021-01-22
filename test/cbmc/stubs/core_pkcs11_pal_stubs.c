@@ -37,6 +37,16 @@ CK_RV PKCS11_PAL_Initialize( void )
     return xResult;
 }
 
+CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
+{
+    CK_RV xResult;
+
+    __CPROVER_assert( xHandle != CK_INVALID_HANDLE,
+                      "Pal destroy should not get an invalid handle." );
+
+    return xResult;
+}
+
 CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
                                  CK_BYTE_PTR * ppucData,
                                  CK_ULONG_PTR pulDataSize,

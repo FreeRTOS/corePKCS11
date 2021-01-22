@@ -2583,7 +2583,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE hSession,
         xResult = CKR_OBJECT_HANDLE_INVALID;
     }
 
-    if( ( xResult == CKR_OK ) && ( xPalHandle != CK_INVALID_HANDLE ) )
+    if( xResult == CKR_OK )
     {
         xResult = PKCS11_PAL_DestroyObject( xPalHandle );
         LogDebug( ( "PKCS11_PAL_DestroyObject returned 0x%0lX", ( unsigned long int ) xResult ) );
@@ -3107,8 +3107,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE hSession,
 
     /* See explanation in prvCheckValidSessionAndModule for this exception. */
     /* coverity[misra_c_2012_rule_10_5_violation] */
-    CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
-    CK_BYTE xByte = 0;
     CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
 
     /*
