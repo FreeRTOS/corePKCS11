@@ -44,72 +44,72 @@ static CK_FUNCTION_LIST prvP11FunctionList =
     { CRYPTOKI_VERSION_MAJOR, CRYPTOKI_VERSION_MINOR },
     C_Initialize,
     C_Finalize,
-    NULL, /*C_GetInfo */
+    C_GetInfo,
     C_GetFunctionList,
     C_GetSlotList,
     C_GetSlotInfo,
     C_GetTokenInfo,
-    NULL, /*C_GetMechanismList*/
+    C_GetMechanismList,
     C_GetMechanismInfo,
     C_InitToken,
-    NULL, /*C_InitPIN*/
-    NULL, /*C_SetPIN*/
+    C_InitPIN,
+    C_SetPIN,
     C_OpenSession,
     C_CloseSession,
-    NULL,    /*C_CloseAllSessions*/
-    NULL,    /*C_GetSessionInfo*/
-    NULL,    /*C_GetOperationState*/
-    NULL,    /*C_SetOperationState*/
-    C_Login, /*C_Login*/
-    NULL,    /*C_Logout*/
+    C_CloseAllSessions,
+    C_GetSessionInfo,
+    C_GetOperationState,
+    C_SetOperationState,
+    C_Login,
+    C_Logout,
     C_CreateObject,
-    NULL,    /*C_CopyObject*/
+    C_CopyObject,
     C_DestroyObject,
-    NULL,    /*C_GetObjectSize*/
+    C_GetObjectSize,
     C_GetAttributeValue,
-    NULL,    /*C_SetAttributeValue*/
+    C_SetAttributeValue,
     C_FindObjectsInit,
     C_FindObjects,
     C_FindObjectsFinal,
-    NULL, /*C_EncryptInit*/
-    NULL, /*C_Encrypt*/
-    NULL, /*C_EncryptUpdate */
-    NULL, /*C_EncryptFinal*/
-    NULL, /*C_DecryptInit*/
-    NULL, /*C_Decrypt*/
-    NULL, /*C_DecryptUpdate*/
-    NULL, /*C_DecryptFinal*/
+    C_EncryptInit,
+    C_Encrypt,
+    C_EncryptUpdate,
+    C_EncryptFinal,
+    C_DecryptInit,
+    C_Decrypt,
+    C_DecryptUpdate,
+    C_DecryptFinal,
     C_DigestInit,
-    NULL, /*C_Digest*/
+    C_Digest,
     C_DigestUpdate,
-    NULL, /* C_DigestKey*/
+    C_DigestKey,
     C_DigestFinal,
     C_SignInit,
     C_Sign,
-    NULL, /*C_SignUpdate*/
-    NULL, /*C_SignFinal*/
-    NULL, /*C_SignRecoverInit*/
-    NULL, /*C_SignRecover*/
+    C_SignUpdate,
+    C_SignFinal,
+    C_SignRecoverInit,
+    C_SignRecover,
     C_VerifyInit,
     C_Verify,
-    NULL, /*C_VerifyUpdate*/
-    NULL, /*C_VerifyFinal*/
-    NULL, /*C_VerifyRecoverInit*/
-    NULL, /*C_VerifyRecover*/
-    NULL, /*C_DigestEncryptUpdate*/
-    NULL, /*C_DecryptDigestUpdate*/
-    NULL, /*C_SignEncryptUpdate*/
-    NULL, /*C_DecryptVerifyUpdate*/
-    NULL, /*C_GenerateKey*/
+    C_VerifyUpdate,
+    C_VerifyFinal,
+    C_VerifyRecoverInit,
+    C_VerifyRecover,
+    C_DigestEncryptUpdate,
+    C_DecryptDigestUpdate,
+    C_SignEncryptUpdate,
+    C_DecryptVerifyUpdate,
+    C_GenerateKey,
     C_GenerateKeyPair,
-    NULL, /*C_WrapKey*/
-    NULL, /*C_UnwrapKey*/
-    NULL, /*C_DeriveKey*/
-    NULL, /*C_SeedRandom*/
+    C_WrapKey,
+    C_UnwrapKey,
+    C_DeriveKey,
+    C_SeedRandom,
     C_GenerateRandom,
-    NULL, /*C_GetFunctionStatus*/
-    NULL, /*C_CancelFunction*/
-    NULL  /*C_WaitForSlotEvent*/
+    C_GetFunctionStatus,
+    C_CancelFunction,
+    C_WaitForSlotEvent,
 };
 
 static uint16_t usMallocFreeCalls = 0;
@@ -272,6 +272,18 @@ static void vCommonStubs( void )
     C_Initialize_IgnoreAndReturn( CKR_OK );
 }
 
+/*!
+ * @brief Sets token uninitialized.
+ *
+ */
+static CK_RV xGetTokenInfoStub( CK_SLOT_ID slotId,
+                                CK_TOKEN_INFO_PTR pInfo )
+{
+    pInfo->flags = 0;
+
+    return CKR_OK;
+}
+
 /*******************************************************************************
  * Unity fixtures
  ******************************************************************************/
@@ -352,6 +364,25 @@ void test_IotPkcs11_xGetSlotList( void )
 }
 
 /*!
+ * @brief xGetSlotList Slot list overflow.
+ *
+ */
+void test_IotPkcs11_xGetSlotListSlotOverflow( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SLOT_ID_PTR pxSlotId = NULL;
+    CK_ULONG xSlotCount = 0;
+    CK_ULONG xExpectedSlotCount = ( size_t ) -1;
+
+    vCommonStubs();
+    C_GetSlotList_ExpectAnyArgsAndReturn( CKR_OK );
+    C_GetSlotList_ReturnThruPtr_pulCount( &xExpectedSlotCount );
+    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
+
+    TEST_ASSERT_EQUAL( CKR_HOST_MEMORY, xResult );
+}
+
+/*!
  * @brief xGetSlotList failed to get function list.
  *
  */
@@ -416,10 +447,9 @@ void test_IotPkcs11_xGetSlotListNoC_GetSlotList( void )
 
     C_GetFunctionList_IgnoreAndReturn( CKR_OK );
     C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList );
-    prvP11FunctionList.C_GetSlotList = NULL;
+    C_GetSlotList_IgnoreAndReturn( CKR_FUNCTION_NOT_SUPPORTED );
     xResult = xGetSlotList( &pxSlotId, &xSlotCount );
-    prvP11FunctionList.C_GetSlotList = C_GetSlotList;
-    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
 }
 
 /*!
@@ -569,49 +599,44 @@ void test_IotPkcs11_xInitializePkcs11TokenBadFunctionList( void )
     C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
     xResult = xInitializePkcs11Token();
 
-    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 }
 
 /*!
- * @brief xInitializePkcs11Token branch path for a NULL C_GetTokenInfo function.
+ * @brief xInitializePkcs11Token branch path for an unimplemented C_GetTokenInfo function.
  *
  */
-void test_IotPkcs11_xInitializePkcs11TokenNullTokenInfo( void )
+void test_IotPkcs11_xInitializePkcs11TokenUnsupportedTokenInfo( void )
 {
     CK_RV xResult = CKR_OK;
-
-    prvP11FunctionList.C_GetTokenInfo = NULL;
 
     vCommonStubs();
     mock_osal_malloc_Stub( pvPkcs11MallocCb );
     mock_osal_free_Stub( vPkcs11FreeCb );
     C_GetSlotList_Stub( ( void * ) xGet1Item );
+    C_GetTokenInfo_IgnoreAndReturn( CKR_FUNCTION_NOT_SUPPORTED );
     xResult = xInitializePkcs11Token();
 
-    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
-
-    prvP11FunctionList.C_GetTokenInfo = C_GetTokenInfo;
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
 }
 
 /*!
- * @brief xInitializePkcs11Token branch path for a NULL C_InitToken function.
+ * @brief xInitializePkcs11Token branch path for an unimplemented C_InitToken function.
  *
  */
-void test_IotPkcs11_xInitializePkcs11TokenNullInitToken( void )
+void test_IotPkcs11_xInitializePkcs11TokenUnsupportedInitToken( void )
 {
     CK_RV xResult = CKR_OK;
-
-    prvP11FunctionList.C_InitToken = NULL;
 
     vCommonStubs();
     mock_osal_malloc_Stub( pvPkcs11MallocCb );
     mock_osal_free_Stub( vPkcs11FreeCb );
+    C_GetTokenInfo_Stub( xGetTokenInfoStub );
+    C_InitToken_IgnoreAndReturn( CKR_FUNCTION_NOT_SUPPORTED );
     C_GetSlotList_Stub( ( void * ) xGet1Item );
     xResult = xInitializePkcs11Token();
 
-    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
-
-    prvP11FunctionList.C_InitToken = C_InitToken;
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
 }
 
 /*!
@@ -690,27 +715,23 @@ void test_IotPkcs11_xInitializePkcs11Session( void )
 }
 
 /*!
- * @brief xInitializePkcs11Session C_Login is a NULL function path.
+ * @brief xInitializePkcs11Session C_Login is an unsupported function path.
  *
  */
-void test_IotPkcs11_xInitializePkcs11SessionNullC_Login( void )
+void test_IotPkcs11_xInitializePkcs11SessionUnsupportedC_Login( void )
 {
     CK_RV xResult = CKR_OK;
     CK_SESSION_HANDLE xHandle = { 0 };
-
-    prvP11FunctionList.C_Login = NULL;
 
     vCommonStubs();
     mock_osal_malloc_Stub( pvPkcs11MallocCb );
     mock_osal_free_Stub( vPkcs11FreeCb );
     C_GetSlotList_Stub( ( void * ) xGet1Item );
     C_OpenSession_IgnoreAndReturn( CKR_OK );
-    C_Login_IgnoreAndReturn( CKR_OK );
+    C_Login_IgnoreAndReturn( CKR_FUNCTION_NOT_SUPPORTED );
     xResult = xInitializePkcs11Session( &xHandle );
 
-    TEST_ASSERT_EQUAL( CKR_OK, xResult );
-
-    prvP11FunctionList.C_Login = C_Login;
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
 }
 
 /*!
@@ -864,5 +885,5 @@ void test_IotPkcs11_xFindObjectWithLabelAndClassBadFunctionList( void )
     C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
     xResult = xFindObjectWithLabelAndClass( xHandle, pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS, strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ), CKO_PRIVATE_KEY, &xPrivateKeyHandle );
 
-    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 }

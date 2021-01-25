@@ -55,7 +55,7 @@ static CK_RV prvOpenSession( CK_SESSION_HANDLE * pxSession,
 
     xResult = C_GetFunctionList( &pxFunctionList );
 
-    if( ( xResult == CKR_OK ) && ( pxFunctionList != NULL ) && ( pxFunctionList->C_OpenSession != NULL ) )
+    if( xResult == CKR_OK )
     {
         xResult = pxFunctionList->C_OpenSession( xSlotId,
                                                  CKF_SERIAL_SESSION | CKF_RW_SESSION,
@@ -83,19 +83,6 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
     else
     {
         xResult = C_GetFunctionList( &pxFunctionList );
-
-        if( pxFunctionList == NULL )
-        {
-            xResult = CKR_FUNCTION_FAILED;
-        }
-        else if( pxFunctionList->C_GetSlotList == NULL )
-        {
-            xResult = CKR_FUNCTION_FAILED;
-        }
-        else
-        {
-            /* MISRA */
-        }
     }
 
     if( xResult == CKR_OK )
@@ -164,7 +151,7 @@ CK_RV xInitializePKCS11( void )
     xResult = C_GetFunctionList( &pxFunctionList );
 
     /* Initialize the PKCS #11 module. */
-    if( ( xResult == CKR_OK ) && ( pxFunctionList != NULL ) && ( pxFunctionList->C_Initialize != NULL ) )
+    if( xResult == CKR_OK )
     {
         xResult = pxFunctionList->C_Initialize( &xInitArgs );
     }
@@ -186,11 +173,6 @@ CK_RV xInitializePkcs11Token( void )
 
     xResult = C_GetFunctionList( &pxFunctionList );
 
-    if( ( pxFunctionList == NULL ) || ( pxFunctionList->C_GetTokenInfo == NULL ) || ( pxFunctionList->C_InitToken == NULL ) )
-    {
-        xResult = CKR_FUNCTION_FAILED;
-    }
-
     if( xResult == CKR_OK )
     {
         xResult = xInitializePKCS11();
@@ -201,9 +183,7 @@ CK_RV xInitializePkcs11Token( void )
         xResult = xGetSlotList( &pxSlotId, &xSlotCount );
     }
 
-    if( ( xResult == CKR_OK ) &&
-        ( NULL != pxFunctionList->C_GetTokenInfo ) &&
-        ( NULL != pxFunctionList->C_InitToken ) )
+    if( xResult == CKR_OK )
     {
         /* Check if the token requires further initialization. */
         pxTokenInfo = PKCS11_MALLOC( sizeof( CK_TOKEN_INFO ) );
@@ -214,6 +194,7 @@ CK_RV xInitializePkcs11Token( void )
              * has multiple slots, insert logic for selecting an appropriate
              * slot here.
              */
+            ( void ) memset( pxTokenInfo, 0x00, sizeof( CK_TOKEN_INFO ) );
             xResult = pxFunctionList->C_GetTokenInfo( pxSlotId[ 0 ], pxTokenInfo );
         }
         else
@@ -295,7 +276,7 @@ CK_RV xInitializePkcs11Session( CK_SESSION_HANDLE * pxSession )
         PKCS11_FREE( pxSlotId );
     }
 
-    if( ( xResult == CKR_OK ) && ( pxFunctionList != NULL ) && ( pxFunctionList->C_Login != NULL ) )
+    if( xResult == CKR_OK )
     {
         xResult = pxFunctionList->C_Login( *pxSession,
                                            CKU_USER,
@@ -333,12 +314,6 @@ CK_RV xFindObjectWithLabelAndClass( CK_SESSION_HANDLE xSession,
         xTemplate[ 1 ].ulValueLen = sizeof( CK_OBJECT_CLASS );
 
         xResult = C_GetFunctionList( &pxFunctionList );
-
-        if( ( pxFunctionList == NULL ) || ( pxFunctionList->C_FindObjectsInit == NULL ) ||
-            ( pxFunctionList->C_FindObjects == NULL ) || ( pxFunctionList->C_FindObjectsFinal == NULL ) )
-        {
-            xResult = CKR_FUNCTION_FAILED;
-        }
     }
 
     /* Initialize the FindObject state in the underlying PKCS #11 module based

@@ -1574,72 +1574,72 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetFunctionList )( CK_FUNCTION_LIST_PTR_PTR ppFunc
         { CRYPTOKI_VERSION_MAJOR, CRYPTOKI_VERSION_MINOR },
         C_Initialize,
         C_Finalize,
-        NULL, /*C_GetInfo */
+        C_GetInfo,
         C_GetFunctionList,
         C_GetSlotList,
-        NULL, /*C_GetSlotInfo*/
+        C_GetSlotInfo,
         C_GetTokenInfo,
-        NULL, /*C_GetMechanismList*/
+        C_GetMechanismList,
         C_GetMechanismInfo,
         C_InitToken,
-        NULL, /*C_InitPIN*/
-        NULL, /*C_SetPIN*/
+        C_InitPIN,
+        C_SetPIN,
         C_OpenSession,
         C_CloseSession,
-        NULL,    /*C_CloseAllSessions*/
-        NULL,    /*C_GetSessionInfo*/
-        NULL,    /*C_GetOperationState*/
-        NULL,    /*C_SetOperationState*/
-        C_Login, /*C_Login*/
-        NULL,    /*C_Logout*/
+        C_CloseAllSessions,
+        C_GetSessionInfo,
+        C_GetOperationState,
+        C_SetOperationState,
+        C_Login,
+        C_Logout,
         C_CreateObject,
-        NULL,    /*C_CopyObject*/
+        C_CopyObject,
         C_DestroyObject,
-        NULL,    /*C_GetObjectSize*/
+        C_GetObjectSize,
         C_GetAttributeValue,
-        NULL,    /*C_SetAttributeValue*/
+        C_SetAttributeValue,
         C_FindObjectsInit,
         C_FindObjects,
         C_FindObjectsFinal,
-        NULL, /*C_EncryptInit*/
-        NULL, /*C_Encrypt*/
-        NULL, /*C_EncryptUpdate*/
-        NULL, /*C_EncryptFinal*/
-        NULL, /*C_DecryptInit*/
-        NULL, /*C_Decrypt*/
-        NULL, /*C_DecryptUpdate*/
-        NULL, /*C_DecryptFinal*/
+        C_EncryptInit,
+        C_Encrypt,
+        C_EncryptUpdate,
+        C_EncryptFinal,
+        C_DecryptInit,
+        C_Decrypt,
+        C_DecryptUpdate,
+        C_DecryptFinal,
         C_DigestInit,
-        NULL, /*C_Digest*/
+        C_Digest,
         C_DigestUpdate,
-        NULL, /* C_DigestKey*/
+        C_DigestKey,
         C_DigestFinal,
         C_SignInit,
         C_Sign,
-        NULL, /*C_SignUpdate*/
-        NULL, /*C_SignFinal*/
-        NULL, /*C_SignRecoverInit*/
-        NULL, /*C_SignRecover*/
+        C_SignUpdate,
+        C_SignFinal,
+        C_SignRecoverInit,
+        C_SignRecover,
         C_VerifyInit,
         C_Verify,
-        NULL, /*C_VerifyUpdate*/
-        NULL, /*C_VerifyFinal*/
-        NULL, /*C_VerifyRecoverInit*/
-        NULL, /*C_VerifyRecover*/
-        NULL, /*C_DigestEncryptUpdate*/
-        NULL, /*C_DecryptDigestUpdate*/
-        NULL, /*C_SignEncryptUpdate*/
-        NULL, /*C_DecryptVerifyUpdate*/
-        NULL, /*C_GenerateKey*/
+        C_VerifyUpdate,
+        C_VerifyFinal,
+        C_VerifyRecoverInit,
+        C_VerifyRecover,
+        C_DigestEncryptUpdate,
+        C_DecryptDigestUpdate,
+        C_SignEncryptUpdate,
+        C_DecryptVerifyUpdate,
+        C_GenerateKey,
         C_GenerateKeyPair,
-        NULL, /*C_WrapKey*/
-        NULL, /*C_UnwrapKey*/
-        NULL, /*C_DeriveKey*/
-        NULL, /*C_SeedRandom*/
+        C_WrapKey,
+        C_UnwrapKey,
+        C_DeriveKey,
+        C_SeedRandom,
         C_GenerateRandom,
-        NULL, /*C_GetFunctionStatus*/
-        NULL, /*C_CancelFunction*/
-        NULL  /*C_WaitForSlotEvent*/
+        C_GetFunctionStatus,
+        C_CancelFunction,
+        C_WaitForSlotEvent,
     };
 
     if( NULL == ppFunctionList )
@@ -4919,3 +4919,1033 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateRandom )( CK_SESSION_HANDLE hSession,
     return xResult;
 }
 /* @[declare_pkcs11_mbedtls_c_generate_random] */
+
+/*********************** Unsupported PKCS #11 functions. ***********************/
+
+/**
+ * @brief Returns general information about Cryptoki.
+ *
+ * @param[in] pInfo            Location that receives information.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_getinfo] */
+CK_DECLARE_FUNCTION( CK_RV, C_GetInfo )( CK_INFO_PTR pInfo )
+{
+    ( void ) pInfo;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_getinfo] */
+
+/**
+ * @brief obtains information about a particular slot in
+ * the system.
+ *
+ * @param[in] slotID            The ID of the slot.
+ * @param[in] pInfo            Location that receives information.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_getslotinfo] */
+CK_DECLARE_FUNCTION( CK_RV, C_GetSlotInfo )( CK_SLOT_ID slotID,
+                                             CK_SLOT_INFO_PTR pInfo )
+{
+    ( void ) slotID;
+    ( void ) pInfo;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_getslotinfo] */
+
+/**
+ * @brief obtains a list of mechanism types
+ * supported by a token.
+ *
+ * @param[in] slotID            The ID of the slot.
+ * @param[in] pMechanismList    Gets mech. array.
+ * @param[in] pulCount          Gets # of mechs.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_getmechanismlist] */
+CK_DECLARE_FUNCTION( CK_RV, C_GetMechanismList )( CK_SLOT_ID slotID,
+                                                  CK_MECHANISM_TYPE_PTR pMechanismList,
+                                                  CK_ULONG_PTR pulCount )
+{
+    ( void ) slotID;
+    ( void ) pMechanismList;
+    ( void ) pulCount;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_getmechanismlist] */
+
+/**
+ * @brief initializes the normal user's PIN.
+ *
+ * @param[in] hSession            The session's handle.
+ * @param[in] pPin                The normal user's PIN.
+ * @param[in] ulPinLen            Length in bytes of the PIN.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_initpin] */
+CK_DECLARE_FUNCTION( CK_RV, C_InitPIN )( CK_SESSION_HANDLE hSession,
+                                         CK_UTF8CHAR_PTR pPin,
+                                         CK_ULONG ulPinLen )
+{
+    ( void ) hSession;
+    ( void ) pPin;
+    ( void ) ulPinLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_initpin] */
+
+/**
+ * @brief modifies the PIN of the user who is logged in.
+ *
+ * @param[in] hSession            The session's handle.
+ * @param[in] pOldPin             The old PIN.
+ * @param[in] ulOldLen            Length of the old PIN.
+ * @param[in] pNewPin             The new PIN.
+ * @param[in] ulNewLen            Length of the new PIN.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_setpin] */
+CK_DECLARE_FUNCTION( CK_RV, C_SetPIN )( CK_SESSION_HANDLE hSession,
+                                        CK_UTF8CHAR_PTR pOldPin,
+                                        CK_ULONG ulOldLen,
+                                        CK_UTF8CHAR_PTR pNewPin,
+                                        CK_ULONG ulNewLen )
+{
+    ( void ) hSession;
+    ( void ) pOldPin;
+    ( void ) ulOldLen;
+    ( void ) pNewPin;
+    ( void ) ulNewLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_setpin] */
+
+/**
+ * @brief closes all sessions with a token.
+ *
+ * @param[in] slotID            The token's slot.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_closeallsessions] */
+CK_DECLARE_FUNCTION( CK_RV, C_CloseAllSessions )( CK_SLOT_ID slotID )
+{
+    ( void ) slotID;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_closeallsessions] */
+
+/**
+ * @brief obtains information about the session.
+ *
+ * @param[in] hSession            The session's handle.
+ * @param[in] pInfo               Receives session info.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_getsessioninfo] */
+CK_DECLARE_FUNCTION( CK_RV, C_GetSessionInfo )( CK_SESSION_HANDLE hSession,
+                                                CK_SESSION_INFO_PTR pInfo )
+{
+    ( void ) hSession;
+    ( void ) pInfo;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_getsessioninfo] */
+
+/**
+ * @brief obtains the state of the cryptographic operation
+ * in a session.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[out] pOperationState          Gets state.
+ * @param[out] pulOperationStateLen     Gets state length.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_getoperationstate] */
+CK_DECLARE_FUNCTION( CK_RV, C_GetOperationState )( CK_SESSION_HANDLE hSession,
+                                                   CK_BYTE_PTR pOperationState,
+                                                   CK_ULONG_PTR pulOperationStateLen )
+{
+    ( void ) hSession;
+    ( void ) pOperationState;
+    ( void ) pulOperationStateLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_getoperationstate] */
+
+/**
+ * @brief restores the state of the cryptographic
+ * operation in a session.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[out] pOperationState          Holds state.
+ * @param[out] pulOperationStateLen     Holds state length.
+ * @param[in] hEncryptionKey            en/decryption key.
+ * @param[in] hAuthenticationKey        sign/verify key.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_setoperationstate] */
+CK_DECLARE_FUNCTION( CK_RV, C_SetOperationState )( CK_SESSION_HANDLE hSession,
+                                                   CK_BYTE_PTR pOperationState,
+                                                   CK_ULONG ulOperationStateLen,
+                                                   CK_OBJECT_HANDLE hEncryptionKey,
+                                                   CK_OBJECT_HANDLE hAuthenticationKey )
+{
+    ( void ) hSession;
+    ( void ) pOperationState;
+    ( void ) ulOperationStateLen;
+    ( void ) hEncryptionKey;
+    ( void ) hAuthenticationKey;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_setoperationstate] */
+
+/**
+ * @brief copies an object, creating a new object for the
+ * copy.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] hObject                   The object's handle.
+ * @param[in] pTemplate                 Template for new object.
+ * @param[in] ulCount                   Attributes in template.
+ * @param[out] phNewObject              Receives handle of copy.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_copyobject] */
+CK_DECLARE_FUNCTION( CK_RV, C_CopyObject )( CK_SESSION_HANDLE hSession,
+                                            CK_OBJECT_HANDLE hObject,
+                                            CK_ATTRIBUTE_PTR pTemplate,
+                                            CK_ULONG ulCount,
+                                            CK_OBJECT_HANDLE_PTR phNewObject
+                                            )
+{
+    ( void ) hSession;
+    ( void ) hObject;
+    ( void ) pTemplate;
+    ( void ) ulCount;
+    ( void ) phNewObject;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_copyobject] */
+
+/**
+ * @brief gets the size of an object in bytes.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] hObject                   The object's handle.
+ * @param[out] pulSize                  Receives size of object
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_getobjectsize] */
+CK_DECLARE_FUNCTION( CK_RV, C_GetObjectSize )( CK_SESSION_HANDLE hSession,
+                                               CK_OBJECT_HANDLE hObject,
+                                               CK_ULONG_PTR pulSize
+                                               )
+{
+    ( void ) hSession;
+    ( void ) hObject;
+    ( void ) pulSize;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_getobjectsize] */
+
+/**
+ * @brief modifies the value of one or more object
+ * attributes.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] hObject                   The object's handle.
+ * @param[in] pTemplate                 Specifies attrs and values.
+ * @param[in] ulCount                   Attributes in template.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_setattributevalue] */
+CK_DECLARE_FUNCTION( CK_RV, C_SetAttributeValue )( CK_SESSION_HANDLE hSession,
+                                                   CK_OBJECT_HANDLE hObject,
+                                                   CK_ATTRIBUTE_PTR pTemplate,
+                                                   CK_ULONG ulCount
+                                                   )
+{
+    ( void ) hSession;
+    ( void ) hObject;
+    ( void ) pTemplate;
+    ( void ) ulCount;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_setattributevalue] */
+
+/**
+ * @brief Initializes an encryption operation.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pMechanism                The encryption mechanism.
+ * @param[in] hKey                      Handle of encryption key.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_encryptinit] */
+CK_DECLARE_FUNCTION( CK_RV, C_EncryptInit )( CK_SESSION_HANDLE hSession,
+                                             CK_MECHANISM_PTR pMechanism,
+                                             CK_OBJECT_HANDLE hKey
+                                             )
+{
+    ( void ) hSession;
+    ( void ) pMechanism;
+    ( void ) hKey;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_encryptinit] */
+
+/**
+ * @brief encrypts single-part data.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pData                     The plaintext data.
+ * @param[in] ulDataLen                 Bytes of plaintext.
+ * @param[out] pEncryptedData           Gets ciphertex.
+ * @param[out] pulEncryptedDataLen      Gets c-text size.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_encrypt] */
+CK_DECLARE_FUNCTION( CK_RV, C_Encrypt )( CK_SESSION_HANDLE hSession,
+                                         CK_BYTE_PTR pData,
+                                         CK_ULONG ulDataLen,
+                                         CK_BYTE_PTR pEncryptedData,
+                                         CK_ULONG_PTR pulEncryptedDataLen
+                                         )
+{
+    ( void ) hSession;
+    ( void ) pData;
+    ( void ) ulDataLen;
+    ( void ) pEncryptedData;
+    ( void ) pulEncryptedDataLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_encrypt] */
+
+/**
+ * @brief continues a multiple-part encryption
+ * operation.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pPart                     The plaintext data.
+ * @param[in] ulPartLen                 Plaintext data len.
+ * @param[out] pEncryptedPart           Gets ciphertext.
+ * @param[out] pulEncryptedPartLen      Gets c-text size.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_encryptupdate] */
+CK_DECLARE_FUNCTION( CK_RV, C_EncryptUpdate )( CK_SESSION_HANDLE hSession,
+                                               CK_BYTE_PTR pPart,
+                                               CK_ULONG ulPartLen,
+                                               CK_BYTE_PTR pEncryptedPart,
+                                               CK_ULONG_PTR pulEncryptedPartLen
+                                               )
+{
+    ( void ) hSession;
+    ( void ) pPart;
+    ( void ) ulPartLen;
+    ( void ) pEncryptedPart;
+    ( void ) pulEncryptedPartLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_encryptupdate] */
+
+/**
+ * @brief finishes a multiple-part encryption
+ * operation.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[out] pLastEncryptedPart       Last c-text.
+ * @param[out pulLastEncryptedPartLen   Gets last size.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_encryptfinal] */
+CK_DECLARE_FUNCTION( CK_RV, C_EncryptFinal )( CK_SESSION_HANDLE hSession,
+                                              CK_BYTE_PTR pLastEncryptedPart,
+                                              CK_ULONG_PTR pulLastEncryptedPartLen
+                                              )
+{
+    ( void ) hSession;
+    ( void ) pLastEncryptedPart;
+    ( void ) pulLastEncryptedPartLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_encryptfinal] */
+
+/**
+ * @brief initializes a decryption operation.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pMechanism                The decryption mechanism.
+ * @param[in] hKey                      Handle of decryption key.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_decryptinit] */
+CK_DECLARE_FUNCTION( CK_RV, C_DecryptInit )( CK_SESSION_HANDLE hSession,
+                                             CK_MECHANISM_PTR pMechanism,
+                                             CK_OBJECT_HANDLE hKey
+                                             )
+{
+    ( void ) hSession;
+    ( void ) pMechanism;
+    ( void ) hKey;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_decryptinit] */
+
+/**
+ * @brief decrypts encrypted data in a single part.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pEncryptedData            Ciphertext.
+ * @param[in] ulEncryptedDataLen        Ciphertext length.
+ * @param[out] pData                    Gets plaintext.
+ * @param[out] pulDataLen               Gets p-text size.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_decrypt] */
+CK_DECLARE_FUNCTION( CK_RV, C_Decrypt )( CK_SESSION_HANDLE hSession,
+                                         CK_BYTE_PTR pEncryptedData,
+                                         CK_ULONG ulEncryptedDataLen,
+                                         CK_BYTE_PTR pData,
+                                         CK_ULONG_PTR pulDataLen
+                                         )
+{
+    ( void ) hSession;
+    ( void ) pEncryptedData;
+    ( void ) ulEncryptedDataLen;
+    ( void ) pData;
+    ( void ) pulDataLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_decrypt] */
+
+/**
+ * @brief continues a multiple-part decryption
+ * operation.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pEncryptedData            Ciphertext.
+ * @param[in] ulEncryptedDataLen        Ciphertext length.
+ * @param[out] pPart                    Gets plaintext.
+ * @param[out] pulPartLen               Gets p-text size.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_decryptupdate] */
+CK_DECLARE_FUNCTION( CK_RV, C_DecryptUpdate )( CK_SESSION_HANDLE hSession,
+                                               CK_BYTE_PTR pEncryptedPart,
+                                               CK_ULONG ulEncryptedPartLen,
+                                               CK_BYTE_PTR pPart,
+                                               CK_ULONG_PTR pulPartLen
+                                               )
+{
+    ( void ) hSession;
+    ( void ) pEncryptedPart;
+    ( void ) ulEncryptedPartLen;
+    ( void ) pPart;
+    ( void ) pulPartLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_decryptupdate] */
+
+/**
+ * @brief finishes a multiple-part decryption
+ * operation.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[out] pLastPart                    Gets plaintext.
+ * @param[out] pulLastPartLen               Gets p-text size.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_decryptfinal] */
+CK_DECLARE_FUNCTION( CK_RV, C_DecryptFinal )( CK_SESSION_HANDLE hSession,
+                                              CK_BYTE_PTR pLastPart,
+                                              CK_ULONG_PTR pulLastPartLen
+                                              )
+{
+    ( void ) hSession;
+    ( void ) pLastPart;
+    ( void ) pulLastPartLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_decryptfinal] */
+
+/**
+ * @brief digests data in a single part.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pData                     Data to be digested.
+ * @param[in] ulDataLen                 Bytes of data to digest.
+ * @param[out] pDigest                  Gets the message digest.
+ * @param[out] pulDigestLen             Gets digest length.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_digest] */
+CK_DECLARE_FUNCTION( CK_RV, C_Digest )( CK_SESSION_HANDLE hSession,
+                                        CK_BYTE_PTR pData,
+                                        CK_ULONG ulDataLen,
+                                        CK_BYTE_PTR pDigest,
+                                        CK_ULONG_PTR pulDigestLen
+                                        )
+{
+    ( void ) hSession;
+    ( void ) pData;
+    ( void ) ulDataLen;
+    ( void ) pDigest;
+    ( void ) pulDigestLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_digest] */
+
+/**
+ * @brief continues a multi-part message-digesting
+ * operation, by digesting the value of a secret key as part of
+ * the data already digested.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] hKey                      Secret key to digest.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_digestkey] */
+CK_DECLARE_FUNCTION( CK_RV, C_DigestKey )( CK_SESSION_HANDLE hSession,
+                                           CK_OBJECT_HANDLE hKey
+                                           )
+{
+    ( void ) hSession;
+    ( void ) hKey;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_digestkey] */
+
+/**
+ * @brief continues a multiple-part signature operation,
+ * where the signature is (will be) an appendix to the data,
+ * and plaintext cannot be recovered from the signature.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pPart                     The data to sign.
+ * @param[in] ulPartLen                 Count of bytes to sign.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_signupdate] */
+CK_DECLARE_FUNCTION( CK_RV, C_SignUpdate )( CK_SESSION_HANDLE hSession,
+                                            CK_BYTE_PTR pPart,
+                                            CK_ULONG ulPartLen
+                                            )
+{
+    ( void ) hSession;
+    ( void ) pPart;
+    ( void ) ulPartLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_signupdate] */
+
+/**
+ * @brief finishes a multiple-part signature operation,
+ * returning the signature.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[out] pSignature               Gets the signature.
+ * @param[out] pulSignatureLen          Gets signature length.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_signfinal] */
+CK_DECLARE_FUNCTION( CK_RV, C_SignFinal )( CK_SESSION_HANDLE hSession,
+                                           CK_BYTE_PTR pSignature,
+                                           CK_ULONG_PTR pulSignatureLen
+                                           )
+{
+    ( void ) hSession;
+    ( void ) pSignature;
+    ( void ) pulSignatureLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_signfinal] */
+
+/**
+ * @brief initializes a signature operation, where
+ * the data can be recovered from the signature.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pMechanism                The signature mechanism.
+ * @param[in] hKey                      Handle of the signature key.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_signrecoverinit] */
+CK_DECLARE_FUNCTION( CK_RV, C_SignRecoverInit )( CK_SESSION_HANDLE hSession,
+                                                 CK_MECHANISM_PTR pMechanism,
+                                                 CK_OBJECT_HANDLE hKey
+                                                 )
+{
+    ( void ) hSession;
+    ( void ) pMechanism;
+    ( void ) hKey;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_signrecoverinit] */
+
+/**
+ * @brief signs data in a single operation, where the
+ * data can be recovered from the signature.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pData                     The data to sign.
+ * @param[in] ulDataLen                 Count of bytes to sign.
+ * @param[out] pSignature               Gets the signature.
+ * @param[out] pulSignatureLen          Gets signature length.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_signrecover] */
+CK_DECLARE_FUNCTION( CK_RV, C_SignRecover )( CK_SESSION_HANDLE hSession,
+                                             CK_BYTE_PTR pData,
+                                             CK_ULONG ulDataLen,
+                                             CK_BYTE_PTR pSignature,
+                                             CK_ULONG_PTR pulSignatureLen
+                                             )
+{
+    ( void ) hSession;
+    ( void ) pData;
+    ( void ) ulDataLen;
+    ( void ) pSignature;
+    ( void ) pulSignatureLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_signrecover] */
+
+/**
+ * @brief continues a multiple-part verification
+ * operation, where the signature is an appendix to the data,
+ * and plaintext cannot be recovered from the signature.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pPart                     Signed data.
+ * @param[in] ulPartLen                 Length of signed data.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_verifyupdate] */
+CK_DECLARE_FUNCTION( CK_RV, C_VerifyUpdate )( CK_SESSION_HANDLE hSession,
+                                              CK_BYTE_PTR pPart,
+                                              CK_ULONG ulPartLen
+                                              )
+{
+    ( void ) hSession;
+    ( void ) pPart;
+    ( void ) ulPartLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_verifyupdate] */
+
+/**
+ * @brief finishes a multiple-part verification
+ * operation, checking the signature.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @param[in] pSignature                Signature to verify.
+ * @param[in] ulSignatureLen            Signature length.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_verifyfinal] */
+CK_DECLARE_FUNCTION( CK_RV, C_VerifyFinal )( CK_SESSION_HANDLE hSession,
+                                             CK_BYTE_PTR pSignature,
+                                             CK_ULONG ulSignatureLen
+                                             )
+{
+    ( void ) hSession;
+    ( void ) pSignature;
+    ( void ) ulSignatureLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_verifyfinal] */
+
+/**
+ * @brief logs a user out from a token.
+ *
+ * @param[in] hSession                  The session's handle.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_logout] */
+CK_DECLARE_FUNCTION( CK_RV, C_Logout )( CK_SESSION_HANDLE hSession )
+{
+    ( void ) hSession;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_logout] */
+
+/**
+ * @brief Waits for a slot event (token insertion,
+ * removal, etc.) to occur.
+ *
+ * @param[in] flags             Blocking/nonblocking flag.
+ * @param[out] pSlot            Location that receives the slot ID. It is the
+ * responsibility of the application to allocate
+ *                              this memory.
+ * @param[in] pRserved           Reserved. Should be NULL_PTR.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_waitforslotevent] */
+CK_DECLARE_FUNCTION( CK_RV, C_WaitForSlotEvent )( CK_FLAGS flags,
+                                                  CK_SLOT_ID_PTR pSlot,
+                                                  CK_VOID_PTR pRserved )
+{
+    ( void ) flags;
+    ( void ) pSlot;
+    ( void ) pRserved;
+    ( void ) flags;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_waitforslotevent] */
+
+/**
+ * @brief A legacy function; it cancels a function
+ * running in parallel.
+ *
+ * @param[in] hSession             The session's handle.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_cancelfunction] */
+CK_DECLARE_FUNCTION( CK_RV, C_CancelFunction )( CK_SESSION_HANDLE hSession )
+{
+    ( void ) hSession;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_cancelfunction] */
+
+/**
+ * @brief A legacy function; it obtains an
+ * updated status of a function running in parallel with an
+ * application.
+ *
+ * @param[in] hSession             The session's handle.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_getfunctionstatus] */
+CK_DECLARE_FUNCTION( CK_RV, C_GetFunctionStatus )( CK_SESSION_HANDLE hSession )
+{
+    ( void ) hSession;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_getfunctionstatus] */
+
+/**
+ * @brief Mixes additional seed material into the token's random number generator.
+ *
+ * @param[in] hSession              The session's handle.
+ * @param[in] pSeed                 The seed material.
+ * @param[in] ulSeedLen             Length of seed material.
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_seedrandom] */
+CK_DECLARE_FUNCTION( CK_RV, C_SeedRandom )( CK_SESSION_HANDLE hSession,
+                                            CK_BYTE_PTR pSeed,
+                                            CK_ULONG ulSeedLen
+                                            )
+{
+    ( void ) hSession;
+    ( void ) pSeed;
+    ( void ) ulSeedLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_seedrandom] */
+
+/**
+ * @brief Derives a key from a base key, creating a new key object.
+ *
+ * @param[in] hSession             The session's handle.
+ * @param[in] pMechanism           Key deriv. mech.
+ * @param[in] hBaseKey             Base key.
+ * @param[in] pTemplate            New key template.
+ * @param[in] ulAttributeCount     Template length.
+ * @param[out] phKey               Gets new handle.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_derivekey] */
+CK_DECLARE_FUNCTION( CK_RV, C_DeriveKey )( CK_SESSION_HANDLE hSession,
+                                           CK_MECHANISM_PTR pMechanism,
+                                           CK_OBJECT_HANDLE hBaseKey,
+                                           CK_ATTRIBUTE_PTR pTemplate,
+                                           CK_ULONG ulAttributeCount,
+                                           CK_OBJECT_HANDLE_PTR phKey
+                                           )
+{
+    ( void ) hSession;
+    ( void ) pMechanism;
+    ( void ) hBaseKey;
+    ( void ) pTemplate;
+    ( void ) ulAttributeCount;
+    ( void ) phKey;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_derivekey] */
+
+/**
+ * @brief Unwraps (decrypts) a wrapped key, creating a new
+ * key object.
+ *
+ * @param[in] hSession             The session's handle.
+ * @param[in] pMechanism           Unwrapping mechanism.
+ * @param[in] hUnwrappingKey       Unwrapping key.
+ * @param[in] pWrappedKey          The wrapped key.
+ * @param[in] ulWrappedKeyLen      Wrapped key len.
+ * @param[in] pTemplate            New key template.
+ * @param[in] ulAttributeCount     Template length.
+ * @param[out] phKey               Gets new handle.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_unwrapkey] */
+CK_DECLARE_FUNCTION( CK_RV, C_UnwrapKey )( CK_SESSION_HANDLE hSession,
+                                           CK_MECHANISM_PTR pMechanism,
+                                           CK_OBJECT_HANDLE hUnwrappingKey,
+                                           CK_BYTE_PTR pWrappedKey,
+                                           CK_ULONG ulWrappedKeyLen,
+                                           CK_ATTRIBUTE_PTR pTemplate,
+                                           CK_ULONG ulAttributeCount,
+                                           CK_OBJECT_HANDLE_PTR phKey
+                                           )
+{
+    ( void ) hSession;
+    ( void ) pMechanism;
+    ( void ) hUnwrappingKey;
+    ( void ) pWrappedKey;
+    ( void ) ulWrappedKeyLen;
+    ( void ) pTemplate;
+    ( void ) ulAttributeCount;
+    ( void ) phKey;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_unwrapkey] */
+
+/**
+ * @brief Wraps (i.e., encrypts) a key.
+ *
+ * @param[in] hSession             The session's handle.
+ * @param[in] pMechanism           The wrapping mechanism.
+ * @param[in] hUnwrappingKey       Unwrapping key.
+ * @param[in] hKey                 Key to be wrapped.
+ * @param[out] pWrappedKey         Gets wrapped key.
+ * @param[out] ulWrappedKeyLen     Gets wrapped key size.
+ * @param[in] pTemplate            New key template.
+ * @param[in] ulAttributeCount     Template length.
+ * @param[out] phKey               Gets new handle.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_wrapkey] */
+CK_DECLARE_FUNCTION( CK_RV, C_WrapKey )( CK_SESSION_HANDLE hSession,
+                                         CK_MECHANISM_PTR pMechanism,
+                                         CK_OBJECT_HANDLE hWrappingKey,
+                                         CK_OBJECT_HANDLE hKey,
+                                         CK_BYTE_PTR pWrappedKey,
+                                         CK_ULONG_PTR pulWrappedKeyLen
+                                         )
+{
+    ( void ) hSession;
+    ( void ) pMechanism;
+    ( void ) hWrappingKey;
+    ( void ) hKey;
+    ( void ) pWrappedKey;
+    ( void ) pulWrappedKeyLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_wrapkey] */
+
+/**
+ * @brief Generates a secret key, creating a new key
+ * object.
+ *
+ * @param[in] hSession             The session's handle.
+ * @param[in] pMechanism           Key generation mech.
+ * @param[in] pTemplate            Template for new key.
+ * @param[in] ulCount              # of attributes in template.
+ * @param[out] phKey               Gets handle of new key.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_generatekey] */
+CK_DECLARE_FUNCTION( CK_RV, C_GenerateKey )( CK_SESSION_HANDLE hSession,
+                                             CK_MECHANISM_PTR pMechanism,
+                                             CK_ATTRIBUTE_PTR pTemplate,
+                                             CK_ULONG ulCount,
+                                             CK_OBJECT_HANDLE_PTR phKey
+                                             )
+{
+    ( void ) hSession;
+    ( void ) pMechanism;
+    ( void ) pTemplate;
+    ( void ) ulCount;
+    ( void ) phKey;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_generatekey] */
+
+/**
+ * @brief Continues a multiple-part signing and
+ * encryption operation.
+ *
+ * @param[in] hSession             The session's handle.
+ * @param[in] pPart                The plaintext.
+ * @param[in] ulPartLen            Plaintext length.
+ * @param[out] pEncryptedPart      Gets ciphertext.
+ * @param[out] pulEncryptedPartLen Gets ciphertext length.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_signencryptupdate] */
+CK_DECLARE_FUNCTION( CK_RV, C_SignEncryptUpdate )( CK_SESSION_HANDLE hSession,
+                                                   CK_BYTE_PTR pPart,
+                                                   CK_ULONG ulPartLen,
+                                                   CK_BYTE_PTR pEncryptedPart,
+                                                   CK_ULONG_PTR pulEncryptedPartLen
+                                                   )
+{
+    ( void ) hSession;
+    ( void ) pPart;
+    ( void ) ulPartLen;
+    ( void ) pEncryptedPart;
+    ( void ) pulEncryptedPartLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_signencryptupdate] */
+
+/**
+ * @brief Continues a multiple-part decryption and
+ * verify operation.
+ *
+ * @param[in] hSession             The session's handle.
+ * @param[in] pEncryptedPart       Ciphertext.
+ * @param[in] ulEncryptedPartLen   Ciphertext length.
+ * @param[in] pPart                Gets plaintext.
+ * @param[in] pulPartLen           Gets p-text length.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_decryptverifyupdate] */
+CK_DECLARE_FUNCTION( CK_RV, C_DecryptVerifyUpdate )( CK_SESSION_HANDLE hSession,
+                                                     CK_BYTE_PTR pEncryptedPart,
+                                                     CK_ULONG ulEncryptedPartLen,
+                                                     CK_BYTE_PTR pPart,
+                                                     CK_ULONG_PTR pulPartLen
+                                                     )
+{
+    ( void ) hSession;
+    ( void ) pEncryptedPart;
+    ( void ) ulEncryptedPartLen;
+    ( void ) pPart;
+    ( void ) pulPartLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_decryptverifyupdate] */
+
+/**
+ * @brief continues a multiple-part decryption and
+ * digesting operation.
+ *
+ * @param[in] hSession             The session's handle.
+ * @param[in] pEncryptedPart       Ciphertext.
+ * @param[in] ulEncryptedPartLen   Ciphertext length.
+ * @param[in] pPart                Gets plaintext.
+ * @param[in] pulPartLen           Gets plaintext length.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_decryptdigestupdate] */
+CK_DECLARE_FUNCTION( CK_RV, C_DecryptDigestUpdate )( CK_SESSION_HANDLE hSession,
+                                                     CK_BYTE_PTR pEncryptedPart,
+                                                     CK_ULONG ulEncryptedPartLen,
+                                                     CK_BYTE_PTR pPart,
+                                                     CK_ULONG_PTR pulPartLen
+                                                     )
+{
+    ( void ) hSession;
+    ( void ) pEncryptedPart;
+    ( void ) ulEncryptedPartLen;
+    ( void ) pPart;
+    ( void ) pulPartLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_decryptdigestupdate] */
+
+/**
+ * @brief continues a multiple-part digesting
+ * and encryption operation.
+ *
+ * @param[in] hSession             The session's handle.
+ * @param[in] pPart                The plaintext data.
+ * @param[in] pulPartLen           Plaintext length.
+ * @param[in] pEncryptedPart       Gets ciphertext.
+ * @param[in] pulEncryptedPartLen  Gets ciphertext length.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_digestencryptupdate] */
+CK_DECLARE_FUNCTION( CK_RV, C_DigestEncryptUpdate )( CK_SESSION_HANDLE hSession,
+                                                     CK_BYTE_PTR pPart,
+                                                     CK_ULONG ulPartLen,
+                                                     CK_BYTE_PTR pEncryptedPart,
+                                                     CK_ULONG_PTR pulEncryptedPartLen
+                                                     )
+{
+    ( void ) hSession;
+    ( void ) pPart;
+    ( void ) ulPartLen;
+    ( void ) pEncryptedPart;
+    ( void ) pulEncryptedPartLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_digestencryptupdate] */
+
+
+/**
+ * @brief Verifies a signature in a single-part
+ * operation, where the data is recovered from the signature.
+ *
+ * @param[in] hSession             The session's handle.
+ * @param[in] pSignature           Signature to verify.
+ * @param[in] ulSignatureLen       Signature length.
+ * @param[out] pData               Gets signed data.
+ * @param[out] pulDataLen          Gets signed data len.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_verifyrecover] */
+CK_DECLARE_FUNCTION( CK_RV, C_VerifyRecover )( CK_SESSION_HANDLE hSession,
+                                               CK_BYTE_PTR pSignature,
+                                               CK_ULONG ulSignatureLen,
+                                               CK_BYTE_PTR pData,
+                                               CK_ULONG_PTR pulDataLen
+                                               )
+{
+    ( void ) hSession;
+    ( void ) pSignature;
+    ( void ) ulSignatureLen;
+    ( void ) pData;
+    ( void ) pulDataLen;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_verifyrecover] */
+
+/**
+ * @brief Initializes a signature verification
+ * operation, where the data is recovered from the signature.
+ *
+ * @param[in] hSession             The session's handle.
+ * @param[in] pMechanism           The verification mechanism.
+ * @param[in] hKey                 Verification key.
+ *
+ * @return CKR_FUNCTION_NOT_SUPPORTED always.
+ */
+/* @[declare_pkcs11_mbedtls_c_verifyrecoverinit] */
+CK_DECLARE_FUNCTION( CK_RV, C_VerifyRecoverInit )( CK_SESSION_HANDLE hSession,
+                                                   CK_MECHANISM_PTR pMechanism,
+                                                   CK_OBJECT_HANDLE hKey
+                                                   )
+{
+    ( void ) hSession;
+    ( void ) pMechanism;
+    ( void ) hKey;
+    return CKR_FUNCTION_NOT_SUPPORTED;
+}
+/* @[declare_pkcs11_mbedtls_c_verifyrecoverinit] */

@@ -4642,3 +4642,648 @@ void test_pkcs11_C_DestroyObjectBadHandle( void )
 
     prvCommonDeinitStubs();
 }
+
+/* ======================  TESTING C_GetInfo  ============================ */
+
+/*!
+ * @brief C_GetInfo happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_GetInfo( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_GetInfo( NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_GetSlotInfo  ============================ */
+
+/*!
+ * @brief C_GetSlotInfo happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_GetSlotInfo( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_GetSlotInfo( 0, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_GetMechanismList  ============================ */
+
+/*!
+ * @brief C_GetMechanismList happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_GetMechanismList( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_GetMechanismList( 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_InitPIN  ============================ */
+
+/*!
+ * @brief C_InitPIN happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_InitPIN( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_InitPIN( 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_SetPIN  ============================ */
+
+/*!
+ * @brief C_SetPIN happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_SetPIN( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_SetPIN( 0, NULL, 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_CloseAllSessions  ============================ */
+
+/*!
+ * @brief C_CloseAllSessions happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_CloseAllSessions( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_CloseAllSessions( 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_GetSessionInfo  ============================ */
+
+/*!
+ * @brief C_GetSessionInfo happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_GetSessionInfo( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_GetSessionInfo( 0, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_GetOperationState  ============================ */
+
+/*!
+ * @brief C_GetOperationState happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_GetOperationState( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_GetOperationState( 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_SetOperationState  ============================ */
+
+/*!
+ * @brief C_SetOperationState happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_SetOperationState( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_SetOperationState( 0, NULL, 0, 0, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_CopyObject  ============================ */
+
+/*!
+ * @brief  C_CopyObject happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_CopyObject( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_CopyObject( 0, 0, NULL, 0, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_GetObjectSize  ============================ */
+
+/*!
+ * @brief  C_GetObjectSize happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_GetObjectSize( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_GetObjectSize( 0, 0, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_SetAttributeValue  ============================ */
+
+/*!
+ * @brief  C_SetAttributeValue happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_SetAttributeValue( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_SetAttributeValue( 0, 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_EncryptInit  ============================ */
+
+/*!
+ * @brief  C_EncryptInit happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_EncryptInit( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_EncryptInit( 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_Encrypt  ============================ */
+
+/*!
+ * @brief  C_Encrypt happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_Encrypt( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_Encrypt( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_EncryptUpdate  ============================ */
+
+/*!
+ * @brief  C_EncryptUpdate happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_EncryptUpdate( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_EncryptUpdate( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_EncryptFinal  ============================ */
+
+/*!
+ * @brief  C_EncryptFinal happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_EncryptFinal( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_EncryptFinal( 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_DecryptInit  ============================ */
+
+/*!
+ * @brief  C_DecryptInit happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_DecryptInit( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_DecryptInit( 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_Decrypt  ============================ */
+
+/*!
+ * @brief  C_Decrypt happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_Decrypt( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_Decrypt( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_DecryptUpdate  ============================ */
+
+/*!
+ * @brief  C_DecryptUpdate happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_DecryptUpdate( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_DecryptUpdate( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_DecryptFinal  ============================ */
+
+/*!
+ * @brief  C_DecryptFinal happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_DecryptFinal( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_DecryptFinal( 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_Digest  ============================ */
+
+/*!
+ * @brief  C_Digest happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_Digest( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_Digest( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_DigestKey  ============================ */
+
+/*!
+ * @brief  C_DigestKey happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_DigestKey( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_DigestKey( 0, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_SignUpdate  ============================ */
+
+/*!
+ * @brief  C_SignUpdate happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_SignUpdate( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_SignUpdate( 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_SignFinal  ============================ */
+
+/*!
+ * @brief  C_SignFinal happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_SignFinal( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_SignFinal( 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_SignRecoverInit  ============================ */
+
+/*!
+ * @brief  C_SignRecoverInit happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_SignRecoverInit( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_SignRecoverInit( 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_SignRecover  ============================ */
+
+/*!
+ * @brief  C_SignRecover happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_SignRecover( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_SignRecover( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_VerifyUpdate  ============================ */
+
+/*!
+ * @brief  C_VerifyUpdate happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_VerifyUpdate( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_VerifyUpdate( 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_VerifyFinal  ============================ */
+
+/*!
+ * @brief  C_VerifyFinal happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_VerifyFinal( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_VerifyFinal( 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_Logout  ============================ */
+
+/*!
+ * @brief  C_Logout happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_Logout( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_Logout( 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_WaitForSlotEvent  ============================ */
+
+/*!
+ * @brief  C_WaitForSlotEvent happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_WaitForSlotEvent( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_WaitForSlotEvent( 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_CancelFunction  ============================ */
+
+/*!
+ * @brief  C_CancelFunction happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_CancelFunction( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_CancelFunction( 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_GetFunctionStatus  ============================ */
+
+/*!
+ * @brief  C_GetFunctionStatus happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_GetFunctionStatus( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_GetFunctionStatus( 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_SeedRandom  ============================ */
+
+/*!
+ * @brief  C_SeedRandom happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_SeedRandom( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_SeedRandom( 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_DeriveKey  ============================ */
+
+/*!
+ * @brief  C_DeriveKey happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_DeriveKey( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_DeriveKey( 0, NULL, 0, NULL, 0, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_UnwrapKey  ============================ */
+
+/*!
+ * @brief  C_UnwrapKey happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_UnwrapKey( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_UnwrapKey( 0, NULL, 0, NULL, 0, NULL, 0, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_WrapKey  ============================ */
+
+/*!
+ * @brief  C_WrapKey happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_WrapKey( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_WrapKey( 0, NULL, 0, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_GenerateKey  ============================ */
+
+/*!
+ * @brief  C_GenerateKey happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_GenerateKey( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_GenerateKey( 0, NULL, NULL, 0, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_SignEncryptUpdate  ============================ */
+
+/*!
+ * @brief  C_SignEncryptUpdate happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_SignEncryptUpdate( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_SignEncryptUpdate( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_DecryptVerifyUpdate  ============================ */
+
+/*!
+ * @brief  C_DecryptVerifyUpdate happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_DecryptVerifyUpdate( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_DecryptVerifyUpdate( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_DecryptDigestUpdate  ============================ */
+
+/*!
+ * @brief  C_DecryptDigestUpdate happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_DecryptDigestUpdate( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_DecryptDigestUpdate( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_DigestEncryptUpdate  ============================ */
+
+/*!
+ * @brief  C_DigestEncryptUpdate happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_DigestEncryptUpdate( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_DigestEncryptUpdate( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_VerifyRecover  ============================ */
+
+/*!
+ * @brief  C_VerifyRecover happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_VerifyRecover( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_VerifyRecover( 0, NULL, 0, NULL, NULL );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
+
+/* ======================  TESTING C_VerifyRecoverInit  ============================ */
+
+/*!
+ * @brief  C_VerifyRecoverInit happy path.
+ * @note update this test suite when this function is implemented.
+ *
+ */
+void test_pkcs11_C_VerifyRecoverInit( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = C_VerifyRecoverInit( 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_NOT_SUPPORTED, xResult );
+}
