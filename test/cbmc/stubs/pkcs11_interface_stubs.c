@@ -62,75 +62,74 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetFunctionList )( CK_FUNCTION_LIST_PTR_PTR ppFunc
     static CK_FUNCTION_LIST prvP11FunctionList =
     {
         { CRYPTOKI_VERSION_MAJOR, CRYPTOKI_VERSION_MINOR },
-        nondet_bool() ? C_Initialize : NULL,
-        nondet_bool() ? C_Finalize : NULL,
-        nondet_bool() ? C_GetInfo : NULL,
-        nondet_bool() ? C_GetFunctionList : NULL,
-        nondet_bool() ? C_GetSlotList : NULL,
-        NULL, /*C_GetSlotInfo*/
-        nondet_bool() ? C_GetTokenInfo : NULL,
-        NULL, /*C_GetMechanismList*/
-
-        NULL, /*C_InitPIN*/
-        nondet_bool() ? C_InitToken : NULL,
-        NULL, /*C_InitPIN*/
-        NULL, /*C_SetPIN*/
-        nondet_bool() ? C_OpenSession : NULL,
-        NULL,
-        NULL, /*C_CloseAllSessions*/
-        NULL, /*C_GetSessionInfo*/
-        NULL, /*C_GetOperationState*/
-        NULL, /*C_SetOperationState*/
-        nondet_bool() ? C_Login : NULL,
-        NULL, /*C_Logout*/
-        nondet_bool() ? C_CreateObject : NULL,
-        NULL, /*C_CopyObject*/
-        nondet_bool() ? C_DestroyObject : NULL,
-        NULL, /*C_GetObjectSize*/
-        nondet_bool() ? C_GetAttributeValue : NULL,
-        NULL, /*C_SetAttributeValue*/
-        nondet_bool() ? C_FindObjectsInit : NULL,
-        nondet_bool() ? C_FindObjects : NULL,
-        nondet_bool() ? C_FindObjectsFinal : NULL,
-        NULL, /*C_EncryptInit*/
-        NULL, /*C_Encrypt*/
-        NULL, /*C_EncryptUpdate*/
-        NULL, /*C_EncryptFinal*/
-        NULL, /*C_DecryptInit*/
-        NULL, /*C_Decrypt*/
-        NULL, /*C_DecryptUpdate*/
-        NULL, /*C_DecryptFinal*/
-        nondet_bool() ? C_FindObjectsFinal : NULL,
-        NULL, /*C_Digest*/
-        nondet_bool() ? C_DigestUpdate : NULL,
-        NULL, /* C_DigestKey*/
-        nondet_bool() ? C_DigestFinal : NULL,
-        nondet_bool() ? C_SignInit : NULL,
-        nondet_bool() ? C_Sign : NULL,
-        NULL, /*C_SignUpdate*/
-        NULL, /*C_SignFinal*/
-        NULL, /*C_SignRecoverInit*/
-        NULL, /*C_SignRecover*/
-        nondet_bool() ? C_VerifyInit : NULL,
-        nondet_bool() ? C_Verify : NULL,
-        NULL, /*C_VerifyUpdate*/
-        NULL, /*C_VerifyFinal*/
-        NULL, /*C_VerifyRecoverInit*/
-        NULL, /*C_VerifyRecover*/
-        NULL, /*C_DigestEncryptUpdate*/
-        NULL, /*C_DecryptDigestUpdate*/
-        NULL, /*C_SignEncryptUpdate*/
-        NULL, /*C_DecryptVerifyUpdate*/
-        NULL, /*C_GenerateKey*/
-        nondet_bool() ? C_GenerateKeyPair : NULL,
-        NULL, /*C_WrapKey*/
-        NULL, /*C_UnwrapKey*/
-        NULL, /*C_DeriveKey*/
-        NULL, /*C_SeedRandom*/
-        nondet_bool() ? C_GenerateRandom : NULL,
-        NULL, /*C_GetFunctionStatus*/
-        NULL, /*C_CancelFunction*/
-        NULL  /*C_WaitForSlotEvent*/
+        C_Initialize,
+        C_Finalize,
+        C_GetInfo,
+        C_GetFunctionList,
+        C_GetSlotList,
+        C_GetSlotInfo,
+        C_GetTokenInfo,
+        C_GetMechanismList,
+        C_GetMechanismInfo,
+        C_InitToken,
+        C_InitPIN,
+        C_SetPIN,
+        C_OpenSession,
+        C_CloseSession,
+        C_CloseAllSessions,
+        C_GetSessionInfo,
+        C_GetOperationState,
+        C_SetOperationState,
+        C_Login,
+        C_Logout,
+        C_CreateObject,
+        C_CopyObject,
+        C_DestroyObject,
+        C_GetObjectSize,
+        C_GetAttributeValue,
+        C_SetAttributeValue,
+        C_FindObjectsInit,
+        C_FindObjects,
+        C_FindObjectsFinal,
+        C_EncryptInit,
+        C_Encrypt,
+        C_EncryptUpdate,
+        C_EncryptFinal,
+        C_DecryptInit,
+        C_Decrypt,
+        C_DecryptUpdate,
+        C_DecryptFinal,
+        C_DigestInit,
+        C_Digest,
+        C_DigestUpdate,
+        C_DigestKey,
+        C_DigestFinal,
+        C_SignInit,
+        C_Sign,
+        C_SignUpdate,
+        C_SignFinal,
+        C_SignRecoverInit,
+        C_SignRecover,
+        C_VerifyInit,
+        C_Verify,
+        C_VerifyUpdate,
+        C_VerifyFinal,
+        C_VerifyRecoverInit,
+        C_VerifyRecover,
+        C_DigestEncryptUpdate,
+        C_DecryptDigestUpdate,
+        C_SignEncryptUpdate,
+        C_DecryptVerifyUpdate,
+        C_GenerateKey,
+        C_GenerateKeyPair,
+        C_WrapKey,
+        C_UnwrapKey,
+        C_DeriveKey,
+        C_SeedRandom,
+        C_GenerateRandom,
+        C_GetFunctionStatus,
+        C_CancelFunction,
+        C_WaitForSlotEvent,
     };
 
     if( xResult == CKR_OK )
