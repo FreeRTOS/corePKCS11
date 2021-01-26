@@ -298,7 +298,7 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
                                  CK_ULONG_PTR pulDataSize,
                                  CK_BBOOL * pIsPrivate )
 {
-    CK_RV ulReturn = CKR_OK;
+    CK_RV ulReturn = CKR_KEY_HANDLE_INVALID;
     uint32_t ulDriverReturn = 0;
     HANDLE hFile = INVALID_HANDLE_VALUE;
     uint32_t ulSize = 0;
@@ -358,6 +358,8 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
         /* Confirm the amount of data read. */
         if( 0 == ulReturn )
         {
+            ulReturn = CKR_OK;
+
             if( ulSize != *pulDataSize )
             {
                 ulReturn = CKR_FUNCTION_FAILED;
@@ -369,10 +371,6 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
         {
             CloseHandle( hFile );
         }
-    }
-    else
-    {
-        ulReturn = CKR_KEY_HANDLE_INVALID;
     }
 
     return ulReturn;
@@ -398,10 +396,9 @@ CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
 {
     const char * pcFileName = NULL;
     CK_BBOOL xIsPrivate = CK_TRUE;
-    CK_RV xResult = CKR_OK;
+    CK_RV xResult = CKR_OBJECT_HANDLE_INVALID;
     FILE * pxFile = NULL;
     BOOL ret = 0;
-
 
     xResult = prvHandleToFilename( xHandle,
                                    &pcFileName,
@@ -417,10 +414,10 @@ CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
             {
                 xResult = CKR_FUNCTION_FAILED;
             }
-        }
-        else
-        {
-            xResult = CKR_OBJECT_HANDLE_INVALID;
+            else
+            {
+                xResult = CKR_OK;
+            }
         }
     }
 

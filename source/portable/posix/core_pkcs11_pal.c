@@ -421,7 +421,7 @@ CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
 {
     const char * pcFileName = NULL;
     CK_BBOOL xIsPrivate = CK_TRUE;
-    CK_RV xResult = CKR_OK;
+    CK_RV xResult = CKR_OBJECT_HANDLE_INVALID;
     FILE * pxFile = NULL;
     int ret = 0;
 
@@ -433,15 +433,11 @@ CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
     if( ( xResult == CKR_OK ) && ( prvFileExists( pcFileName ) == CKR_OK ) )
     {
         ret = remove( pcFileName );
-    }
-    else
-    {
-        xResult = CKR_OBJECT_HANDLE_INVALID;
-    }
 
-    if( ret != 0 )
-    {
-        xResult = CKR_FUNCTION_FAILED;
+        if( ret != 0 )
+        {
+            xResult = CKR_FUNCTION_FAILED;
+        }
     }
 
     return xResult;

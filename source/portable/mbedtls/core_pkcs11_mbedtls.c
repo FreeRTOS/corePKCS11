@@ -2571,12 +2571,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE hSession,
     CK_BYTE_PTR pcLabel = NULL;
     CK_ULONG xLabelLength = 0;
 
-    prvFindObjectInListByHandle( hObject, &xPalHandle, &pcLabel, &xLabelLength );
 
-    if( ( hObject < 1UL ) || ( hObject > pkcs11configMAX_NUM_OBJECTS ) )
-    {
-        xResult = CKR_OBJECT_HANDLE_INVALID;
-    }
+    prvFindObjectInListByHandle( hObject, &xPalHandle, &pcLabel, &xLabelLength );
 
     if( xPalHandle == CK_INVALID_HANDLE )
     {
@@ -2586,20 +2582,19 @@ CK_DECLARE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE hSession,
     if( xResult == CKR_OK )
     {
         xResult = PKCS11_PAL_DestroyObject( xPalHandle );
-        LogDebug( ( "PKCS11_PAL_DestroyObject returned 0x%0lX", ( unsigned long int ) xResult ) );
+
+        if( xResult == CKR_OK )
+        {
+            xResult = prvDeleteObjectFromList( xPalHandle );
+        }
+        else
+        {
+            LogError( ( "Failed to destroy object. PKCS11_PAL_DestroyObject failed." ) );
+        }
     }
     else
     {
         LogError( ( "Failed to destroy object. The session was invalid." ) );
-    }
-
-    if( xResult == CKR_OK )
-    {
-        xResult = prvDeleteObjectFromList( xPalHandle );
-    }
-    else
-    {
-        LogError( ( "Failed to destroy object. PKCS11_PAL_DestroyObject failed." ) );
     }
 
     return xResult;
@@ -4726,9 +4721,20 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
 
             if( xResult != CKR_OK )
             {
-                ( void ) PKCS11_PAL_DestroyObject( xPalPrivate );
-                ( void ) PKCS11_PAL_DestroyObject( xPalPublic );
                 LogError( ( "Could not add private key to object list. Cleaning up PAL objects." ) );
+                xResult = PKCS11_PAL_DestroyObject( xPalPrivate );
+
+                if( xResult != CKR_OK )
+                {
+                    LogError( ( "Could not clean up private key. PKCS11_PAL_DestroyObject failed with (0x%0lX).", xResult ) );
+                }
+
+                xResult = PKCS11_PAL_DestroyObject( xPalPublic );
+
+                if( xResult != CKR_OK )
+                {
+                    LogError( ( "Could not clean up public key. PKCS11_PAL_DestroyObject failed with (0x%0lX).", xResult ) );
+                }
             }
         }
         else
