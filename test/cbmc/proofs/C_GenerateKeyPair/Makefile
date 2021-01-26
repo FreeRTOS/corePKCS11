@@ -34,6 +34,7 @@ UNWINDSET += memcpy.0:32
 # Be very careful increasing this. At the time of writing this, the PKCS stack was
 # configured to store just one object.
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvAddObjectToList.0:2
+UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvDeleteObjectFromList.0:2
 UNWINDSET += C_GenerateKeyPair.0:$(TEMPLATE_SIZE)
 UNWINDSET += C_GenerateKeyPair.1:$(TEMPLATE_SIZE)
 
