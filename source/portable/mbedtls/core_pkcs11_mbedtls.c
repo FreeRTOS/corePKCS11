@@ -4543,6 +4543,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
     uint32_t xPublicRequiredAttributeMap = ( LABEL_IN_TEMPLATE | EC_PARAMS_IN_TEMPLATE | VERIFY_IN_TEMPLATE );
     uint32_t xPrivateRequiredAttributeMap = ( LABEL_IN_TEMPLATE | PRIVATE_IN_TEMPLATE | SIGN_IN_TEMPLATE );
     uint32_t xAttributeMap = 0;
+    CK_RV xAddObjectListResult = CKR_OK;
 
     const P11Session_t * pxSession = prvSessionPointerFromHandle( hSession );
     CK_RV xResult = prvCheckValidSessionAndModule( pxSession );
@@ -4713,35 +4714,49 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
 
     if( ( xPalPublic != CK_INVALID_HANDLE ) && ( xPalPrivate != CK_INVALID_HANDLE ) )
     {
-        xResult = prvAddObjectToList( xPalPrivate, phPrivateKey, pxPrivateLabel->pValue, pxPrivateLabel->ulValueLen );
+        xAddObjectListResult = prvAddObjectToList( xPalPrivate, phPrivateKey, pxPrivateLabel->pValue, pxPrivateLabel->ulValueLen );
 
-        if( xResult == CKR_OK )
+        if( xAddObjectListResult == CKR_OK )
         {
-            xResult = prvAddObjectToList( xPalPublic, phPublicKey, pxPublicLabel->pValue, pxPublicLabel->ulValueLen );
+            xAddObjectListResult = prvAddObjectToList( xPalPublic, phPublicKey, pxPublicLabel->pValue, pxPublicLabel->ulValueLen );
+        }
+
+        if( xAddObjectListResult != CKR_OK )
+        {
+            LogError( ( "Could not add private key to object list failed with (0x%0lX). Cleaning up PAL objects.", xResult ) );
+
+            xResult = PKCS11_PAL_DestroyObject( xPalPrivate );
 
             if( xResult != CKR_OK )
             {
-                LogError( ( "Could not add private key to object list. Cleaning up PAL objects." ) );
-                xResult = PKCS11_PAL_DestroyObject( xPalPrivate );
-
-                if( xResult != CKR_OK )
-                {
-                    LogError( ( "Could not clean up private key. PKCS11_PAL_DestroyObject failed with (0x%0lX).", xResult ) );
-                }
-
-                xResult = PKCS11_PAL_DestroyObject( xPalPublic );
-
-                if( xResult != CKR_OK )
-                {
-                    LogError( ( "Could not clean up public key. PKCS11_PAL_DestroyObject failed with (0x%0lX).", xResult ) );
-                }
+                LogError( ( "Could not clean up private key. PKCS11_PAL_DestroyObject failed with (0x%0lX).", xResult ) );
             }
-        }
-        else
-        {
-            ( void ) PKCS11_PAL_DestroyObject( xPalPrivate );
-            ( void ) PKCS11_PAL_DestroyObject( xPalPublic );
-            LogError( ( "Could not add private key to object list. Cleaning up PAL objects." ) );
+
+            xResult = prvDeleteObjectFromList( xPalPrivate );
+
+            if( xResult != CKR_OK )
+            {
+                LogError( ( "Could not remove private key object from internal list. Failed with (0x%0lX).", xResult ) );
+            }
+
+            xResult = PKCS11_PAL_DestroyObject( xPalPublic );
+
+            if( xResult != CKR_OK )
+            {
+                LogError( ( "Could not clean up public key. PKCS11_PAL_DestroyObject failed with (0x%0lX).", xResult ) );
+            }
+
+            xResult = prvDeleteObjectFromList( xPalPublic );
+
+            if( xResult != CKR_OK )
+            {
+                LogError( ( "Could not remove private key object from internal list. Failed with (0x%0lX).", xResult ) );
+            }
+
+            if( xResult == CKR_OK )
+            {
+                xResult = xAddObjectListResult;
+            }
         }
     }
 
