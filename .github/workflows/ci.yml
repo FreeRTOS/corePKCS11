@@ -8,6 +8,26 @@ on:
   workflow_dispatch:
 
 jobs:
+  systemtests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone This Repo
+        uses: actions/checkout@v2
+      - name: Build
+        run: |
+          sudo apt-get install -y lcov
+          cmake -S test -B build/ \
+          -G "Unix Makefiles" \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DBUILD_CLONE_SUBMODULES=ON \
+          -DSYSTEM_TESTS=1 \
+          -DCMAKE_C_FLAGS='--coverage -Wall -Wextra -DNDEBUG'
+          make -C build/ all
+      - name: System Tests
+        run: |
+          cd build/
+          ctest -E system --output-on-failure
+          cd ..
   unittest:
     runs-on: ubuntu-latest
     steps:
@@ -20,9 +40,10 @@ jobs:
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
           -DBUILD_CLONE_SUBMODULES=ON \
+          -DUNIT_TESTS=1 \
           -DCMAKE_C_FLAGS='--coverage -Wall -Wextra -DNDEBUG'
           make -C build/ all
-      - name: Test
+      - name: Unit Tests
         run: |
           cd build/
           ctest -E system --output-on-failure

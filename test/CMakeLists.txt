@@ -81,7 +81,14 @@ add_cmock_targets()
 include( ${MODULE_ROOT_DIR}/tools/cmock/create_test.cmake )
 
 # Include build configuration for unit tests.
+if(UNIT_TESTS)
 add_subdirectory( unit-test )
+endif()
+
+# Include build configuration for system tests.
+if(SYSTEM_TESTS)
+add_subdirectory( system-test )
+endif()
 
 
 #  ==================================== Coverage Analysis configuration ========================================
@@ -93,4 +100,3 @@ add_custom_target( coverage
     DEPENDS cmock unity core_pkcs11_mbedtls_utest core_pkcs11_utest core_pki_utils_utest
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
-
