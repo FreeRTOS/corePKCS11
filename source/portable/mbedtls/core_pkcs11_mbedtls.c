@@ -5203,7 +5203,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_EncryptInit )( CK_SESSION_HANDLE hSession,
  * @param[in] hSession                  The session's handle.
  * @param[in] pData                     The plaintext data.
  * @param[in] ulDataLen                 Bytes of plaintext.
- * @param[out] pEncryptedData           Gets ciphertex.
+ * @param[out] pEncryptedData           Gets ciphertext.
  * @param[out] pulEncryptedDataLen      Gets c-text size.
  * @return CKR_FUNCTION_NOT_SUPPORTED always.
  */
