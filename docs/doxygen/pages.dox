@@ -201,14 +201,6 @@ The more sessions created, the higher RAM used by the PKCS #11 module.<br>
 <b>Possible values:</b> 0 or 1 <br>
 <b>Default value (if undefined): </b> `0`
 
-@section pkcs11configPAL_DESTROY_SUPPORTED
-@brief Set to 1 if a PAL destroy object is implemented.
-
-Set to 1 if a PAL destroy object is implemented. If not implemented PKCS #11 will not be able to destroy existing objects.
-
-<b>Possible values:</b> Any positive integer.<br>
-<b>Default value (if undefined): </b> `0`
-
 @section pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS
 @brief The PKCS #11 label for device private key.
 
@@ -368,7 +360,7 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 @snippet core_pkcs11_pal.h declare_pkcs11_pal_saveobject
 
 @page pkcs11_pal_destroyobject PKCS11_PAL_DestroyObject
-@snippet core_pkcs11_mbedtls.c declare_pkcs11_pal_destroyobject
+@snippet core_pkcs11_pal.h declare_pkcs11_pal_destroyobject
 
 @page pkcs11_pal_findobject PKCS11_PAL_FindObject
 @snippet core_pkcs11_pal.h declare_pkcs11_pal_findobject
@@ -392,5 +384,3 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 @page pkcs11_utils_pkimbedtlssignaturetopkcs11signature PKI_pkcs11SignatureTombedTLSSignature
 @snippet core_pki_utils.h declare_pkcs11_utils_pkimbedtlssignaturetopkcs11signature
 */
-
-

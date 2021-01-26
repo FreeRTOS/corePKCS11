@@ -1,6 +1,6 @@
 cmake_minimum_required ( VERSION 3.13.0 )
 project ( "corePKCS11 unit test"
-          VERSION 2.0.0
+          VERSION 3.0.0
           LANGUAGES C )
 
 # Allow the project to be organized into folders.
@@ -93,4 +93,3 @@ add_custom_target( coverage
     DEPENDS cmock unity core_pkcs11_mbedtls_utest core_pkcs11_utest core_pki_utils_utest
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
-

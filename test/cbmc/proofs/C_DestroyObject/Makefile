@@ -27,6 +27,7 @@ UNWINDSET += strncmp.0:$(MAX_LABEL_SIZE)
 UNWINDSET += strlen.0:$(MAX_LABEL_SIZE)
 
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByLabel.0:$(MAX_OBJECT_NUM)
+UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvDeleteObjectFromList.0:$(MAX_OBJECT_NUM)
 
 
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c

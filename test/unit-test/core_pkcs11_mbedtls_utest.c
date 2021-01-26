@@ -2626,13 +2626,46 @@ void test_pkcs11_C_FindObjects( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         PKCS11_PAL_FindObject_IgnoreAndReturn( 1 );
-        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
-        PKCS11_PAL_GetObjectValue_ReturnThruPtr_ppucData( ( CK_BYTE_PTR * ) &ppucBufPtr );
-        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pulDataSize( &ulObjectLength );
-        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
         xResult = C_FindObjects( xSession, ( CK_OBJECT_HANDLE_PTR ) &xObject, 1, &ulFoundCount );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
         TEST_ASSERT_EQUAL( 1, ulFoundCount );
+
+        /* Clean up after C_FindObjectsInit. */
+        mock_osal_free_Stub( vPkcs11FreeCb );
+        xResult = C_FindObjectsFinal( xSession );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    }
+
+    prvCommonDeinitStubs();
+}
+
+/*!
+ * @brief C_FindObjects PKCS11_PAL_FindObject fails.
+ *
+ */
+void test_pkcs11_C_FindObjectsPalFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_ULONG ulCount = 1;
+    CK_ULONG ulFoundCount = 0;
+    CK_OBJECT_HANDLE xObject = 1;
+    char * pucLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
+
+    CK_ATTRIBUTE xFindTemplate = { CKA_LABEL, pucLabel, strlen( ( const char * ) pucLabel ) };
+
+    prvCommonInitStubs();
+
+    if( TEST_PROTECT() )
+    {
+        xResult = C_FindObjectsInit( xSession, ( CK_ATTRIBUTE_PTR ) &xFindTemplate, ulCount );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_FindObject_IgnoreAndReturn( 0 );
+        xResult = C_FindObjects( xSession, ( CK_OBJECT_HANDLE_PTR ) &xObject, 1, &ulFoundCount );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+        TEST_ASSERT_EQUAL( 0, ulFoundCount );
+        TEST_ASSERT_EQUAL( CK_INVALID_HANDLE, xObject );
 
         /* Clean up after C_FindObjectsInit. */
         mock_osal_free_Stub( vPkcs11FreeCb );
@@ -2675,17 +2708,6 @@ void test_pkcs11_C_FindObjectsBadArgs( void )
         PKCS11_PAL_FindObject_IgnoreAndReturn( CK_INVALID_HANDLE );
         xResult = C_FindObjects( xSession, ( CK_OBJECT_HANDLE_PTR ) &xObject, 1, &ulFoundCount );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
-        TEST_ASSERT_EQUAL( 0, ulFoundCount );
-
-        PKCS11_PAL_FindObject_IgnoreAndReturn( 1 );
-        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
-        PKCS11_PAL_GetObjectValue_ReturnThruPtr_ppucData( ( CK_BYTE_PTR * ) &ppucBufPtr );
-        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pulDataSize( &ulObjectLength );
-        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-
-        xResult = C_FindObjects( xSession, ( CK_OBJECT_HANDLE_PTR ) &xObject, 1, &ulFoundCount );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
-        TEST_ASSERT_EQUAL( CK_INVALID_HANDLE, xObject );
         TEST_ASSERT_EQUAL( 0, ulFoundCount );
 
         xResult = C_FindObjects( xSession, NULL, 1, &ulFoundCount );
@@ -2987,155 +3009,6 @@ void test_pkcs11_C_DigestFinalBadArgs( void )
         ulDigestLen = 0;
         xResult = C_DigestFinal( xSession, pxDummyData, &ulDigestLen );
         TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
-    }
-
-    prvCommonDeinitStubs();
-}
-/* ======================  TESTING PKCS11_PAL_DestroyObject  ============================ */
-
-/*!
- * @brief PKCS11_PAL_DestroyObject happy path.
- *
- */
-void test_pkcs11_PKCS11_PAL_DestroyObject( void )
-{
-    CK_RV xResult = CKR_OK;
-    CK_SESSION_HANDLE xSession = 0;
-    CK_OBJECT_HANDLE xObject = 0;
-
-    prvCommonInitStubs();
-
-    if( TEST_PROTECT() )
-    {
-        xResult = prvCreateEcPriv( &xSession, &xObject );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
-
-        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
-        mock_osal_calloc_Stub( pvPkcs11CallocCb );
-        mock_osal_free_Stub( vPkcs11FreeCb );
-        PKCS11_PAL_SaveObject_IgnoreAndReturn( 2 );
-        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        xResult = PKCS11_PAL_DestroyObject( xObject );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
-    }
-
-    prvCommonDeinitStubs();
-}
-
-/*!
- * @brief PKCS11_PAL_DestroyObject PKCS11_PAL_SAVE returns an invalid handle.
- *
- */
-void test_pkcs11_PKCS11_PAL_DestroyObjectBadSave( void )
-{
-    CK_RV xResult = CKR_OK;
-    CK_SESSION_HANDLE xSession = 0;
-    CK_OBJECT_HANDLE xObject = 0;
-
-    prvCommonInitStubs();
-
-    if( TEST_PROTECT() )
-    {
-        xResult = prvCreateEcPub( &xSession, &xObject );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
-
-        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
-        mock_osal_calloc_Stub( pvPkcs11CallocCb );
-        mock_osal_free_Stub( vPkcs11FreeCb );
-        PKCS11_PAL_SaveObject_IgnoreAndReturn( xObject + 1 );
-        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        xResult = PKCS11_PAL_DestroyObject( xObject );
-        TEST_ASSERT_EQUAL( CKR_GENERAL_ERROR, xResult );
-        prvCommonDeinitStubs();
-    }
-}
-
-/*!
- * @brief PKCS11_PAL_DestroyObject PKCS11_PAL_SAVE malloc fail.
- *
- */
-void test_pkcs11_PKCS11_PAL_DestroyObjectMemFail( void )
-{
-    CK_RV xResult = CKR_OK;
-    CK_SESSION_HANDLE xSession = 0;
-    CK_OBJECT_HANDLE xObject = 0;
-
-    prvCommonInitStubs();
-
-    if( TEST_PROTECT() )
-    {
-        xResult = prvCreateEcPub( &xSession, &xObject );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
-
-        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
-        mock_osal_calloc_IgnoreAndReturn( NULL );
-        mock_osal_free_CMockIgnore();
-        xResult = PKCS11_PAL_DestroyObject( xObject );
-        TEST_ASSERT_EQUAL( CKR_HOST_MEMORY, xResult );
-    }
-
-    prvCommonDeinitStubs();
-}
-
-/*!
- * @brief PKCS11_PAL_DestroyObject PAL Destroy on a public key.
- *
- */
-void test_pkcs11_PKCS11_PAL_DestroyObjectPubKey( void )
-{
-    CK_RV xResult = CKR_OK;
-    CK_SESSION_HANDLE xSession = 0;
-    CK_OBJECT_HANDLE xObject = 0;
-
-    prvCommonInitStubs();
-
-    if( TEST_PROTECT() )
-    {
-        xResult = prvCreateEcPriv( &xSession, &xObject );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
-
-        xResult = prvCreateEcPub( &xSession, &xObject );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
-
-        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
-        mock_osal_calloc_Stub( pvPkcs11CallocCb );
-        mock_osal_free_Stub( vPkcs11FreeCb );
-        PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
-        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        xResult = PKCS11_PAL_DestroyObject( xObject );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
-    }
-
-    prvCommonDeinitStubs();
-}
-
-/*!
- * @brief PKCS11_PAL_DestroyObject PAL Destroy on a private key.
- *
- */
-void test_pkcs11_PKCS11_PAL_DestroyObjectPrivKey( void )
-{
-    CK_RV xResult = CKR_OK;
-    CK_SESSION_HANDLE xSession = 0;
-    CK_OBJECT_HANDLE xObject = 0;
-
-    prvCommonInitStubs();
-
-    if( TEST_PROTECT() )
-    {
-        xResult = prvCreateEcPub( &xSession, &xObject );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
-
-        xResult = prvCreateEcPriv( &xSession, &xObject );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
-
-        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
-        mock_osal_calloc_Stub( pvPkcs11CallocCb );
-        mock_osal_free_Stub( vPkcs11FreeCb );
-        PKCS11_PAL_SaveObject_IgnoreAndReturn( 2 );
-        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        xResult = PKCS11_PAL_DestroyObject( xObject );
-        TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
     prvCommonDeinitStubs();
@@ -4101,6 +3974,7 @@ void test_pkcs11_C_GenerateKeyPairECDSALockFail( void )
         mbedtls_pk_free_CMockIgnore();
         PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
         PKCS11_PAL_SaveObject_IgnoreAndReturn( 2 );
+        PKCS11_PAL_DestroyObject_IgnoreAndReturn( CKR_OK );
         mock_osal_mutex_lock_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
         xResult = C_GenerateKeyPair( xSession, &xMechanism, xPublicKeyTemplate,
@@ -4557,6 +4431,7 @@ void test_pkcs11_C_DestroyObject( void )
         mock_osal_free_Stub( vPkcs11FreeCb );
         PKCS11_PAL_SaveObject_IgnoreAndReturn( 2 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        PKCS11_PAL_DestroyObject_IgnoreAndReturn( CKR_OK );
         xResult = C_DestroyObject( xSession, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
@@ -4589,7 +4464,7 @@ void test_pkcs11_C_DestroyObjectNoLock( void )
         mock_osal_free_Stub( vPkcs11FreeCb );
         PKCS11_PAL_SaveObject_IgnoreAndReturn( 2 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mock_osal_mutex_lock_ExpectAnyArgsAndReturn( -1 );
+        PKCS11_PAL_DestroyObject_IgnoreAndReturn( CKR_OK );
         mock_osal_mutex_lock_ExpectAnyArgsAndReturn( -1 );
         xResult = C_DestroyObject( xSession, xObject );
         TEST_ASSERT_EQUAL( CKR_CANT_LOCK, xResult );
@@ -4599,7 +4474,7 @@ void test_pkcs11_C_DestroyObjectNoLock( void )
 }
 
 /*!
- * @brief C_DestroyObject invalid object is pased to C_DestroyObject, and it can't be found.
+ * @brief C_DestroyObject invalid object is passed to C_DestroyObject, and it can't be found.
  *
  */
 void test_pkcs11_C_DestroyObjectNullLabel( void )
@@ -4616,7 +4491,7 @@ void test_pkcs11_C_DestroyObjectNullLabel( void )
         mock_osal_calloc_Stub( pvPkcs11CallocCb );
         mock_osal_free_Stub( vPkcs11FreeCb );
         xResult = C_DestroyObject( xSession, xObject );
-        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+        TEST_ASSERT_EQUAL( CKR_OBJECT_HANDLE_INVALID, xResult );
     }
 
     prvCommonDeinitStubs();
