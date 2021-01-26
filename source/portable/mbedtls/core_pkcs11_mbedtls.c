@@ -1083,21 +1083,26 @@ static void prvFindObjectInListByHandle( CK_OBJECT_HANDLE xAppHandle,
  *
  * @warning This does not delete the object from NVM.
  *
- * @param[in] xAppHandle     Application handle of the object to be deleted.
+ * @param[in] xPalHandle            PAL handle of the object to be deleted.
  */
-static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
+static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xPalHandle )
 {
     CK_RV xResult = CKR_OK;
     int32_t lGotSemaphore = ( int32_t ) 0;
-    CK_OBJECT_HANDLE ulIndex = xAppHandle - ( ( CK_OBJECT_HANDLE ) 1 );
+    uint32_t ulIndex = 0;
 
     lGotSemaphore = mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex );
 
     if( lGotSemaphore == 0 )
     {
-        if( xP11Context.xObjectList.xObjects[ ulIndex ].xHandle != CK_INVALID_HANDLE )
+        /* Remove all references that have the same PAL handle, as it has now
+         * been deleted in the PKCS11_PAL. */
+        for( ulIndex = 0; ulIndex < pkcs11configMAX_NUM_OBJECTS; ulIndex++ )
         {
-            ( void ) memset( &xP11Context.xObjectList.xObjects[ ulIndex ], 0, sizeof( P11Object_t ) );
+            if( xP11Context.xObjectList.xObjects[ ulIndex ].xHandle == xPalHandle )
+            {
+                ( void ) memset( &xP11Context.xObjectList.xObjects[ ulIndex ], 0, sizeof( P11Object_t ) );
+            }
         }
 
         ( void ) mbedtls_mutex_unlock( &xP11Context.xObjectList.xMutex );
@@ -1111,7 +1116,6 @@ static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xAppHandle )
 
     return xResult;
 }
-
 
 /**
  * @brief Add an object that exists in NVM to the application object array.
@@ -1333,123 +1337,6 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
 
     return xResult;
 }
-
-
-#if ( pkcs11configPAL_DESTROY_SUPPORTED != 1 )
-
-/**
- * @brief Given a label delete the corresponding private or public key.
- */
-    static CK_RV prvOverwritePalObject( CK_OBJECT_HANDLE xPalHandle,
-                                        CK_ATTRIBUTE_PTR pxLabel )
-    {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
-        /* coverity[misra_c_2012_rule_10_5_violation] */
-        CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
-        CK_RV xResult = CKR_OK;
-        CK_BYTE_PTR pxZeroedData = NULL;
-        CK_BYTE_PTR pxObject = NULL;
-        CK_ULONG ulObjectLength = sizeof( CK_BYTE ); /* MISRA: Cannot initialize to 0, as the integer passed to memset must be positive. */
-        CK_OBJECT_HANDLE xPalHandle2 = CK_INVALID_HANDLE;
-
-        xResult = PKCS11_PAL_GetObjectValue( xPalHandle, &pxObject, &ulObjectLength, &xIsPrivate );
-
-        if( xResult == CKR_OK )
-        {
-            /* Some ports return a pointer to memory for which using memset directly won't work. */
-            pxZeroedData = mbedtls_calloc( 1, ulObjectLength );
-
-            if( NULL != pxZeroedData )
-            {
-                /* Zero out the object. */
-                ( void ) memset( pxZeroedData, 0x0, ulObjectLength );
-                /* Create an object label attribute. */
-                /* Overwrite the object in NVM with zeros. */
-                xPalHandle2 = PKCS11_PAL_SaveObject( pxLabel, pxZeroedData, ( size_t ) ulObjectLength );
-
-                if( xPalHandle2 != xPalHandle )
-                {
-                    LogError( ( "Failed destroying object. Received a "
-                                "different handle from the PAL when writing "
-                                "to the same label." ) );
-                    xResult = CKR_GENERAL_ERROR;
-                }
-            }
-            else
-            {
-                LogError( ( "Failed destroying object. Failed to allocated "
-                            "a buffer of length %lu bytes.", ulObjectLength ) );
-                xResult = CKR_HOST_MEMORY;
-            }
-
-            PKCS11_PAL_GetObjectValueCleanup( pxObject, ulObjectLength );
-            mbedtls_free( pxZeroedData );
-        }
-
-        return xResult;
-    }
-
-/* @[declare_pkcs11_pal_destroyobject] */
-    CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
-    {
-        CK_BYTE_PTR pcLabel = NULL;
-        CK_ULONG xLabelLength = 0;
-        CK_RV xResult = CKR_OK;
-        CK_ATTRIBUTE xLabel = { 0 };
-        CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
-        CK_OBJECT_HANDLE xAppHandle2 = CK_INVALID_HANDLE;
-        CK_BYTE pxPubKeyLabel[] = { pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS };
-        CK_BYTE pxPrivKeyLabel[] = { pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS };
-
-        prvFindObjectInListByHandle( xHandle, &xPalHandle, &pcLabel, &xLabelLength );
-
-        if( pcLabel != NULL )
-        {
-            xLabel.type = CKA_LABEL;
-            xLabel.pValue = pcLabel;
-            xLabel.ulValueLen = xLabelLength;
-            xResult = prvOverwritePalObject( xPalHandle, &xLabel );
-        }
-        else
-        {
-            LogError( ( "Failed destroying object. Could not found the object label." ) );
-            xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-        }
-
-        if( xResult == CKR_OK )
-        {
-            if( 0 == strncmp( xLabel.pValue, pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS, xLabel.ulValueLen ) )
-            {
-                /* Remove NULL terminator in comparison. */
-                prvFindObjectInListByLabel( pxPubKeyLabel, sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ), &xPalHandle, &xAppHandle2 );
-            }
-            else if( 0 == strncmp( xLabel.pValue, pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS, xLabel.ulValueLen ) )
-            {
-                /* Remove NULL terminator in comparison. */
-                prvFindObjectInListByLabel( pxPrivKeyLabel, sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ), &xPalHandle, &xAppHandle2 );
-            }
-            else
-            {
-                LogWarn( ( "Trying to destroy an object with an unknown label." ) );
-            }
-
-            if( ( xPalHandle != CK_INVALID_HANDLE ) && ( xAppHandle2 != CK_INVALID_HANDLE ) )
-            {
-                xResult = prvDeleteObjectFromList( xAppHandle2 );
-            }
-
-            if( xResult != CKR_OK )
-            {
-                LogWarn( ( "Failed to remove xAppHandle2 from object list when destroying object memory." ) );
-            }
-
-            xResult = prvDeleteObjectFromList( xHandle );
-        }
-
-        return xResult;
-    }
-    /* @[declare_pkcs11_pal_destroyobject] */
-#endif /* if ( pkcs11configPAL_DESTROY_SUPPORTED != 1 ) */
 
 /*-------------------------------------------------------------*/
 
@@ -2680,16 +2567,30 @@ CK_DECLARE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE hSession,
 {
     const P11Session_t * pxSession = prvSessionPointerFromHandle( hSession );
     CK_RV xResult = prvCheckValidSessionAndModule( pxSession );
+    CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
+    CK_BYTE_PTR pcLabel = NULL;
+    CK_ULONG xLabelLength = 0;
 
-    if( ( hObject < 1UL ) || ( hObject > pkcs11configMAX_NUM_OBJECTS ) )
+
+    prvFindObjectInListByHandle( hObject, &xPalHandle, &pcLabel, &xLabelLength );
+
+    if( xPalHandle == CK_INVALID_HANDLE )
     {
         xResult = CKR_OBJECT_HANDLE_INVALID;
     }
 
     if( xResult == CKR_OK )
     {
-        xResult = PKCS11_PAL_DestroyObject( hObject );
-        LogDebug( ( "PKCS11_PAL_DestroyObject returned 0x%0lX", ( unsigned long int ) xResult ) );
+        xResult = PKCS11_PAL_DestroyObject( xPalHandle );
+
+        if( xResult == CKR_OK )
+        {
+            xResult = prvDeleteObjectFromList( xPalHandle );
+        }
+        else
+        {
+            LogError( ( "Failed to destroy object. PKCS11_PAL_DestroyObject failed." ) );
+        }
     }
     else
     {
@@ -3199,14 +3100,9 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE hSession,
     P11Session_t * pxSession = prvSessionPointerFromHandle( hSession );
     CK_RV xResult = prvCheckValidSessionAndModule( pxSession );
 
-    CK_BYTE_PTR pucObjectValue = NULL;
-    CK_ULONG xObjectLength = 0;
     /* See explanation in prvCheckValidSessionAndModule for this exception. */
     /* coverity[misra_c_2012_rule_10_5_violation] */
-    CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
-    CK_BYTE xByte = 0;
     CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
-    CK_ULONG ulIndex;
 
     /*
      * Check parameters.
@@ -3251,34 +3147,9 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE hSession,
 
         if( xPalHandle != CK_INVALID_HANDLE )
         {
-            xResult = PKCS11_PAL_GetObjectValue( xPalHandle, &pucObjectValue, &xObjectLength, &xIsPrivate );
-
-            if( xResult == CKR_OK )
-            {
-                for( ulIndex = 0; ulIndex < xObjectLength; ulIndex++ )
-                {
-                    xByte = pucObjectValue[ ulIndex ];
-
-                    if( xByte != 0UL )
-                    {
-                        break;
-                    }
-                }
-
-                if( xByte == 0UL ) /* Deleted objects are overwritten completely w/ zero. */
-                {
-                    LogDebug( ( "Found an overwritten object." ) );
-                    *phObject = CK_INVALID_HANDLE;
-                }
-                else
-                {
-                    LogDebug( ( "Found object in PAL. Adding object handle to list." ) );
-                    xResult = prvAddObjectToList( xPalHandle, phObject, pxSession->pxFindObjectLabel, pxSession->xFindObjectLabelLen );
-                    *pulObjectCount = 1;
-                }
-
-                PKCS11_PAL_GetObjectValueCleanup( pucObjectValue, xObjectLength );
-            }
+            LogDebug( ( "Found object in PAL. Adding object handle to list." ) );
+            xResult = prvAddObjectToList( xPalHandle, phObject, pxSession->pxFindObjectLabel, pxSession->xFindObjectLabelLen );
+            *pulObjectCount = 1;
         }
         else
         {
@@ -3301,6 +3172,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE hSession,
 
     return xResult;
 }
+
 /* @[declare_pkcs11_mbedtls_c_findobjects] */
 
 /**
@@ -4671,6 +4543,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
     uint32_t xPublicRequiredAttributeMap = ( LABEL_IN_TEMPLATE | EC_PARAMS_IN_TEMPLATE | VERIFY_IN_TEMPLATE );
     uint32_t xPrivateRequiredAttributeMap = ( LABEL_IN_TEMPLATE | PRIVATE_IN_TEMPLATE | SIGN_IN_TEMPLATE );
     uint32_t xAttributeMap = 0;
+    CK_RV xAddObjectListResult = CKR_OK;
 
     const P11Session_t * pxSession = prvSessionPointerFromHandle( hSession );
     CK_RV xResult = prvCheckValidSessionAndModule( pxSession );
@@ -4841,21 +4714,49 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
 
     if( ( xPalPublic != CK_INVALID_HANDLE ) && ( xPalPrivate != CK_INVALID_HANDLE ) )
     {
-        xResult = prvAddObjectToList( xPalPrivate, phPrivateKey, pxPrivateLabel->pValue, pxPrivateLabel->ulValueLen );
+        xAddObjectListResult = prvAddObjectToList( xPalPrivate, phPrivateKey, pxPrivateLabel->pValue, pxPrivateLabel->ulValueLen );
 
-        if( xResult == CKR_OK )
+        if( xAddObjectListResult == CKR_OK )
         {
-            xResult = prvAddObjectToList( xPalPublic, phPublicKey, pxPublicLabel->pValue, pxPublicLabel->ulValueLen );
+            xAddObjectListResult = prvAddObjectToList( xPalPublic, phPublicKey, pxPublicLabel->pValue, pxPublicLabel->ulValueLen );
+        }
+
+        if( xAddObjectListResult != CKR_OK )
+        {
+            LogError( ( "Could not add private key to object list failed with (0x%0lX). Cleaning up PAL objects.", xResult ) );
+
+            xResult = PKCS11_PAL_DestroyObject( xPalPrivate );
 
             if( xResult != CKR_OK )
             {
-                ( void ) PKCS11_PAL_DestroyObject( *phPrivateKey );
-                LogDebug( ( "Destroyed %lu private key handle due to errors.", ( unsigned long int ) *phPrivateKey ) );
+                LogError( ( "Could not clean up private key. PKCS11_PAL_DestroyObject failed with (0x%0lX).", xResult ) );
             }
-        }
-        else
-        {
-            LogDebug( ( "Could not add private key to object list." ) );
+
+            xResult = prvDeleteObjectFromList( xPalPrivate );
+
+            if( xResult != CKR_OK )
+            {
+                LogError( ( "Could not remove private key object from internal list. Failed with (0x%0lX).", xResult ) );
+            }
+
+            xResult = PKCS11_PAL_DestroyObject( xPalPublic );
+
+            if( xResult != CKR_OK )
+            {
+                LogError( ( "Could not clean up public key. PKCS11_PAL_DestroyObject failed with (0x%0lX).", xResult ) );
+            }
+
+            xResult = prvDeleteObjectFromList( xPalPublic );
+
+            if( xResult != CKR_OK )
+            {
+                LogError( ( "Could not remove private key object from internal list. Failed with (0x%0lX).", xResult ) );
+            }
+
+            if( xResult == CKR_OK )
+            {
+                xResult = xAddObjectListResult;
+            }
         }
     }
 

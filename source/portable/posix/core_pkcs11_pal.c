@@ -71,7 +71,7 @@ enum eObjectHandles
  *
  * @param[in] pcFileName         The name of the file to check for existance.
  *
- * @returns pdTRUE if the file exists, pdFALSE if not.
+ * @returns CKR_OK if the file exists, CKR_OBJECT_HANDLE_INVALID if not.
  */
 static CK_RV prvFileExists( const char * pcFileName )
 {
@@ -413,6 +413,34 @@ void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
     {
         free( pucData );
     }
+}
+
+/*-----------------------------------------------------------*/
+
+CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
+{
+    const char * pcFileName = NULL;
+    CK_BBOOL xIsPrivate = CK_TRUE;
+    CK_RV xResult = CKR_OBJECT_HANDLE_INVALID;
+    FILE * pxFile = NULL;
+    int ret = 0;
+
+
+    xResult = prvHandleToFilename( xHandle,
+                                   &pcFileName,
+                                   &xIsPrivate );
+
+    if( ( xResult == CKR_OK ) && ( prvFileExists( pcFileName ) == CKR_OK ) )
+    {
+        ret = remove( pcFileName );
+
+        if( ret != 0 )
+        {
+            xResult = CKR_FUNCTION_FAILED;
+        }
+    }
+
+    return xResult;
 }
 
 /*-----------------------------------------------------------*/
