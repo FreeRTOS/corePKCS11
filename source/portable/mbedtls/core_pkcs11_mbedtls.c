@@ -5082,8 +5082,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetOperationState )( CK_SESSION_HANDLE hSession,
  * @param[in] hSession                  The session's handle.
  * @param[out] pOperationState          Holds state.
  * @param[out] pulOperationStateLen     Holds state length.
- * @param[in] hEncryptionKey            en/decryption key.
- * @param[in] hAuthenticationKey        sign/verify key.
+ * @param[in] hEncryptionKey            Encryption and decryption key.
+ * @param[in] hAuthenticationKey        Sign and verify key.
  * @return CKR_FUNCTION_NOT_SUPPORTED always.
  */
 /* @[declare_pkcs11_mbedtls_c_setoperationstate] */
