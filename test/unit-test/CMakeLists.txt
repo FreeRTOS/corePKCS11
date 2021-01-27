@@ -47,8 +47,8 @@ list(APPEND mock_define_list
 # list the files you would like to test here
 list(APPEND real_source_files
             "${MODULE_ROOT_DIR}/source/core_pkcs11.c"
-            "${MODULE_ROOT_DIR}/test/unit-test/config/logging_stack.h"
-            "${MODULE_ROOT_DIR}/test/unit-test/config/logging_levels.h"
+            "${MODULE_ROOT_DIR}/test/shared-config/logging_stack.h"
+            "${MODULE_ROOT_DIR}/test/shared-config/logging_levels.h"
         )
 
 # list the directories the module under test includes
