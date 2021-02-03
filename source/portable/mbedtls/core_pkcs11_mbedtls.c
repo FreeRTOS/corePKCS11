@@ -64,7 +64,7 @@
  * @brief Internal datatypes for PKCS #11 software implementation.
  */
 
-#ifdef DISABLE_LOGGING
+#ifndef DISABLE_LOGGING
 
 /**
  * @brief Represents string to be logged when mbedTLS returned error
@@ -94,7 +94,7 @@
     ( mbedtls_strerror_lowlevel( mbedTlsCode ) != NULL ) ? \
     mbedtls_strerror_lowlevel( mbedTlsCode ) : pNoLowLevelMbedTlsCodeStr
 
-#endif /* ifdef DISABLE_LOGGING */
+#endif /* ifndef DISABLE_LOGGING */
 
 /**
  * @ingroup pkcs11_macros
@@ -2071,6 +2071,7 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
     }
 }
 
+#ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
 
 /**
  * @brief Helper to search a template for the label attribute.
@@ -2084,7 +2085,6 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
  * combination of the public and private key in DER format, and re-import of the
  * combination.
  */
-#ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
     static CK_RV prvGetExistingKeyComponent( CK_OBJECT_HANDLE_PTR pxPalHandle,
                                              mbedtls_pk_context * pxMbedContext,
                                              const CK_ATTRIBUTE * pxLabel )
