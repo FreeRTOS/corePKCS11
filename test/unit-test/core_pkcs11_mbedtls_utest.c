@@ -806,7 +806,7 @@ void test_pkcs11_C_GetMechanismInfo( void )
     TEST_ASSERT_EQUAL( CKF_VERIFY, xInfo.flags );
     TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
-    #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
+    #ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
         xType = CKM_ECDSA;
         memset( &xInfo, 0, sizeof( CK_MECHANISM_INFO ) );
         xResult = C_GetMechanismInfo( 0, xType, &xInfo );
@@ -824,7 +824,7 @@ void test_pkcs11_C_GetMechanismInfo( void )
         TEST_ASSERT_EQUAL( 256, xInfo.ulMaxKeySize );
         TEST_ASSERT_EQUAL( CKF_GENERATE_KEY_PAIR, xInfo.flags );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
-    #endif /* if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 ) */
+    #endif /* #ifdef pkcs11configSUPPRESS_ECDSA_MECHANISM */
 
     xType = CKM_SHA256;
     memset( &xInfo, 0, sizeof( CK_MECHANISM_INFO ) );

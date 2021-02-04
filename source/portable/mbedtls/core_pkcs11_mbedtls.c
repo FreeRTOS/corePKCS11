@@ -64,13 +64,6 @@
  * @brief Internal datatypes for PKCS #11 software implementation.
  */
 
-/* @ingroup pkcs11_macros
- * @brief Suppress EC operations.
- */
-#ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
-    #define pkcs11configSUPPRESS_ECDSA_MECHANISM    0
-#endif
-
 #ifndef DISABLE_LOGGING
 
 /**
@@ -799,7 +792,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 /**
  * @brief Parses attribute values for a private EC Key.
  */
-#if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
+#ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
     static CK_RV prvEcPrivKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                        const mbedtls_pk_context * pxMbedContext )
     {
@@ -843,12 +836,12 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         return xResult;
     }
-#endif /* if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 ) */
+#endif /* ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM */
 
 /**
  * @brief Parses attribute values for a public EC Key.
  */
-#if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
+#ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
     static CK_RV prvEcPubKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                       const mbedtls_pk_context * pxMbedContext )
     {
@@ -902,12 +895,12 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         return xResult;
     }
-#endif /* if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 ) */
+#endif /* ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM */
 
 /**
  * @brief Parses attribute values for an EC Key.
  */
-#if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
+#ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
     static CK_RV prvEcKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                    const mbedtls_pk_context * pxMbedContext,
                                    CK_BBOOL xIsPrivate )
@@ -1007,7 +1000,7 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         return xResult;
     }
-#endif /* if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 ) */
+#endif /* ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM */
 
 /*-----------------------------------------------------------------------*/
 /* Functions for maintaining the PKCS #11 module's label-handle lookups. */
@@ -1666,7 +1659,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetMechanismInfo )( CK_SLOT_ID slotID,
     {
         { CKM_RSA_PKCS,        { 2048, 2048, CKF_SIGN              } },
         { CKM_RSA_X_509,       { 2048, 2048, CKF_VERIFY            } },
-        #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
+        #ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
             { CKM_ECDSA,           { 256,  256,  CKF_SIGN | CKF_VERIFY } },
             { CKM_EC_KEY_PAIR_GEN, { 256,  256,  CKF_GENERATE_KEY_PAIR } },
         #endif
@@ -2078,6 +2071,7 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
     }
 }
 
+#ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
 
 /**
  * @brief Helper to search a template for the label attribute.
@@ -2091,7 +2085,6 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
  * combination of the public and private key in DER format, and re-import of the
  * combination.
  */
-#if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
     static CK_RV prvGetExistingKeyComponent( CK_OBJECT_HANDLE_PTR pxPalHandle,
                                              mbedtls_pk_context * pxMbedContext,
                                              const CK_ATTRIBUTE * pxLabel )
@@ -2162,8 +2155,10 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
         return xResult;
     }
 
-/*
+/**
  * @brief Helper function to load an EC group to the mbed TLS pk context.
+ * @param[in] pxMbedContext mbedtls context used to load EC group params.
+ *
  */
     static CK_RV prvLoadEcGroup( mbedtls_pk_context * pxMbedContext )
     {
@@ -2283,7 +2278,7 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
 
         return xResult;
     }
-#endif /* if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 ) */
+#endif /* ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM */
 
 /**
  * @brief Helper function for parsing RSA Private Key attribute templates
@@ -2291,6 +2286,7 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
  * @param[in] pxTemplate templates to search for a key in.
  * @param[in] ulCount length of templates array.
  * @param[in] pxObject PKCS #11 object handle.
+ * @param[in] xIsPrivate boolean indicating whether the key is private or public.
  */
 static CK_RV prvCreateRsaKey( CK_ATTRIBUTE * pxTemplate,
                               CK_ULONG ulCount,
@@ -2382,7 +2378,7 @@ static CK_RV prvCreatePrivateKey( CK_ATTRIBUTE * pxTemplate,
                                    ( CK_BBOOL ) CK_TRUE );
     }
 
-    #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
+    #ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
         /* CKK_EC = CKK_ECDSA. */
         else if( xKeyType == CKK_EC )
         {
@@ -2393,7 +2389,7 @@ static CK_RV prvCreatePrivateKey( CK_ATTRIBUTE * pxTemplate,
                                       /* coverity[misra_c_2012_rule_10_5_violation] */
                                       ( CK_BBOOL ) CK_TRUE );
         }
-    #endif /* if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 ) */
+    #endif /* pkcs11configSUPPRESS_ECDSA_MECHANISM */
     else
     {
         LogError( ( "Failed to create a key. Tried to create a key with an "
@@ -2428,14 +2424,14 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
         xResult = prvCreateRsaKey( pxTemplate, ulCount, pxObject, ( CK_BBOOL ) CK_FALSE );
     }
 
-    #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 )
+    #ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
         else if( xKeyType == CKK_EC ) /* CKK_EC = CKK_ECDSA. */
         {
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             xResult = prvCreateECKey( pxTemplate, ulCount, pxObject, ( CK_BBOOL ) CK_FALSE );
         }
-    #endif /* if ( pkcs11configSUPPRESS_ECDSA_MECHANISM != 1 ) */
+    #endif /* ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM */
     else
     {
         LogError( ( "Failed to create public key. Received an invalid mechanism. "
@@ -4548,7 +4544,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
     const P11Session_t * pxSession = prvSessionPointerFromHandle( hSession );
     CK_RV xResult = prvCheckValidSessionAndModule( pxSession );
 
-    #if ( pkcs11configSUPPRESS_ECDSA_MECHANISM == 1 )
+    #ifdef pkcs11configSUPPRESS_ECDSA_MECHANISM
         if( xResult == CKR_OK )
         {
             LogDebug( ( "ECDSA Mechanism is suppressed on this port." ) );
