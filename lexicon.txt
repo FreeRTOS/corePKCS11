@@ -31,6 +31,7 @@ configlabel
 configmax
 configpal
 configsuppress
+copydoc
 copyobject
 coverity
 createmutex
@@ -114,6 +115,7 @@ http
 https
 iattrib
 ietf
+ifdef
 ifndef
 inc
 ingroup
@@ -154,7 +156,6 @@ palfile
 papplication
 param
 params
-pclabelname
 pcfilename
 pclabel
 pclabelname
@@ -269,11 +270,11 @@ ucsigcomponentlength
 uctemp
 uint
 ul
-ullabelnamelen
 ulcount
 uldatalen
 uldatasize
 ulindex
+ullabelnamelen
 ulmaxobjectcount
 ulobjectlength
 ulong
