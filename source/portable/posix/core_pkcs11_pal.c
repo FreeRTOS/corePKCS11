@@ -422,7 +422,6 @@ CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
     const char * pcFileName = NULL;
     CK_BBOOL xIsPrivate = CK_TRUE;
     CK_RV xResult = CKR_OBJECT_HANDLE_INVALID;
-    FILE * pxFile = NULL;
     int ret = 0;
 
 
