@@ -162,6 +162,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: git submodule update --init --recursive --checkout
+      - name: Install Python3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7.10'
       - name: Measure sizes
         uses: FreeRTOS/CI-CD-Github-Actions/memory_statistics@main
         with:
