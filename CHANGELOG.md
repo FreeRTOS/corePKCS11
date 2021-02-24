@@ -1,6 +1,6 @@
 # Change Log for corePKCS11 Library
 
-## v3.0.1 (March 2021)
+## v3.1.0 (March 2021)
 * Removed default `PKCS11_PAL_DestroyObject` implementation from `core_pkcs11_mbedtls.c`. [#74](https://github.com/FreeRTOS/corePKCS11/pull/74)
 
 ## v3.0.0 (December 2020)
