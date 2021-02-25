@@ -1,7 +1,7 @@
 # Change Log for corePKCS11 Library
 
 ## v3.0.1 (February 2021)
-* Removed default `PKCS11_PAL_DestroyObject` implementation from `core_pkcs11_mbedtls.c`. [#74](https://github.com/FreeRTOS/corePKCS11/pull/74)
+* Removed default `PKCS11_PAL_DestroyObject` implementation from `core_pkcs11_mbedtls.c`. [#74](https://github.com/FreeRTOS/corePKCS11/pull/74). This means that all PAL ports must implement `PKCS11_PAL_DestroyObject`.
 
 ## v3.0.0 (December 2020)
 * Changed `xFindObjectWithLabelAndClass` to include a size parameter to allow the caller to specify the size of the passed in label.
