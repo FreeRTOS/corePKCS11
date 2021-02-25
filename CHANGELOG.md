@@ -7,7 +7,7 @@
 * Changed `xFindObjectWithLabelAndClass` to include a size parameter to allow the caller to specify the size of the passed in label.
 * Added CBMC memory proofs for all functions
 * Removed `threading_alt.h` from corePKCS11
-* Restructured third party folder in order to align with other core repositories. Folders located in “`corePKCS11/3rdparty`” are now in “`corePKCS11/source/dependency/3rdparty`”.
+* Restructured third party folder in order to align with other core repositories. Folders located in `corePKCS11/3rdparty` are now in `corePKCS11/source/dependency/3rdparty`.
 * Updated logs and format specifiers to use standard C types.
 * Added a POSIX PAL port.
 
