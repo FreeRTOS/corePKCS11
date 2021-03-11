@@ -221,6 +221,12 @@
 #define PKCS11_INVALID_KEY_TYPE            ( ( CK_KEY_TYPE ) 0xFFFFFFFFUL )
 
 /**
+ * @ingroup pkcs11_macros
+ * @brief Private define for minimum SHA256-HMAC key size.
+ */
+#define PKCS11_SHA256_HMAC_MIN_SIZE        ( 32UL )
+
+/**
  * @ingroup pkcs11_datatypes
  * @brief PKCS #11 object container.
  *
@@ -283,6 +289,8 @@ typedef struct P11Session
     CK_OBJECT_HANDLE xSignKeyHandle;             /**< @brief Object handle to the signing key. */
     mbedtls_pk_context xSignKey;                 /**< @brief Signing key.  Set during C_SignInit. */
     mbedtls_sha256_context xSHA256Context;       /**< @brief Context for in progress digest operation. */
+    CK_OBJECT_HANDLE xHMACKeyHandle;             /**< @brief Object handle to the HMAC key. */
+    mbedtls_md_context_t xHMACSecretContext;     /**< @brief Context for in progress HMAC operation. Set during C_SignInit or C_VerifyInit. */
 } P11Session_t;
 
 /*-----------------------------------------------------------*/
@@ -2353,6 +2361,116 @@ static CK_RV prvCreateRsaKey( CK_ATTRIBUTE * pxTemplate,
 }
 
 /**
+ * @brief Helper function for parsing SHA256-HMAC Key attribute templates
+ * for C_CreateObject.
+ * @param[in] pxTemplate templates to search for a key in.
+ * @param[in] ulCount length of templates array.
+ * @param[in] pxObject PKCS #11 object handle.
+ */
+static CK_RV prvCreateSHA256HMAC( CK_ATTRIBUTE * pxTemplate,
+                                  CK_ULONG ulCount,
+                                  CK_OBJECT_HANDLE_PTR pxObject )
+{
+    CK_RV xResult = CKR_OK;
+    uint32_t ulIndex;
+    CK_ATTRIBUTE_PTR pxLabel = NULL;
+    CK_BYTE_PTR pxSecretKeyValue = NULL;
+    CK_ULONG ulSecretKeyValueLen = 0;
+    CK_ATTRIBUTE_PTR pxAttribute = NULL;
+    CK_BBOOL xBool = CK_FALSE;
+    CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
+
+    prvGetLabel( &pxLabel, pxTemplate, ulCount );
+
+    if( pxLabel == NULL )
+    {
+        LogError( ( "Failed creating a SHA256-HMAC key. Label was a NULL pointer." ) );
+        xResult = CKR_ARGUMENTS_BAD;
+    }
+
+    if( xResult == CKR_OK )
+    {
+        for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
+        {
+            if( xResult != CKR_OK )
+            {
+                break;
+            }
+
+            pxAttribute = &pxTemplate[ ulIndex ];
+
+            switch( pxAttribute->type )
+            {
+                case ( CKA_CLASS ):
+                case ( CKA_KEY_TYPE ):
+                case ( CKA_LABEL ):
+                    /* Do nothing. These values were parsed previously. */
+                    break;
+
+                case ( CKA_TOKEN ):
+                case ( CKA_VERIFY ):
+                case ( CKA_SIGN ):
+
+                    if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+                    {
+                        ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+                    }
+
+                    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                    /* coverity[misra_c_2012_rule_10_5_violation] */
+                    if( xBool != ( CK_BBOOL ) CK_TRUE )
+                    {
+                        xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+                    }
+
+                    break;
+
+                case ( CKA_VALUE ):
+
+                    if( ( pxAttribute->ulValueLen >= PKCS11_SHA256_HMAC_MIN_SIZE ) &&
+                        ( pxAttribute->pValue != NULL ) )
+                    {
+                        pxSecretKeyValue = pxAttribute->pValue;
+                        ulSecretKeyValueLen = pxAttribute->ulValueLen;
+                    }
+                    else
+                    {
+                        LogError( ( "Failed to create SHA256-HMAC secret key. "
+                                    "Key should be at least 32 bytes and/or non-NULL." ) );
+                        xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+                    }
+
+                    break;
+
+                default:
+                    xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+                    break;
+            }
+        }
+    }
+
+    if( ( xResult == CKR_OK ) && ( pxSecretKeyValue != NULL ) &&
+        ( ulSecretKeyValueLen >= PKCS11_SHA256_HMAC_MIN_SIZE ) )
+    {
+        xPalHandle = PKCS11_PAL_SaveObject( pxLabel,
+                                            pxSecretKeyValue,
+                                            ulSecretKeyValueLen );
+
+        if( xPalHandle == CK_INVALID_HANDLE )
+        {
+            LogError( ( "Failed saving HMAC secret key to flash. Failed to the PKCS #11 PAL." ) );
+            xResult = CKR_DEVICE_MEMORY;
+        }
+        else
+        {
+            xResult = prvAddObjectToList( xPalHandle, pxObject, pxLabel->pValue, pxLabel->ulValueLen );
+        }
+    }
+
+    return xResult;
+}
+
+/**
  * @brief Helper function for importing private keys using template
  * C_CreateObject.
  * @param[in] pxTemplate templates to search for a key in.
@@ -2442,6 +2560,38 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
     return xResult;
 }
 
+/**
+ * @brief Helper function for importing secret keys using template
+ * C_CreateObject.
+ * @param[in] pxTemplate templates to search for a key in.
+ * @param[in] ulCount length of templates array.
+ * @param[in] pxObject PKCS #11 object handle.
+ */
+static CK_RV prvCreateSecretKey( CK_ATTRIBUTE * pxTemplate,
+                                 CK_ULONG ulCount,
+                                 CK_OBJECT_HANDLE_PTR pxObject )
+{
+    CK_RV xResult = CKR_OK;
+    CK_KEY_TYPE xKeyType;
+
+    prvGetKeyType( &xKeyType, pxTemplate, ulCount );
+
+    if( xKeyType == CKK_SHA256_HMAC )
+    {
+        xResult = prvCreateSHA256HMAC( pxTemplate,
+                                       ulCount,
+                                       pxObject );
+    }
+    else
+    {
+        LogError( ( "Failed to create a key. Tried to create a key with an "
+                    "invalid or unknown mechanism. Only CKK_SHA256_HMAC is "
+                    "currently support." ) );
+        xResult = CKR_MECHANISM_INVALID;
+    }
+
+    return xResult;
+}
 
 /**
  * @brief Creates an object.
@@ -2532,6 +2682,10 @@ CK_DECLARE_FUNCTION( CK_RV, C_CreateObject )( CK_SESSION_HANDLE hSession,
 
             case CKO_PUBLIC_KEY:
                 xResult = prvCreatePublicKey( pTemplate, ulCount, phObject );
+                break;
+
+            case CKO_SECRET_KEY:
+                xResult = prvCreateSecretKey( pTemplate, ulCount, phObject );
                 break;
 
             default:
