@@ -4262,6 +4262,8 @@ void test_pkcs11_C_VerifyInitBadArgs( void )
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_MECHANISM_INVALID, xResult );
 
+        xMechanism.mechanism = CKM_RSA_X_509;
+
         mock_osal_mutex_lock_IgnoreAndReturn( 1 );
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
@@ -4271,8 +4273,6 @@ void test_pkcs11_C_VerifyInitBadArgs( void )
 
         xResult = C_VerifyInit( xSession, &xMechanism, pkcs11configMAX_NUM_OBJECTS + 2 );
         TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
-
-        xMechanism.mechanism = CKM_RSA_X_509;
 
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );

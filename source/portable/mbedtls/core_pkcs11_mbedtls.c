@@ -4199,11 +4199,10 @@ static CK_RV prvVerifyInitEC_RSAKeys( P11Session_t * pxSession,
  *                                          mechanism chosen by pxMechanism.
  *
  * @return CKR_OK if successful.
+=======
+>>>>>>> Implement C_VerifyInit for SHA256 HMAC.
  */
-/* @[declare_pkcs11_mbedtls_c_verifyinit] */
-CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
-                                            CK_MECHANISM_PTR pMechanism,
-                                            CK_OBJECT_HANDLE hKey )
+static void prvVerifyInitHMACCleanUp( P11Session_t * pxSession )
 {
     P11Session_t * pxSession;
     CK_RV xResult = CKR_OK;
@@ -4217,35 +4216,75 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
 
-    pxSession = prvSessionPointerFromHandle( hSession );
-    xResult = prvCheckValidSessionAndModule( pxSession );
+    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* coverity[misra_c_2012_rule_10_5_violation] */
+    CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
 
-    if( NULL == pMechanism )
+    /* Grab the verify mutex.  This ensures that no signing operation
+     * is underway on another thread where modification of key would lead to hard fault.*/
+    if( 0 == mbedtls_mutex_lock( &pxSession->xVerifyMutex ) )
     {
         LogError( ( "Failed to initialize verify operation. Null verification "
                     "mechanism provided." ) );
         xResult = CKR_ARGUMENTS_BAD;
     }
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
-    /* coverity[misra_c_2012_rule_10_5_violation] */
-    if( ( xResult == CKR_OK ) && ( prvOperationActive( pxSession ) == ( CK_BBOOL ) CK_TRUE ) )
+                if( pxMdInfo != NULL )
+                {
+                     lMbedTLSResult = mbedtls_md_setup( &pxSession->xHMACSecretContext, 
+                             pxMdInfo, 
+                             PKCS11_USING_HMAC );
+
+                     if( lMbedTLSResult != 0 )
+                     {
+                        LogError( ( "Failed to initialize verify operation. "
+                                    "mbedtls_md_setup failed: mbed TLS error = %s : %s.",
+                                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                        prvVerifyInitHMACCleanUp( pxSession );
+                        xResult = CKR_KEY_HANDLE_INVALID;
+                     }
+                    else
+                    {
+                        lMbedTLSResult = mbedtls_md_hmac_starts(&pxSession->xHMACSecretContext,
+                                pucKeyData, ulKeyDataLength );
+                        if( lMbedTLSResult != 0 )
+                        {
+                           LogError( ( "Failed to initialize verify operation. "
+                                        "mbedtls_md_setup failed: mbed TLS error = %s : %s.",
+                                       mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                       mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                           prvVerifyInitHMACCleanUp( pxSession );
+                           xResult = CKR_KEY_HANDLE_INVALID;
+                        }
+                    }
+                }
+                else
+                {
+                    LogError( ( "Failed to initialize verify operation. "
+                                "mbedtls_md_info_from_type failed. Consider "
+                                "double checking the mbedtls_md_type_t object "
+                                 "that was used." ) );
+                    xResult = CKR_KEY_HANDLE_INVALID;
+                    prvVerifyInitHMACCleanUp( pxSession );
+                }
+      }
+        ( void ) mbedtls_mutex_unlock( &pxSession->xSignMutex );
+    }
+    else
     {
-        LogError( ( "Failed to initialize verify operation. An operation was "
-                    "already active." ) );
-        xResult = CKR_OPERATION_ACTIVE;
+        LogError( ( "Failed to initialize verify operation. Could not "
+                    "take xVerifyMutex." ) );
+        xResult = CKR_CANT_LOCK;
     }
 
     if( xResult == CKR_OK )
     {
-        prvFindObjectInListByHandle( hKey,
-                                     &xPalHandle,
-                                     &pxLabel,
-                                     &xLabelLength );
+        pxSession->xHMACKeyHandle = hKey;
+    }
 
-        if( xPalHandle != CK_INVALID_HANDLE )
-        {
-            xResult = PKCS11_PAL_GetObjectValue( xPalHandle, &pucKeyData, &ulKeyDataLength, &xIsPrivate );
+    return xResult;
+}
 
             if( xResult != CKR_OK )
             {
