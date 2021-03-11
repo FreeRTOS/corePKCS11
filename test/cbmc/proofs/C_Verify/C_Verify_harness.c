@@ -57,6 +57,8 @@ typedef struct P11Session
     CK_OBJECT_HANDLE xSignKeyHandle;
     mbedtls_pk_context xSignKey;
     mbedtls_sha256_context xSHA256Context;
+    CK_OBJECT_HANDLE xHMACKeyHandle;     
+    mbedtls_md_context_t xHMACSecretContext;
 } P11Session_t;
 
 

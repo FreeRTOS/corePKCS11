@@ -2361,6 +2361,69 @@ static CK_RV prvCreateRsaKey( CK_ATTRIBUTE * pxTemplate,
 }
 
 /**
+ * @brief Parses attribute values for a RSA Key.
+ */
+static CK_RV prvHMACKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
+                                 CK_BYTE_PTR * ppxHmacKey,
+                                 CK_ULONG * pulHmacKeyLen )
+{
+    CK_RV xResult = CKR_OK;
+    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* coverity[misra_c_2012_rule_10_5_violation] */
+    CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
+
+    switch( pxAttribute->type )
+    {
+        case ( CKA_CLASS ):
+        case ( CKA_KEY_TYPE ):
+        case ( CKA_LABEL ):
+            /* Do nothing. These values were parsed previously. */
+            break;
+
+        case ( CKA_TOKEN ):
+        case ( CKA_VERIFY ):
+        case ( CKA_SIGN ):
+
+            if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
+            {
+                ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
+            }
+
+            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* coverity[misra_c_2012_rule_10_5_violation] */
+            if( xBool != ( CK_BBOOL ) CK_TRUE )
+            {
+                xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+            }
+
+            break;
+
+        case ( CKA_VALUE ):
+
+            if( ( pxAttribute->ulValueLen >= PKCS11_SHA256_HMAC_MIN_SIZE ) &&
+                ( pxAttribute->pValue != NULL ) )
+            {
+                *ppxHmacKey = pxAttribute->pValue;
+                *pulHmacKeyLen = pxAttribute->ulValueLen;
+            }
+            else
+            {
+                LogError( ( "Failed to create SHA256-HMAC secret key. "
+                            "Key should be at least 32 bytes and/or non-NULL." ) );
+                xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+            }
+
+            break;
+
+        default:
+            xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+            break;
+    }
+
+    return xResult;
+}
+
+/**
  * @brief Helper function for parsing SHA256-HMAC Key attribute templates
  * for C_CreateObject.
  * @param[in] pxTemplate templates to search for a key in.
@@ -2392,59 +2455,11 @@ static CK_RV prvCreateSHA256HMAC( CK_ATTRIBUTE * pxTemplate,
     {
         for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
         {
+            xResult = prvHMACKeyAttParse( &pxTemplate[ ulIndex ], &pxSecretKeyValue, &ulSecretKeyValueLen );
+
             if( xResult != CKR_OK )
             {
                 break;
-            }
-
-            pxAttribute = &pxTemplate[ ulIndex ];
-
-            switch( pxAttribute->type )
-            {
-                case ( CKA_CLASS ):
-                case ( CKA_KEY_TYPE ):
-                case ( CKA_LABEL ):
-                    /* Do nothing. These values were parsed previously. */
-                    break;
-
-                case ( CKA_TOKEN ):
-                case ( CKA_VERIFY ):
-                case ( CKA_SIGN ):
-
-                    if( pxAttribute->ulValueLen == sizeof( CK_BBOOL ) )
-                    {
-                        ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
-                    }
-
-                    /* See explanation in prvCheckValidSessionAndModule for this exception. */
-                    /* coverity[misra_c_2012_rule_10_5_violation] */
-                    if( xBool != ( CK_BBOOL ) CK_TRUE )
-                    {
-                        xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-                    }
-
-                    break;
-
-                case ( CKA_VALUE ):
-
-                    if( ( pxAttribute->ulValueLen >= PKCS11_SHA256_HMAC_MIN_SIZE ) &&
-                        ( pxAttribute->pValue != NULL ) )
-                    {
-                        pxSecretKeyValue = pxAttribute->pValue;
-                        ulSecretKeyValueLen = pxAttribute->ulValueLen;
-                    }
-                    else
-                    {
-                        LogError( ( "Failed to create SHA256-HMAC secret key. "
-                                    "Key should be at least 32 bytes and/or non-NULL." ) );
-                        xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-                    }
-
-                    break;
-
-                default:
-                    xResult = CKR_ATTRIBUTE_TYPE_INVALID;
-                    break;
             }
         }
     }

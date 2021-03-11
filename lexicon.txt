@@ -65,6 +65,7 @@ eawscodesigningkey
 eawsdevicecertificate
 eawsdeviceprivatekey
 eawsdevicepublickey
+eawshmacsecretkey
 ec
 ecdsa
 einvalidhandle
@@ -106,6 +107,7 @@ gettokeninfo
 github
 helvetica
 hkey
+hmac
 hobject
 href
 hsession
@@ -310,6 +312,8 @@ xfindobjectlabellen
 xfindobjectwithlabelandclass
 xgetslotlist
 xhandle
+xhmackeyhandle
+xhmacsecretcontext
 xinitializepkcs
 xisinitialized
 xisprivate

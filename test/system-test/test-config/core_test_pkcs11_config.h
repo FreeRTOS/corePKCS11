@@ -117,7 +117,7 @@
  * For devices with secure elements or hardware limitations, this may be defined
  * to a different label to preserve AWS IoT credentials for other test suites.
  */
-#define pkcs11testLABEL_HMAC_KEY                           pkcs11configLABEL_HMAC_KEY
+#define pkcs11testLABEL_HMAC_KEY                      pkcs11configLABEL_HMAC_KEY
 
 /**
  * @brief The PKCS #11 label for the AWS Trusted Root Certificate.
