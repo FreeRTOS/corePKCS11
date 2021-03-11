@@ -2105,5 +2105,8 @@ void test_SHA256_HMAC( void )
                                            &hMacKey );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to create SHA256 HMAC object." );
     TEST_ASSERT_NOT_EQUAL_MESSAGE( CK_INVALID_HANDLE, hMacKey, "SHA256 HMAC key is invalid." );
+
+    result = globalFunctionList->C_VerifyInit( globalSession, &mechanism, hMacKey );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to C_VerifyInit SHA256 HMAC." );
 }
 /*-----------------------------------------------------------*/
