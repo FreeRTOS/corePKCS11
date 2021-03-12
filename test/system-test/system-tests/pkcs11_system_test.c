@@ -251,7 +251,7 @@ static void findObjectTest( CK_OBJECT_HANDLE_PTR privateKeyHandlePtr,
     /* Happy Path - Find a previously created object. */
     result = xFindObjectWithLabelAndClass( globalSession,
                                            pkcs11testLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
-                                           sizeof( pkcs11testLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ),
+                                           sizeof( pkcs11testLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) - 1,
                                            CKO_PRIVATE_KEY,
                                            privateKeyHandlePtr );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to find private key after closing and reopening a session." );
@@ -260,7 +260,7 @@ static void findObjectTest( CK_OBJECT_HANDLE_PTR privateKeyHandlePtr,
     /* TODO: Add the code sign key and root ca. */
     result = xFindObjectWithLabelAndClass( globalSession,
                                            pkcs11testLABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
-                                           sizeof( pkcs11testLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ),
+                                           sizeof( pkcs11testLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) - 1,
                                            CKO_PUBLIC_KEY,
                                            publicKeyHandlePtr );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to find public key after closing and reopening a session." );
@@ -269,7 +269,7 @@ static void findObjectTest( CK_OBJECT_HANDLE_PTR privateKeyHandlePtr,
 
     result = xFindObjectWithLabelAndClass( globalSession,
                                            pkcs11testLABEL_DEVICE_CERTIFICATE_FOR_TLS,
-                                           sizeof( pkcs11testLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
+                                           sizeof( pkcs11testLABEL_DEVICE_CERTIFICATE_FOR_TLS ) - 1,
                                            CKO_CERTIFICATE,
                                            pcertificateHandle );
 
@@ -635,6 +635,16 @@ static const char validRSAPrivateKey[] =
     "ERIYrvveGGtQ3vSknLWUJ/0BgmuYj5U6aJBZPv8COM2eKIbTQbtQaQ==\n"
     "-----END RSA PRIVATE KEY-----\n";
 
+static const char validRSAPublicKey[] =
+    "-----BEGIN RSA PUBLIC KEY-----\n"
+    "MIIBCgKCAQEAsIqRecRxLz3PZXzZOHF7jMlB25tfv2LDGR7nGTJiey5zxd7oswih\n"
+    "e7+26yx8medpNvX1ym9jphty+9IR053k1WGnQQ4aaDeJonqn7V50Vesw6zFx/x8L\n"
+    "MdXFoBAkRXIL8WS5YKafC87KPnye8A0piVWUFy7+IEEaK3hQEJTzB6LC/N100XL5\n"
+    "ykLCa4xJBOqlIvbDvJ+bKty1EBA3sStlTNuXi3nBWZbXwCB2A+ddjijFf5+gUjin\n"
+    "r7h6e2uQeipWyiIw9NKWbvq8AG1Mj4XBoFL9wP2YTf2SQAgAzx0ySPNrIYOzBNl1\n"
+    "YZ4lIW5sJLATES9+Z8nHi7yRDLw6x/kcVQIDAQAB\n"
+    "-----END RSA PUBLIC KEY-----\n";
+
 /* Valid RSA certificate. */
 static const char validRSACertificate[] =
     "-----BEGIN CERTIFICATE-----\n"
@@ -660,7 +670,8 @@ static const char validRSACertificate[] =
     "5GC4F+8LFLzRrZJWs18FMLaCE+zJChw/oeSt+RS0JZDFn+uX9Q==\n"
     "-----END CERTIFICATE-----\n";
 
-static void provisionRsaTestCredentials( CK_OBJECT_HANDLE_PTR privateKeyHandlePtr,
+static void provisionRsaTestCredentials( CK_OBJECT_HANDLE_PTR privateKeyHandle,
+                                         CK_OBJECT_HANDLE_PTR ppublicKeyHandle,
                                          CK_OBJECT_HANDLE_PTR pcertificateHandle )
 {
     CK_RV result;
@@ -670,10 +681,21 @@ static void provisionRsaTestCredentials( CK_OBJECT_HANDLE_PTR privateKeyHandlePt
                                   ( uint8_t * ) validRSAPrivateKey,
                                   sizeof( validRSAPrivateKey ),
                                   ( uint8_t * ) pkcs11testLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
-                                  privateKeyHandlePtr );
+                                  privateKeyHandle );
 
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to create RSA private key." );
-    TEST_ASSERT_NOT_EQUAL_MESSAGE( CK_INVALID_HANDLE, *privateKeyHandlePtr, "Invalid object handle returned for RSA private key." );
+    TEST_ASSERT_NOT_EQUAL_MESSAGE( CK_INVALID_HANDLE, *privateKeyHandle, "Invalid object handle returned for RSA private key." );
+
+    /* Create a public key. */
+    result = provisionPublicKey( globalSession,
+                                 ( uint8_t * ) validRSAPublicKey,
+                                 sizeof( validRSAPublicKey ),
+                                 CKK_RSA,
+                                 ( uint8_t * ) pkcs11testLABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
+                                 ppublicKeyHandle );
+
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to create RSA public key." );
+    TEST_ASSERT_NOT_EQUAL_MESSAGE( CK_INVALID_HANDLE, *ppublicKeyHandle, "Invalid object handle returned for RSA public key." );
 
     /* Create a certificate. */
     result = provisionCertificate( globalSession,
@@ -691,11 +713,13 @@ void test_CreateObject_RSA( void )
     CK_RV result;
     CK_OBJECT_HANDLE privateKeyHandle = CK_INVALID_HANDLE;
     CK_OBJECT_HANDLE certificateHandle = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE publicKeyHandle = CK_INVALID_HANDLE;
 
     result = destroyTestCredentials();
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to destroy credentials in test setup." );
 
-    provisionRsaTestCredentials( &privateKeyHandle, &certificateHandle );
+    provisionRsaTestCredentials( &privateKeyHandle, &publicKeyHandle, &certificateHandle );
+    findObjectTest( &privateKeyHandle, &certificateHandle, &publicKeyHandle );
 }
 
 void test_FindObject_RSA( void )
@@ -720,7 +744,7 @@ void test_GetAttributeValue_RSA( void )
 
     result = xFindObjectWithLabelAndClass( globalSession,
                                            pkcs11testLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
-                                           sizeof( pkcs11testLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ),
+                                           sizeof( pkcs11testLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) - 1,
                                            CKO_PRIVATE_KEY,
                                            &privateKeyHandle );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to find RSA private key." );
@@ -728,7 +752,7 @@ void test_GetAttributeValue_RSA( void )
 
     result = xFindObjectWithLabelAndClass( globalSession,
                                            pkcs11testLABEL_DEVICE_CERTIFICATE_FOR_TLS,
-                                           sizeof( pkcs11testLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
+                                           sizeof( pkcs11testLABEL_DEVICE_CERTIFICATE_FOR_TLS ) - 1,
                                            CKO_CERTIFICATE,
                                            &certificateHandle );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to find RSA certificate." );
@@ -762,6 +786,7 @@ void test_Sign_RSA( void )
 {
     CK_RV result;
     CK_OBJECT_HANDLE privateKeyHandle;
+    CK_OBJECT_HANDLE publicKeyHandle;
     CK_OBJECT_HANDLE certificateHandle;
     CK_MECHANISM mechanism;
     CK_BYTE hashedMessage[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
@@ -769,7 +794,7 @@ void test_Sign_RSA( void )
     CK_ULONG signatureLength;
     CK_BYTE hashPlusOid[ pkcs11RSA_SIGNATURE_INPUT_LENGTH ];
 
-    provisionRsaTestCredentials( &privateKeyHandle, &certificateHandle );
+    provisionRsaTestCredentials( &privateKeyHandle, &publicKeyHandle, &certificateHandle );
 
     result = vAppendSHA256AlgorithmIdentifierSequence( hashedMessage, hashPlusOid );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to append hash algorithm to RSA signature material." );
@@ -2028,4 +2053,57 @@ static CK_RV destroyProvidedObjects( CK_SESSION_HANDLE session,
     return result;
 }
 
+void test_SHA256_HMAC( void )
+{
+    CK_RV result;
+    CK_FUNCTION_LIST_PTR functionList;
+
+    CK_BYTE label[] = pkcs11testLABEL_HMAC_KEY;
+    CK_KEY_TYPE hmacKeyType = CKK_SHA256_HMAC;
+    CK_OBJECT_CLASS hmacKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL trueObject = CK_TRUE;
+
+    CK_OBJECT_HANDLE hMacKey;
+    /* Min Key Size is 32 */
+    CK_BYTE keyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
+    CK_BYTE message[] = "Hello world";
+    CK_BYTE signature[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
+    size_t signatureLength = sizeof( signature );
+
+    CK_MECHANISM mechanism =
+    {
+        CKM_SHA256_HMAC, NULL_PTR, 0
+    };
+
+    /* Generated with: */
+    /* $ echo -n "Hello world" | openssl dgst -sha256 -hmac abcdabcdabcdabcdabcdabcdabcdabcd -binary | hexdump */
+    CK_BYTE knownSignature[] =
+    {
+        0x81, 0xc7, 0xe0, 0x72, 0x57, 0x45, 0xe1, 0x7d,
+        0x2e, 0x13, 0xd1, 0x27, 0x30, 0xa8, 0x60, 0x78,
+        0xb5, 0x85, 0x3a, 0x93, 0x2b, 0x6f, 0xda, 0x7f,
+        0x8b, 0x7c, 0x4d, 0xd1, 0x39, 0xf6, 0x34, 0x4e
+    };
+
+    result = C_GetFunctionList( &functionList );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to get PKCS #11 function list." );
+
+    CK_ATTRIBUTE sha256_hmac_template[] =
+    {
+        { CKA_CLASS,    &hmacKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &hmacKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    label,         sizeof( label ) - 1       },
+        { CKA_TOKEN,    &trueObject,   sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &trueObject,   sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &trueObject,   sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    keyValue,      sizeof( keyValue ) - 1    }
+    };
+
+    result = functionList->C_CreateObject( globalSession,
+                                           ( CK_ATTRIBUTE_PTR ) &sha256_hmac_template,
+                                           sizeof( sha256_hmac_template ) / sizeof( CK_ATTRIBUTE ),
+                                           &hMacKey );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to create SHA256 HMAC object." );
+    TEST_ASSERT_NOT_EQUAL_MESSAGE( CK_INVALID_HANDLE, hMacKey, "SHA256 HMAC key is invalid." );
+}
 /*-----------------------------------------------------------*/

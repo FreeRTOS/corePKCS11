@@ -135,6 +135,11 @@
 #define pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS       "Device Cert"
 
 /**
+ * @brief The PKCS #11 label for the object to be used for HMAC operations.
+ */
+#define pkcs11configLABEL_HMAC_KEY                         "HMAC Key"
+
+/**
  * @brief The PKCS #11 label for the object to be used for code verification.
  *
  * Used by over-the-air update code to verify an incoming signed image.

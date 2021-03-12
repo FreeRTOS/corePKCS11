@@ -111,6 +111,15 @@
 #define pkcs11testLABEL_JITP_CERTIFICATE              pkcs11configLABEL_JITP_CERTIFICATE
 
 /**
+ * @brief The PKCS #11 label for the object to be used for HMAC operations.
+ *
+ * For devices with on-chip storage, this should match the non-test label.
+ * For devices with secure elements or hardware limitations, this may be defined
+ * to a different label to preserve AWS IoT credentials for other test suites.
+ */
+#define pkcs11testLABEL_HMAC_KEY                      pkcs11configLABEL_HMAC_KEY
+
+/**
  * @brief The PKCS #11 label for the AWS Trusted Root Certificate.
  *
  * @see aws_default_root_certificates.h

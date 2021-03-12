@@ -233,6 +233,14 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 
 <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
 <b>Default value (if undefined): </b> `Root Cert`
+
+@section pkcs11configLABEL_HMAC_KEY
+@brief The PKCS #11 label for the AWS Trusted Root Certificate.
+
+The PKCS #11 label for the object to be used for HMAC operations.
+
+<b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
+<b>Default value (if undefined): </b> `HMAC Key`
 */
 
 /**
