@@ -14,6 +14,17 @@ See memory requirements for the latest release [here](https://docs.aws.amazon.co
 
 **corePKCS11 v3.0.0 [source code](https://github.com/FreeRTOS/corePKCS11/tree/v3.0.0/source) is part of the [FreeRTOS 202012.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202012.00-LTS) release.**
 
+# Purpose
+
+The purpose of this library is to provide a PKCS #11 implementation that allows for rapid prototyping and developing. Once a secure cryptoprocessor is selected, this library must be replaced with a PKCS #11 implementation that abstracts
+said cryptoprocessor.
+
+Since the PKCS #11 interface is defined as part of the PKCS #11 [specification](https://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html) replacing this library with another implementation 
+should require little porting effort, as the interface will not change. The system tests distributed in this repository can be leveraged to verify the behavior of a different implementation is similar to corePKCS11.
+
+Generally vendors for secure cryptoprocessors such as TPM, HSM, Secure Element, or any other type of secure hardware enclave, distribute a PKCS #11 implementation with the hardware. 
+The recommendation is to use a secure cryptoprocessor, and replace corePKCS11 with an implementation compatible with said cryptoprocessor.
+
 ## Building Unit Tests.
 
 ### PKCS Config File
