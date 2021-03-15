@@ -4,7 +4,7 @@ The Cryptoki or PKCS #11 standard defines a platform-independent API to manage a
 
 The PKCS #11 API is useful for writing software without taking a dependency on any particular implementation or hardware. By writing against the PKCS #11 standard interface, code can be used interchangeably with multiple algorithms, implementations and hardware. 
 
-This repository contains a software based implementation of the PKCS #11 interface (API)  to enable rapid development and flexibility when developing  applications that rely on cryptographic operations.
+This repository contains a software based implementation of the PKCS #11 interface (API)  to enable rapid development and flexibility when developing applications that rely on cryptographic operations.
 
 Only a subset of the PKCS #11 standard is implemented, with a focus on operations involving asymmetric keys, random number generation, and hashing. 
 
@@ -20,7 +20,7 @@ See memory requirements for the latest release [here](https://docs.aws.amazon.co
 
 # Purpose
 
-The purpose of this library is to provide a PKCS #11 implementation that allows for rapid prototyping and developing. Once a secure cryptoprocessor is selected, this library must be replaced with a PKCS #11 implementation that abstracts
+The purpose of this library is to provide a PKCS #11 implementation that allows for rapid prototyping and development. Once a secure cryptoprocessor is selected, this library must be replaced with a PKCS #11 implementation that abstracts
 said cryptoprocessor.
 
 Since the PKCS #11 interface is defined as part of the PKCS #11 [specification](https://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html) replacing this library with another implementation 
