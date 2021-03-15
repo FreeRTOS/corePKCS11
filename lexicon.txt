@@ -75,7 +75,6 @@ encryptupdate
 enddot
 endif
 enums
-existance
 exportable
 fillcolor
 findobject
