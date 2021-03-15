@@ -1,5 +1,9 @@
 # corePKCS11 Library 
 
+The Cryptoki or PKCS #11 standard defines a platform-independent API to manage and use cryptographic tokens. The name, "PKCS #11", is used interchangeably to refer to the API itself and the standard which defines it.
+
+The PKCS #11 API is useful for writing software without taking a dependency on any particular implementation or hardware. By writing against the PKCS #11 standard interface, code can have compatibility and flexibility with multiple algorithms, implementations and hardware. 
+
 This repository contains a software based implementation of the PKCS #11 interface (API)  to enable rapid development and flexibility when developing  applications that rely on cryptographic operations.
 
 Only a subset of the PKCS #11 standard is implemented, with a focus on operations involving asymmetric keys, random number generation, and hashing. 
@@ -61,6 +65,19 @@ git submodule update --checkout --init --recursive test/unit-test/CMock
 ## Reference examples
 
 The FreeRTOS-Labs repository contains demos using the PKCS #11 library [here](https://github.com/FreeRTOS/FreeRTOS-Labs/tree/master/FreeRTOS-Plus/Demo/FreeRTOS_Plus_PKCS11_Windows_Simulator/examples) using FreeRTOS on the Windows simulator platform. These can be used as reference examples for the library API.
+
+## Porting Guide
+Documentation for porting corePKCS11 to a new platform can be found on the AWS [docs](https://docs.aws.amazon.com/freertos/latest/portingguide/afr-porting-pkcs.html) web page.
+
+corePKCS11 is not meant to be ported to projects that have a TPM, HSM, or other hardware for offloading crypto-processing. This library is specifically meant to be used for development and prototyping.
+
+
+## Related Example Implementations
+These projects implement the PKCS #11 interface on real hardware and have similar behavior to corePKCS11. It is preferred to use these, over corePKCS11, as they allow for offloading Cryptography to separate hardware.
+
+* ARM's [Platform Security Architecture](https://github.com/Linaro/freertos-pkcs11-psa). 
+* Microchip's [cryptoauthlib](https://github.com/MicrochipTech/cryptoauthlib). 
+* Infineon's [Optiga Trust X](https://github.com/aws/amazon-freertos/blob/master/vendors/infineon/secure_elements/pkcs11/iot_pkcs11_trustx.c). 
 
 ## Generating documentation
 
