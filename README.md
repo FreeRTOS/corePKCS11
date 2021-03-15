@@ -2,7 +2,7 @@
 
 The Cryptoki or PKCS #11 standard defines a platform-independent API to manage and use cryptographic tokens. The name, "PKCS #11", is used interchangeably to refer to the API itself and the standard which defines it.
 
-The PKCS #11 API is useful for writing software without taking a dependency on any particular implementation or hardware. By writing against the PKCS #11 standard interface, code can have compatibility and flexibility with multiple algorithms, implementations and hardware. 
+The PKCS #11 API is useful for writing software without taking a dependency on any particular implementation or hardware. By writing against the PKCS #11 standard interface, code can be used interchangeably with multiple algorithms, implementations and hardware. 
 
 This repository contains a software based implementation of the PKCS #11 interface (API)  to enable rapid development and flexibility when developing  applications that rely on cryptographic operations.
 
