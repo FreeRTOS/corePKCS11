@@ -440,6 +440,7 @@ void test_IotPkcs11_xGetSlotListFreeMemory( void )
     mock_osal_free_Stub( vPkcs11FreeCb );
     xResult = xGetSlotList( &pxSlotId, &xSlotCount );
 
+    TEST_ASSERT_EQUAL( pxSlotId, NULL );
     TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 }
 

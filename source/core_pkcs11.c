@@ -134,6 +134,7 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
     if( ( xResult != CKR_OK ) && ( pxSlotId != NULL ) )
     {
         PKCS11_FREE( pxSlotId );
+        *ppxSlotId = NULL;
     }
 
     return xResult;
