@@ -1,11 +1,11 @@
 # corePKCS11 Library 
+[PKCS #11](https://en.wikipedia.org/wiki/PKCS_11) is a standardised and widely used API for manipulating common cryptographic objects. It is important because the functions it specifies allow application software to use, create, modify, and delete cryptographic objects, without ever exposing those objects to the application’s memory. 
+For example, FreeRTOS AWS reference integrations use a small subset of the PKCS #11 API to, among other things, access the secret (private) key necessary to create a network connection that is authenticated and secured by the [Transport Layer Security (TLS)](https://en.wikipedia.org/wiki/Transport_Layer_Security) protocol – without the application ever ‘seeing’ the key.
+
 
 The Cryptoki or PKCS #11 standard defines a platform-independent API to manage and use cryptographic tokens. The name, "PKCS #11", is used interchangeably to refer to the API itself and the standard which defines it.
 
-The PKCS #11 API is useful for writing software without taking a dependency on any particular implementation or hardware. By writing against the PKCS #11 standard interface, code can be used interchangeably with multiple algorithms, implementations and hardware. 
-
 This repository contains a software based implementation of the PKCS #11 interface (API)  to enable rapid development and flexibility when developing applications that rely on cryptographic operations.
-
 Only a subset of the PKCS #11 standard is implemented, with a focus on operations involving asymmetric keys, random number generation, and hashing. 
 
 The targeted use cases include certificate and key management for TLS authentication and code-sign signature verification, on small embedded devices.
