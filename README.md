@@ -5,7 +5,8 @@ For example, FreeRTOS AWS reference integrations use a small subset of the PKCS 
 
 The Cryptoki or PKCS #11 standard defines a platform-independent API to manage and use cryptographic tokens. The name, "PKCS #11", is used interchangeably to refer to the API itself and the standard which defines it.
 
-This repository contains a software based implementation of the PKCS #11 interface (API)  to enable rapid development and flexibility when developing applications that rely on cryptographic operations.
+This repository contains a software based mock implementation of the PKCS #11 interface (API) that uses the cryptographic functionality provided by mbedtls. Using a software mock to enables rapid development and flexibility, but it is expected that the mock be replaced by an implementation specific to your chosen secure key storage in production. 
+
 Only a subset of the PKCS #11 standard is implemented, with a focus on operations involving asymmetric keys, random number generation, and hashing. 
 
 The targeted use cases include certificate and key management for TLS authentication and code-sign signature verification, on small embedded devices.
@@ -20,14 +21,11 @@ See memory requirements for the latest release [here](https://docs.aws.amazon.co
 
 # Purpose
 
-The purpose of this library is to provide a PKCS #11 implementation that allows for rapid prototyping and development. Once a secure cryptoprocessor is selected, this library must be replaced with a PKCS #11 implementation that abstracts
-said cryptoprocessor.
+Generally vendors for secure cryptoprocessors such as TPM, HSM, Secure Element, or any other type of secure hardware enclave, distribute a PKCS #11 implementation with the hardware. 
+The purpose of this software only mock is therefore to provide a PKCS #11 implementation that allows for rapid prototyping and development before switching to a cryptoprocessor specific PKCS #11 implementation in production devices.
 
 Since the PKCS #11 interface is defined as part of the PKCS #11 [specification](https://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html) replacing this library with another implementation 
 should require little porting effort, as the interface will not change. The system tests distributed in this repository can be leveraged to verify the behavior of a different implementation is similar to corePKCS11.
-
-Generally vendors for secure cryptoprocessors such as TPM, HSM, Secure Element, or any other type of secure hardware enclave, distribute a PKCS #11 implementation with the hardware. 
-The recommendation is to use a secure cryptoprocessor, and replace corePKCS11 with an implementation compatible with said cryptoprocessor.
 
 ## Building Unit Tests.
 
