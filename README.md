@@ -21,7 +21,7 @@ See memory requirements for the latest release [here](https://docs.aws.amazon.co
 
 # Purpose
 
-Generally vendors for secure cryptoprocessors such as TPM, HSM, Secure Element, or any other type of secure hardware enclave, distribute a PKCS #11 implementation with the hardware. 
+Generally vendors for secure cryptoprocessors such as Trusted Platform Module ([TPM](https://en.wikipedia.org/wiki/Trusted_Platform_Module)), Hardware Security Module ([HSM](https://en.wikipedia.org/wiki/Hardware_security_module)), Secure Element, or any other type of secure hardware enclave, distribute a PKCS #11 implementation with the hardware. 
 The purpose of this software only mock is therefore to provide a PKCS #11 implementation that allows for rapid prototyping and development before switching to a cryptoprocessor specific PKCS #11 implementation in production devices.
 
 Since the PKCS #11 interface is defined as part of the PKCS #11 [specification](https://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html) replacing this library with another implementation 
