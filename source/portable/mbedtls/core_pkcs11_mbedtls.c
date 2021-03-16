@@ -4124,35 +4124,35 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
     CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
     mbedtls_pk_type_t xKeyType;
     int32_t lMbedTLSResult = 0;
-    CK_RV xResult = CKR_OK;
+    CK_RV xResult = CKR_KEY_HANDLE_INVALID;
 
     mbedtls_pk_init( &pxSession->xVerifyKey );
     lMbedTLSResult = mbedtls_pk_parse_public_key( &pxSession->xVerifyKey, pucKeyData, ulKeyDataLength );
 
-    if( 0 != lMbedTLSResult )
+    if( 0 == lMbedTLSResult )
+    {
+        pxSession->xVerifyKeyHandle = hKey;
+        xResult = CKR_OK;
+    }
+
+    if( xResult != CKR_OK )
     {
         lMbedTLSResult = mbedtls_pk_parse_key( &pxSession->xVerifyKey, pucKeyData, ulKeyDataLength, NULL, 0 );
 
-        if( 0 != lMbedTLSResult )
+        if( 0 == lMbedTLSResult )
+        {
+            pxSession->xVerifyKeyHandle = hKey;
+            xResult = CKR_OK;
+        }
+        else
         {
             LogError( ( "Failed to initialize verify operation. "
                         "mbedtls_pk_parse_key failed: mbed TLS "
                         "error = %s : %s.",
                         mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                         mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-            xResult = CKR_KEY_HANDLE_INVALID;
             prvVerifyInitECRSACleanUp( pxSession );
         }
-        else
-        {
-            LogDebug( ( "Found verify key handle." ) );
-            pxSession->xVerifyKeyHandle = hKey;
-        }
-    }
-    else
-    {
-        LogDebug( ( "Found verify key handle." ) );
-        pxSession->xVerifyKeyHandle = hKey;
     }
 
     /* Check that the mechanism and key type are compatible, supported. */
@@ -4160,7 +4160,15 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
     {
         xKeyType = mbedtls_pk_get_type( &pxSession->xVerifyKey );
 
-        if( ( pMechanism->mechanism == CKM_RSA_X_509 ) && ( xKeyType != MBEDTLS_PK_RSA ) )
+        if( ( pMechanism->mechanism == CKM_RSA_X_509 ) && ( xKeyType == MBEDTLS_PK_RSA ) )
+        {
+            /* Mechanisms align with the port. */
+        }
+        else if( ( pMechanism->mechanism == CKM_ECDSA ) && ( ( xKeyType == MBEDTLS_PK_ECDSA ) || ( xKeyType == MBEDTLS_PK_ECKEY ) ) )
+        {
+            /* Mechanisms align with the port. */
+        }
+        else
         {
             LogError( ( "Failed to initialize verify operation. "
                         "Verification key type (0x%0lX) does not match "
@@ -4168,19 +4176,6 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
                         ( unsigned long int ) xKeyType ) );
             xResult = CKR_KEY_TYPE_INCONSISTENT;
             prvVerifyInitECRSACleanUp( pxSession );
-        }
-        else if( ( pMechanism->mechanism == CKM_ECDSA ) && ( ( xKeyType != MBEDTLS_PK_ECDSA ) && ( xKeyType != MBEDTLS_PK_ECKEY ) ) )
-        {
-            LogError( ( "Failed to initialize verify operation. "
-                        "Verification key type (0x%0lX) does not match "
-                        "ECDSA mechanism.",
-                        ( unsigned long int ) xKeyType ) );
-            xResult = CKR_KEY_TYPE_INCONSISTENT;
-            prvVerifyInitECRSACleanUp( pxSession );
-        }
-        else
-        {
-            /* MISRA. */
         }
     }
 
