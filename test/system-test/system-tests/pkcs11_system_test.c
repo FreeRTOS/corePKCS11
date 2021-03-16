@@ -2108,5 +2108,12 @@ void test_SHA256_HMAC( void )
 
     result = globalFunctionList->C_VerifyInit( globalSession, &mechanism, hMacKey );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to C_VerifyInit SHA256 HMAC." );
+
+    result = globalFunctionList->C_Verify( globalSession, 
+                                            message, 
+                                            sizeof( message ) -1 , 
+                                            knownSignature, 
+                                            sizeof( knownSignature ) );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "SHA256 HMAC failed to verify the known signature." );
 }
 /*-----------------------------------------------------------*/
