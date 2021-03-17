@@ -79,7 +79,7 @@ enum eObjectHandles
 /**
  * @brief Checks to see if a file exists
  *
- * @param[in] pcFileName         The name of the file to check for existance.
+ * @param[in] pcFileName         The name of the file to check for existence.
  *
  * @returns pdTRUE if the file exists, pdFALSE if not.
  */
@@ -102,7 +102,7 @@ BaseType_t prvFileExists( const char * pcFileName )
 /**
  * @brief Maps label to filename and object handle.
  * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existance.
+ * @param[out] pcFileName        The name of the file to check for existence.
  * @param[out] pHandle           The type of the PKCS #11 object.
  *
  */
@@ -153,7 +153,7 @@ void prvLabelToFilenameHandle( uint8_t * pcLabel,
  * @brief Maps object handle to file name
  *
  * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existance.
+ * @param[out] pcFileName        The name of the file to check for existence.
  * @param[out] pHandle           The type of the PKCS #11 object.
  *
  */
