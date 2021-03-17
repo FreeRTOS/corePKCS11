@@ -270,18 +270,6 @@ int suiteTearDown( int numFailures )
 
 /* ==========================  Helper functions  ============================ */
 
-#define prvCommonInitStubs()               \
-    xResult = prvInitializePkcs11();       \
-    TEST_ASSERT_EQUAL( CKR_OK, xResult );  \
-    xResult = prvOpenSession( &xSession ); \
-    TEST_ASSERT_EQUAL( CKR_OK, xResult );
-
-#define prvCommonDeinitStubs()              \
-    xResult = prvCloseSession( &xSession ); \
-    TEST_ASSERT_EQUAL( CKR_OK, xResult );   \
-    xResult = prvUninitializePkcs11();      \
-    TEST_ASSERT_EQUAL( CKR_OK, xResult )
-
 /*!
  * @brief Helper function to stub mbedtls_pk_free.
  *
@@ -361,6 +349,32 @@ static CK_RV prvCloseSession( CK_SESSION_HANDLE_PTR pxSession )
 
     return xResult;
 }
+
+static void prvCommonInitStubs( CK_SESSION_HANDLE_PTR pxSession )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = prvInitializePkcs11();
+    TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    xResult = prvOpenSession( pxSession );
+    TEST_ASSERT_EQUAL( CKR_OK, xResult );
+}
+
+static void prvCommonDeinitStubs( CK_SESSION_HANDLE_PTR pxSession )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = prvCloseSession( pxSession );
+    /* Can't check xResult here. First TEST_ASSERT will exit TEST_PROTECT block. */
+
+    if( xResult == CKR_OK )
+    {
+        xResult = prvUninitializePkcs11();
+    }
+
+    TEST_ASSERT_EQUAL( CKR_OK, xResult );
+}
+
 
 /*!
  * @brief Helper function to create a x509 certificate.
@@ -983,7 +997,7 @@ void test_pkcs11_C_CloseSession( void )
     CK_RV xResult = CKR_OK;
     CK_SESSION_HANDLE xSession = 0;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1074,7 +1088,7 @@ void test_pkcs11_C_CreateObjectECPrivKey( void )
 
     CK_ATTRIBUTE xPrivateKeyTemplate[] = EC_PRIV_KEY_INITIALIZER;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1105,7 +1119,10 @@ void test_pkcs11_C_CreateObjectECPrivKey( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -1135,7 +1152,7 @@ void test_pkcs11_C_CreateObjectECCurveLoadFail( void )
 
     CK_ATTRIBUTE xPrivateKeyTemplate[] = EC_PRIV_KEY_INITIALIZER;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1152,7 +1169,10 @@ void test_pkcs11_C_CreateObjectECCurveLoadFail( void )
         TEST_ASSERT_EQUAL( CKR_HOST_MEMORY, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1180,7 +1200,7 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
 
     xPrivateKeyTemplate[ 5 ].type = CKA_MODULUS;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1290,7 +1310,10 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1316,7 +1339,7 @@ void test_pkcs11_C_CreateObjectECPrivKeyDerFail( void )
 
     CK_ATTRIBUTE xPrivateKeyTemplate[] = EC_PRIV_KEY_INITIALIZER;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1355,7 +1378,10 @@ void test_pkcs11_C_CreateObjectECPrivKeyDerFail( void )
         TEST_ASSERT_EQUAL( CKR_HOST_MEMORY, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -1379,7 +1405,7 @@ void test_pkcs11_C_CreateObjectECPubKey( void )
 
     CK_ATTRIBUTE xPublicKeyTemplate[] = EC_PUB_KEY_INITIALIZER;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1407,7 +1433,10 @@ void test_pkcs11_C_CreateObjectECPubKey( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -1431,7 +1460,7 @@ void test_pkcs11_C_CreateObjectECPubKeyPalSaveFail( void )
 
     CK_ATTRIBUTE xPublicKeyTemplate[] = EC_PUB_KEY_INITIALIZER;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1459,7 +1488,10 @@ void test_pkcs11_C_CreateObjectECPubKeyPalSaveFail( void )
         TEST_ASSERT_EQUAL( CKR_DEVICE_MEMORY, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1485,7 +1517,7 @@ void test_pkcs11_C_CreateObjectECPubKeyBadAtt( void )
 
     CK_ATTRIBUTE xPublicKeyTemplate[] = EC_PUB_KEY_INITIALIZER;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1571,7 +1603,10 @@ void test_pkcs11_C_CreateObjectECPubKeyBadAtt( void )
         TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1591,7 +1626,7 @@ void test_pkcs11_C_CreateObjectRSAPrivKey( void )
 
     RsaParams_t xRsaParams = { 0 };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1616,7 +1651,10 @@ void test_pkcs11_C_CreateObjectRSAPrivKey( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1637,7 +1675,7 @@ void test_pkcs11_C_CreateObjectRSAPrivKeyBadAtt( void )
 
     RsaParams_t xRsaParams = { 0 };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1693,7 +1731,10 @@ void test_pkcs11_C_CreateObjectRSAPrivKeyBadAtt( void )
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1712,7 +1753,7 @@ void test_pkcs11_C_CreateObjectRSAPubKey( void )
     CK_BYTE xModulus[ MODULUS_LENGTH + 1 ] = { 0 };
     CK_BYTE pucPublicKeyLabel[] = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1745,7 +1786,10 @@ void test_pkcs11_C_CreateObjectRSAPubKey( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1764,7 +1808,7 @@ void test_pkcs11_C_CreateObjectRSAPubKeyMbedFail( void )
     CK_BYTE xModulus[ MODULUS_LENGTH + 1 ] = { 0 };
     CK_BYTE pucPublicKeyLabel[] = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1795,7 +1839,10 @@ void test_pkcs11_C_CreateObjectRSAPubKeyMbedFail( void )
         TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1815,7 +1862,7 @@ void test_pkcs11_C_CreateObjectRSAPubKeyBadAtts( void )
     CK_BYTE xModulus[ MODULUS_LENGTH + 1 ] = { 0 };
     CK_BYTE pucPublicKeyLabel[] = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1860,7 +1907,10 @@ void test_pkcs11_C_CreateObjectRSAPubKeyBadAtts( void )
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1882,7 +1932,7 @@ void test_pkcs11_C_CreateObjectCertificate( void )
 
     PKCS11_CertificateTemplate_t xCertificateTemplate = CERT_INITIALIZER;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1894,7 +1944,10 @@ void test_pkcs11_C_CreateObjectCertificate( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1916,7 +1969,7 @@ void test_pkcs11_C_CreateObjectCertificateSaveFail( void )
 
     PKCS11_CertificateTemplate_t xCertificateTemplate = CERT_INITIALIZER;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1928,7 +1981,10 @@ void test_pkcs11_C_CreateObjectCertificateSaveFail( void )
         TEST_ASSERT_EQUAL( CKR_DEVICE_MEMORY, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -1953,7 +2009,7 @@ void test_pkcs11_C_CreateObjectCertificateIncomplete( void )
         { CKA_CLASS, &xCertificateClass, sizeof( CK_OBJECT_CLASS ) },
     };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1964,7 +2020,10 @@ void test_pkcs11_C_CreateObjectCertificateIncomplete( void )
         TEST_ASSERT_EQUAL( CKR_TEMPLATE_INCOMPLETE, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 
@@ -1987,7 +2046,7 @@ void test_pkcs11_C_CreateObjectCertificateTooLongLabel( void )
 
     PKCS11_CertificateTemplate_t xCertificateTemplate = CERT_INITIALIZER;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -1998,7 +2057,13 @@ void test_pkcs11_C_CreateObjectCertificateTooLongLabel( void )
         TEST_ASSERT_EQUAL( CKR_DATA_LEN_RANGE, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        if( TEST_PROTECT() )
+        {
+            prvCommonDeinitStubs( &xSession );
+        }
+    }
 }
 
 /*
@@ -2021,7 +2086,7 @@ void test_pkcs11_C_CreateObjectCertificateBadType( void )
     PKCS11_CertificateTemplate_t xCertificateTemplate = CERT_INITIALIZER;
 
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2035,7 +2100,10 @@ void test_pkcs11_C_CreateObjectCertificateBadType( void )
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -2057,7 +2125,7 @@ void test_pkcs11_C_CreateObjectCertificateBadToken( void )
 
     PKCS11_CertificateTemplate_t xCertificateTemplate = CERT_INITIALIZER;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2070,7 +2138,10 @@ void test_pkcs11_C_CreateObjectCertificateBadToken( void )
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*
@@ -2094,7 +2165,7 @@ void test_pkcs11_C_CreateObjectCertificateUnkownAtt( void )
 
     xCertificateTemplate.xSubject.type = CKA_MODULUS;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2107,7 +2178,10 @@ void test_pkcs11_C_CreateObjectCertificateUnkownAtt( void )
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_TYPE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2137,7 +2211,7 @@ void test_pkcs11_C_CreateObjectSHA256HMACKey( void )
         { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
     };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2152,7 +2226,10 @@ void test_pkcs11_C_CreateObjectSHA256HMACKey( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2182,7 +2259,7 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyBadAtts( void )
         { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
     };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2194,7 +2271,10 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyBadAtts( void )
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2224,7 +2304,7 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyUnknownAtt( void )
         { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
     };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2236,7 +2316,10 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyUnknownAtt( void )
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_TYPE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2265,7 +2348,7 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyMissingLabel( void )
         { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
     };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2277,7 +2360,10 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyMissingLabel( void )
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2305,7 +2391,7 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyNullSecretKey( void )
         { CKA_VALUE,    NULL,       0                         }
     };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2318,7 +2404,10 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyNullSecretKey( void )
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2348,7 +2437,7 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyShortSecretKey( void )
         { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
     };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2361,7 +2450,10 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyShortSecretKey( void )
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2391,7 +2483,7 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyPalFailure( void )
         { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
     };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2404,7 +2496,10 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyPalFailure( void )
         TEST_ASSERT_EQUAL( CKR_DEVICE_MEMORY, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2434,7 +2529,7 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyInvalidKeyType( void )
         { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
     };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2449,7 +2544,10 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyInvalidKeyType( void )
         TEST_ASSERT_EQUAL( CKR_MECHANISM_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /* ======================  TESTING C_GetAttributeValue  ============================ */
@@ -2466,7 +2564,7 @@ void test_pkcs11_C_GetAttributeValueCert( void )
     CK_ULONG ulCount = 1;
     PKCS11_CertificateTemplate_t xCertificateTemplate = { 0 };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2487,7 +2585,10 @@ void test_pkcs11_C_GetAttributeValueCert( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2511,7 +2612,7 @@ void test_pkcs11_C_GetAttributeValueAttParsing( void )
     CK_OBJECT_CLASS xKnownPrivateKeyClass = CKO_PRIVATE_KEY;
     CK_ATTRIBUTE xTemplate = { CKA_EC_PARAMS, pulBuf, sizeof( pulBuf ) };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2629,7 +2730,10 @@ void test_pkcs11_C_GetAttributeValueAttParsing( void )
         TEST_ASSERT_EQUAL( 1, *( uint32_t * ) xTemplate.pValue );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2646,7 +2750,7 @@ void test_pkcs11_C_GetAttributeValuePrivKey( void )
     CK_KEY_TYPE xKeyType = { 0 };
     CK_KEY_TYPE xKnownKeyType = CKK_EC;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2783,7 +2887,10 @@ void test_pkcs11_C_GetAttributeValuePrivKey( void )
         TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2797,7 +2904,7 @@ void test_pkcs11_C_GetAttributeBadArgs( void )
     CK_OBJECT_HANDLE xObject = 0;
     CK_ULONG ulCount = 1;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2817,7 +2924,10 @@ void test_pkcs11_C_GetAttributeBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_OBJECT_HANDLE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /* ======================  TESTING C_FindObjectsInit  ============================ */
@@ -2836,7 +2946,7 @@ void test_pkcs11_C_FindObjectsInit( void )
 
     CK_ATTRIBUTE xFindTemplate = { CKA_LABEL, pucLabel, strlen( ( const char * ) pucLabel ) };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2853,7 +2963,10 @@ void test_pkcs11_C_FindObjectsInit( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2870,7 +2983,7 @@ void test_pkcs11_C_FindObjectsInitActiveOp( void )
 
     CK_ATTRIBUTE xFindTemplate = { CKA_LABEL, pucLabel, strlen( ( const char * ) pucLabel ) };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2890,7 +3003,10 @@ void test_pkcs11_C_FindObjectsInitActiveOp( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2907,7 +3023,7 @@ void test_pkcs11_C_FindObjectsInitBadArgs( void )
 
     CK_ATTRIBUTE xFindTemplate = { CKA_LABEL, pucLabel, strlen( ( const char * ) pucLabel ) };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2935,7 +3051,10 @@ void test_pkcs11_C_FindObjectsInitBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_OPERATION_NOT_INITIALIZED, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /* ======================  TESTING C_FindObjects  ============================ */
@@ -2958,7 +3077,7 @@ void test_pkcs11_C_FindObjects( void )
 
     CK_ATTRIBUTE xFindTemplate = { CKA_LABEL, pucLabel, strlen( ( const char * ) pucLabel ) };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -2979,7 +3098,10 @@ void test_pkcs11_C_FindObjects( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -2997,7 +3119,7 @@ void test_pkcs11_C_FindObjectsPalFail( void )
 
     CK_ATTRIBUTE xFindTemplate = { CKA_LABEL, pucLabel, strlen( ( const char * ) pucLabel ) };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3016,7 +3138,10 @@ void test_pkcs11_C_FindObjectsPalFail( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3037,7 +3162,7 @@ void test_pkcs11_C_FindObjectsBadArgs( void )
 
     CK_ATTRIBUTE xFindTemplate = { CKA_LABEL, pucLabel, strlen( ( const char * ) pucLabel ) };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3061,7 +3186,10 @@ void test_pkcs11_C_FindObjectsBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /* ======================  TESTING C_FindObjectsFinal  ============================ */
@@ -3082,7 +3210,7 @@ void test_pkcs11_C_FindObjectsFinal( void )
                                                             pucLabel,
                                                             strlen( ( const char * ) pucLabel ) } };
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3098,7 +3226,10 @@ void test_pkcs11_C_FindObjectsFinal( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 /* ======================  TESTING C_DigestInit  ============================ */
 
@@ -3114,7 +3245,7 @@ void test_pkcs11_C_DigestInit( void )
 
     xMechanism.mechanism = CKM_SHA256;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3124,7 +3255,10 @@ void test_pkcs11_C_DigestInit( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3139,7 +3273,7 @@ void test_pkcs11_C_DigestInitClosedSession( void )
 
     xMechanism.mechanism = CKM_SHA256;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3166,7 +3300,7 @@ void test_pkcs11_C_DigestInitBadArgs( void )
 
     xMechanism.mechanism = CKM_SHA256;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3193,7 +3327,10 @@ void test_pkcs11_C_DigestInitBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_OPERATION_ACTIVE, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /* ======================  TESTING C_DigestUpdate  ============================ */
@@ -3211,7 +3348,7 @@ void test_pkcs11_C_DigestUpdate( void )
     xMechanism.mechanism = CKM_SHA256;
     CK_BYTE pxDummyData[] = "Dummy data";
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3225,7 +3362,10 @@ void test_pkcs11_C_DigestUpdate( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3241,7 +3381,7 @@ void test_pkcs11_C_DigestUpdateBadArgs( void )
     xMechanism.mechanism = CKM_SHA256;
     CK_BYTE pxDummyData[] = "Dummy data";
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3265,7 +3405,10 @@ void test_pkcs11_C_DigestUpdateBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 /* ======================  TESTING C_DigestFinal  ============================ */
 
@@ -3284,7 +3427,7 @@ void test_pkcs11_C_DigestFinal( void )
     CK_ULONG ulDigestLen = pkcs11SHA256_DIGEST_LENGTH;
 
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3303,7 +3446,10 @@ void test_pkcs11_C_DigestFinal( void )
         TEST_ASSERT_EQUAL( pkcs11SHA256_DIGEST_LENGTH, ulDigestLen );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3321,7 +3467,7 @@ void test_pkcs11_C_DigestFinalBadArgs( void )
     CK_ULONG ulDigestLen = pkcs11SHA256_DIGEST_LENGTH;
 
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3354,7 +3500,10 @@ void test_pkcs11_C_DigestFinalBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 /* ======================  TESTING C_SignInit  ============================ */
 
@@ -3371,7 +3520,7 @@ void test_pkcs11_C_SignInitECDSA( void )
     xMechanism.mechanism = CKM_ECDSA;
     CK_OBJECT_HANDLE xObject = 0;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3388,7 +3537,10 @@ void test_pkcs11_C_SignInitECDSA( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3406,7 +3558,7 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
     xMechanism.mechanism = CKM_ECDSA;
     CK_OBJECT_HANDLE xKey = pkcs11configMAX_NUM_OBJECTS + 1;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3479,7 +3631,10 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
         TEST_ASSERT_EQUAL( CKR_OPERATION_ACTIVE, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 /* ======================  TESTING C_Sign  ============================ */
 
@@ -3503,7 +3658,7 @@ void test_pkcs11_C_SignECDSA( void )
     xSignAndVerifyKey.pk_ctx = &xResult;
     xMechanism.mechanism = CKM_ECDSA;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3526,7 +3681,10 @@ void test_pkcs11_C_SignECDSA( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3549,7 +3707,7 @@ void test_pkcs11_C_SignRSA( void )
     CK_BYTE pxDummySignature[ pkcs11RSA_2048_SIGNATURE_LENGTH ] = { 0xAA };
     CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3572,7 +3730,10 @@ void test_pkcs11_C_SignRSA( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3589,7 +3750,7 @@ void test_pkcs11_C_SignNoInit( void )
     CK_BYTE pxDummySignature[ pkcs11ECDSA_P256_SIGNATURE_LENGTH ] = { 0xAA };
     CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3597,7 +3758,10 @@ void test_pkcs11_C_SignNoInit( void )
         TEST_ASSERT_EQUAL( CKR_OPERATION_NOT_INITIALIZED, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3620,7 +3784,7 @@ void test_pkcs11_C_SignBadArgs( void )
     CK_BYTE pxDummySignature[ pkcs11ECDSA_P256_SIGNATURE_LENGTH ] = { 0xAA };
     CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3674,7 +3838,10 @@ void test_pkcs11_C_SignBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_CANT_LOCK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /* ======================  TESTING C_VerifyInit  ============================ */
@@ -3694,7 +3861,7 @@ void test_pkcs11_C_VerifyInitECDSA( void )
     xMechanism.mechanism = CKM_ECDSA;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3713,7 +3880,10 @@ void test_pkcs11_C_VerifyInitECDSA( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3731,7 +3901,7 @@ void test_pkcs11_C_VerifyInitECDSAPriv( void )
     xMechanism.mechanism = CKM_ECDSA;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3751,7 +3921,10 @@ void test_pkcs11_C_VerifyInitECDSAPriv( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3768,7 +3941,7 @@ void test_pkcs11_C_VerifyInitBadArgs( void )
     xMechanism.mechanism = CKM_ECDSA;
     CK_BBOOL xIsPrivate = CK_TRUE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3844,7 +4017,10 @@ void test_pkcs11_C_VerifyInitBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_OPERATION_ACTIVE, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 /* ======================  TESTING C_Verify  ============================ */
 
@@ -3867,7 +4043,7 @@ void test_pkcs11_C_VerifyECDSA( void )
     xMechanism.mechanism = CKM_ECDSA;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3894,7 +4070,10 @@ void test_pkcs11_C_VerifyECDSA( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3916,7 +4095,7 @@ void test_pkcs11_C_VerifyECDSAInvalidSig( void )
     xMechanism.mechanism = CKM_ECDSA;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3943,7 +4122,10 @@ void test_pkcs11_C_VerifyECDSAInvalidSig( void )
         TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -3964,7 +4146,7 @@ void test_pkcs11_C_VerifyRSA( void )
     xMechanism.mechanism = CKM_RSA_X_509;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3989,7 +4171,10 @@ void test_pkcs11_C_VerifyRSA( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4011,7 +4196,7 @@ void test_pkcs11_C_VerifyBadArgs( void )
     xMechanism.mechanism = CKM_ECDSA;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4108,7 +4293,13 @@ void test_pkcs11_C_VerifyBadArgs( void )
         mbedtls_mpi_read_binary_IgnoreAndReturn( 0 );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        if( TEST_PROTECT() )
+        {
+            prvCommonDeinitStubs( &xSession );
+        }
+    }
 }
 /* ======================  TESTING C_GenerateKeyPair  ============================ */
 
@@ -4123,7 +4314,7 @@ void test_pkcs11_C_GenerateKeyPairECDSA( void )
     CK_OBJECT_HANDLE xPrivKeyHandle = 0;
     CK_OBJECT_HANDLE xPubKeyHandle = 0;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4172,7 +4363,10 @@ void test_pkcs11_C_GenerateKeyPairECDSA( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4186,7 +4380,7 @@ void test_pkcs11_C_GenerateKeyPairMbedCallsFail( void )
     CK_OBJECT_HANDLE xPrivKeyHandle = 0;
     CK_OBJECT_HANDLE xPubKeyHandle = 0;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4255,7 +4449,10 @@ void test_pkcs11_C_GenerateKeyPairMbedCallsFail( void )
         TEST_ASSERT_EQUAL( CKR_GENERAL_ERROR, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4269,7 +4466,7 @@ void test_pkcs11_C_GenerateKeyPairECDSALockFail( void )
     CK_OBJECT_HANDLE xPrivKeyHandle = 0;
     CK_OBJECT_HANDLE xPubKeyHandle = 0;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4327,7 +4524,10 @@ void test_pkcs11_C_GenerateKeyPairECDSALockFail( void )
         TEST_ASSERT_EQUAL( CKR_CANT_LOCK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4341,7 +4541,7 @@ void test_pkcs11_C_GenerateKeyPairECDSABadPrivateKeyParam( void )
     CK_OBJECT_HANDLE xPrivKeyHandle = 0;
     CK_OBJECT_HANDLE xPubKeyHandle = 0;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4391,7 +4591,10 @@ void test_pkcs11_C_GenerateKeyPairECDSABadPrivateKeyParam( void )
         TEST_ASSERT_EQUAL( CKR_TEMPLATE_INCONSISTENT, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4405,7 +4608,7 @@ void test_pkcs11_C_GenerateKeyPairCallocFails( void )
     CK_OBJECT_HANDLE xPrivKeyHandle = 0;
     CK_OBJECT_HANDLE xPubKeyHandle = 0;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4448,7 +4651,10 @@ void test_pkcs11_C_GenerateKeyPairCallocFails( void )
         TEST_ASSERT_EQUAL( CKR_HOST_MEMORY, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4463,7 +4669,7 @@ void test_pkcs11_C_GenerateKeyPairRSAGen( void )
     CK_OBJECT_HANDLE xPrivKeyHandle = 0;
     CK_OBJECT_HANDLE xPubKeyHandle = 0;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4505,7 +4711,10 @@ void test_pkcs11_C_GenerateKeyPairRSAGen( void )
         TEST_ASSERT_EQUAL( CKR_MECHANISM_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4519,7 +4728,7 @@ void test_pkcs11_C_GenerateKeyPairBadArgs( void )
     CK_OBJECT_HANDLE xPrivKeyHandle = 0;
     CK_OBJECT_HANDLE xPubKeyHandle = 0;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4650,7 +4859,10 @@ void test_pkcs11_C_GenerateKeyPairBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_TEMPLATE_INCONSISTENT, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 /* ======================  TESTING C_GenerateRandom  ============================ */
 
@@ -4665,7 +4877,7 @@ void test_pkcs11_C_GenerateRandom( void )
     CK_BYTE ucRandData[ 3 ] = { 0 };
     CK_ULONG ulRandLen = sizeof( ucRandData );
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4674,7 +4886,10 @@ void test_pkcs11_C_GenerateRandom( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4688,7 +4903,7 @@ void test_pkcs11_C_GenerateRandomDrbgFail( void )
     CK_BYTE ucRandData[ 3 ] = { 0 };
     CK_ULONG ulRandLen = sizeof( ucRandData );
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4697,7 +4912,10 @@ void test_pkcs11_C_GenerateRandomDrbgFail( void )
         TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4711,7 +4929,7 @@ void test_pkcs11_C_GenerateRandomDrbgSessionInvalid( void )
     CK_BYTE ucRandData[ 3 ] = { 0 };
     CK_ULONG ulRandLen = sizeof( ucRandData );
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4736,7 +4954,7 @@ void test_pkcs11_C_GenerateRandomBadArgs( void )
     CK_RV xResult = CKR_OK;
     CK_SESSION_HANDLE xSession = 0;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4744,7 +4962,10 @@ void test_pkcs11_C_GenerateRandomBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /* ======================  TESTING C_DestroyObject  ============================ */
@@ -4761,7 +4982,7 @@ void test_pkcs11_C_DestroyObject( void )
 
     if( TEST_PROTECT() )
     {
-        prvCommonInitStubs();
+        prvCommonInitStubs( &xSession );
 
         xResult = prvCreateEcPub( &xSession, &xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
@@ -4779,7 +5000,10 @@ void test_pkcs11_C_DestroyObject( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4794,7 +5018,7 @@ void test_pkcs11_C_DestroyObjectNoLock( void )
 
     if( TEST_PROTECT() )
     {
-        prvCommonInitStubs();
+        prvCommonInitStubs( &xSession );
 
         xResult = prvCreateEcPub( &xSession, &xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
@@ -4813,7 +5037,10 @@ void test_pkcs11_C_DestroyObjectNoLock( void )
         TEST_ASSERT_EQUAL( CKR_CANT_LOCK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4826,10 +5053,10 @@ void test_pkcs11_C_DestroyObjectNullLabel( void )
     CK_SESSION_HANDLE xSession = 0;
     CK_OBJECT_HANDLE xObject = 1;
 
+    prvCommonInitStubs( &xSession );
+
     if( TEST_PROTECT() )
     {
-        prvCommonInitStubs();
-
         PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
         mock_osal_calloc_Stub( pvPkcs11CallocCb );
         mock_osal_free_Stub( vPkcs11FreeCb );
@@ -4837,7 +5064,10 @@ void test_pkcs11_C_DestroyObjectNullLabel( void )
         TEST_ASSERT_EQUAL( CKR_OBJECT_HANDLE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4850,7 +5080,7 @@ void test_pkcs11_C_DestroyObjectBadHandle( void )
     CK_SESSION_HANDLE xSession = 0;
     CK_OBJECT_HANDLE xObject = ( CK_OBJECT_HANDLE ) -1;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4858,5 +5088,8 @@ void test_pkcs11_C_DestroyObjectBadHandle( void )
         TEST_ASSERT_EQUAL( CKR_OBJECT_HANDLE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
