@@ -3529,6 +3529,11 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
         xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_MECHANISM_INVALID, xResult );
 
+        xMechanism.mechanism = CKM_RSA_X_509;
+
+        xResult = C_SignInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_MECHANISM_INVALID, xResult );
+
         xMechanism.mechanism = CKM_ECDSA;
 
         xResult = prvCreateEcPub( &xSession, &xObject );
