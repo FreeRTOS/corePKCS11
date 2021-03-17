@@ -4108,8 +4108,8 @@ static void prvVerifyInitECRSACleanUp( P11Session_t * pxSession )
 /**
  * @brief Helper function for initializing a verify operation for an EC or RSA key.
  * @param[in] pxSession   Pointer to a valid PKCS #11 session.
- * @param[in] pMechanism  HMAC mechanism.
- * @param[in] hKey        HMAC secret key handle.
+ * @param[in] pMechanism  EC/RSA mechanism.
+ * @param[in] hKey        EC/RSA public key handle.
  * @param[in] pucKeyData        EC/RSA public key data.
  * @param[in] ulKeyDataLength   EC/RSA public key size.
  */
@@ -4172,7 +4172,7 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
         {
             LogError( ( "Failed to initialize verify operation. "
                         "Verification key type (0x%0lX) does not match "
-                        "RSA mechanism.",
+                        "RSA or EC mechanism.",
                         ( unsigned long int ) xKeyType ) );
             xResult = CKR_KEY_TYPE_INCONSISTENT;
             prvVerifyInitECRSACleanUp( pxSession );
