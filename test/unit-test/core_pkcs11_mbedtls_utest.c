@@ -2059,10 +2059,7 @@ void test_pkcs11_C_CreateObjectCertificateTooLongLabel( void )
 
     if( TEST_PROTECT() )
     {
-        if( TEST_PROTECT() )
-        {
-            prvCommonDeinitStubs( &xSession );
-        }
+        prvCommonDeinitStubs( &xSession );
     }
 }
 
@@ -4295,10 +4292,7 @@ void test_pkcs11_C_VerifyBadArgs( void )
 
     if( TEST_PROTECT() )
     {
-        if( TEST_PROTECT() )
-        {
-            prvCommonDeinitStubs( &xSession );
-        }
+        prvCommonDeinitStubs( &xSession );
     }
 }
 /* ======================  TESTING C_GenerateKeyPair  ============================ */
