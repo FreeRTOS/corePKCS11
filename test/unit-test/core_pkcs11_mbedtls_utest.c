@@ -4411,7 +4411,7 @@ void test_pkcs11_C_VerifyRSA( void )
 
     if( TEST_PROTECT() )
     {
-        xResult = prvCreateEcPub( &xSession, &xObject );
+        xResult = prvCreateRSAPub( &xSession, &xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         xResult = C_Verify( xSession, pxDummyData, 0, pxDummySignature, ulDummySignatureLen );

@@ -4013,8 +4013,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
 /* @[declare_pkcs11_mbedtls_c_sign] */
 
 /**
- * @brief Helper function for cleaning up a verify operation for an HMAC operation.
- * @param[in] pxSession   Pointer to a valid PKCS #11 session.
+ * @brief Helper function for cleaning up an HMAC verify operation.
+ * @param[in] pxSession  Pointer to a valid PKCS #11 session.
  */
 static void prvVerifyInitHMACCleanUp( P11Session_t * pxSession )
 {
@@ -4035,11 +4035,9 @@ static CK_RV prvVerifyInitSHA256HMAC( P11Session_t * pxSession,
                                       CK_ULONG ulKeyDataLength )
 {
     CK_RV xResult = CKR_OK;
-    int32_t lMbedTLSResult = 0;
+    int32_t lMbedTLSResult = -1;
     const mbedtls_md_info_t * pxMdInfo = NULL;
 
-    /* Grab the verify mutex.  This ensures that no signing operation
-     * is underway on another thread where modification of key would lead to hard fault.*/
     mbedtls_md_init( &pxSession->xHMACSecretContext );
     pxMdInfo = mbedtls_md_info_from_type( MBEDTLS_MD_SHA256 );
 
@@ -4123,7 +4121,7 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
     mbedtls_pk_type_t xKeyType;
-    int32_t lMbedTLSResult = 0;
+    int32_t lMbedTLSResult = 1;
     CK_RV xResult = CKR_KEY_HANDLE_INVALID;
 
     mbedtls_pk_init( &pxSession->xVerifyKey );
@@ -4146,7 +4144,7 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
         }
         else
         {
-            LogError( ( "Failed to initialize verify operation. "
+            LogError( ( "Verification operation failed. "
                         "mbedtls_pk_parse_key failed: mbed TLS "
                         "error = %s : %s.",
                         mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
@@ -4155,7 +4153,7 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
         }
     }
 
-    /* Check that the mechanism and key type are compatible, supported. */
+    /* Check that the mechanism and key type are compatible and supported. */
     if( xResult == CKR_OK )
     {
         xKeyType = mbedtls_pk_get_type( &pxSession->xVerifyKey );
@@ -4164,7 +4162,8 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
         {
             /* Mechanisms align with the port. */
         }
-        else if( ( pMechanism->mechanism == CKM_ECDSA ) && ( ( xKeyType == MBEDTLS_PK_ECDSA ) || ( xKeyType == MBEDTLS_PK_ECKEY ) ) )
+        else if( ( pMechanism->mechanism == CKM_ECDSA ) && 
+                ( ( xKeyType == MBEDTLS_PK_ECDSA ) || ( xKeyType == MBEDTLS_PK_ECKEY ) ) )
         {
             /* Mechanisms align with the port. */
         }
@@ -4193,7 +4192,7 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
  *
  *
  * @param[in] hSession                      Handle of a valid PKCS #11 session.
- * @param[in] pMechanism                   Mechanism used to verify signature.
+ * @param[in] pMechanism                    Mechanism used to verify signature.
  *                                          This port supports the following mechanisms:
  *                                          - CKM_RSA_X_509 for RSA verifications
  *                                          - CKM_ECDSA for elliptic curve verifications
@@ -4253,7 +4252,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
             if( xResult != CKR_OK )
             {
                 LogError( ( "Failed to initialize verify operation. Unable to "
-                            "retrieve value of key for verifying 0x%0lX.",
+                            "retrieve value of public key for verification 0x%0lX.",
                             ( unsigned long int ) xResult ) );
                 xResult = CKR_KEY_HANDLE_INVALID;
             }
@@ -4269,6 +4268,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
     /* Retrieve key value from storage. */
     if( xResult == CKR_OK )
     {
+        /* Mutex is used to protect the verification keys and contexts. */
         if( 0 == mbedtls_mutex_lock( &pxSession->xVerifyMutex ) )
         {
             switch( pMechanism->mechanism )
