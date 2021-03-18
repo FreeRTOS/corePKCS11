@@ -4162,8 +4162,8 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
         {
             /* Mechanisms align with the port. */
         }
-        else if( ( pMechanism->mechanism == CKM_ECDSA ) && 
-                ( ( xKeyType == MBEDTLS_PK_ECDSA ) || ( xKeyType == MBEDTLS_PK_ECKEY ) ) )
+        else if( ( pMechanism->mechanism == CKM_ECDSA ) &&
+                 ( ( xKeyType == MBEDTLS_PK_ECDSA ) || ( xKeyType == MBEDTLS_PK_ECKEY ) ) )
         {
             /* Mechanisms align with the port. */
         }
