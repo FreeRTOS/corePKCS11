@@ -4117,9 +4117,6 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
                                      CK_BYTE_PTR pucKeyData,
                                      CK_ULONG ulKeyDataLength )
 {
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
-    /* coverity[misra_c_2012_rule_10_5_violation] */
-    CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
     mbedtls_pk_type_t xKeyType;
     int32_t lMbedTLSResult = 1;
     CK_RV xResult = CKR_KEY_HANDLE_INVALID;
@@ -4133,6 +4130,7 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
         xResult = CKR_OK;
     }
 
+    /* If we fail to parse the public key, try again as a private key. */
     if( xResult != CKR_OK )
     {
         lMbedTLSResult = mbedtls_pk_parse_key( &pxSession->xVerifyKey, pucKeyData, ulKeyDataLength, NULL, 0 );
@@ -4315,7 +4313,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
         }
         else
         {
-            LogError( ( "Failed verify operation. Could not take verify mutex." ) );
+            LogError( ( "Verify operation failed. Could not take verify mutex." ) );
             xResult = CKR_CANT_LOCK;
         }
     }
