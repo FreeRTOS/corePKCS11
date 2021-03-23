@@ -3980,7 +3980,7 @@ void test_pkcs11_C_VerifyInitSHA256HMAC( void )
     xMechanism.mechanism = CKM_SHA256_HMAC;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -3998,7 +3998,10 @@ void test_pkcs11_C_VerifyInitSHA256HMAC( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4015,7 +4018,7 @@ void test_pkcs11_C_VerifyInitSHA256HMACMDInfoFail( void )
     xMechanism.mechanism = CKM_SHA256_HMAC;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4033,7 +4036,10 @@ void test_pkcs11_C_VerifyInitSHA256HMACMDInfoFail( void )
         TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4050,7 +4056,7 @@ void test_pkcs11_C_VerifyInitSHA256HMACMDSetupFail( void )
     xMechanism.mechanism = CKM_SHA256_HMAC;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4068,7 +4074,10 @@ void test_pkcs11_C_VerifyInitSHA256HMACMDSetupFail( void )
         TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4085,7 +4094,7 @@ void test_pkcs11_C_VerifyInitSHA256HMACMDsStartsFail( void )
     xMechanism.mechanism = CKM_SHA256_HMAC;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4104,7 +4113,10 @@ void test_pkcs11_C_VerifyInitSHA256HMACMDsStartsFail( void )
         TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
@@ -4121,7 +4133,7 @@ void test_pkcs11_C_VerifyInitSHA256HMACMDLockFail( void )
     xMechanism.mechanism = CKM_SHA256_HMAC;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
-    prvCommonInitStubs();
+    prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
@@ -4136,7 +4148,10 @@ void test_pkcs11_C_VerifyInitSHA256HMACMDLockFail( void )
         TEST_ASSERT_EQUAL( CKR_CANT_LOCK, xResult );
     }
 
-    prvCommonDeinitStubs();
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
 }
 
 /*!
