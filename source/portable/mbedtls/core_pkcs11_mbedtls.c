@@ -4096,7 +4096,7 @@ static CK_RV prvVerifyInitSHA256HMAC( P11Session_t * pxSession,
  * @brief Helper function for cleaning up a verify operation for an EC or RSA key.
  * @param[in] pxSession   Pointer to a valid PKCS #11 session.
  */
-static void prvVerifyInitECRSACleanUp( P11Session_t * pxSession )
+static void prvVerifyInitEC_RSACleanUp( P11Session_t * pxSession )
 {
     mbedtls_pk_free( &pxSession->xVerifyKey );
     pxSession->xVerifyKeyHandle = CK_INVALID_HANDLE;
@@ -4111,7 +4111,7 @@ static void prvVerifyInitECRSACleanUp( P11Session_t * pxSession )
  * @param[in] pucKeyData        EC/RSA public key data.
  * @param[in] ulKeyDataLength   EC/RSA public key size.
  */
-static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
+static CK_RV prvVerifyInitEC_RSAKeys( P11Session_t * pxSession,
                                      CK_MECHANISM_PTR pMechanism,
                                      CK_OBJECT_HANDLE hKey,
                                      CK_BYTE_PTR pucKeyData,
@@ -4147,7 +4147,7 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
                         "error = %s : %s.",
                         mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                         mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-            prvVerifyInitECRSACleanUp( pxSession );
+            prvVerifyInitEC_RSACleanUp( pxSession );
         }
     }
 
@@ -4172,7 +4172,7 @@ static CK_RV prvVerifyInitECRSAKeys( P11Session_t * pxSession,
                         "RSA or EC mechanism.",
                         ( unsigned long int ) xKeyType ) );
             xResult = CKR_KEY_TYPE_INCONSISTENT;
-            prvVerifyInitECRSACleanUp( pxSession );
+            prvVerifyInitEC_RSACleanUp( pxSession );
         }
     }
 
@@ -4284,7 +4284,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
                     }
                     else if( ( pxSession->xVerifyKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xVerifyKeyHandle != hKey ) )
                     {
-                        xResult = prvVerifyInitECRSAKeys( pxSession, pMechanism, hKey, pucKeyData, ulKeyDataLength );
+                        xResult = prvVerifyInitEC_RSAKeys( pxSession, pMechanism, hKey, pucKeyData, ulKeyDataLength );
                     }
                     else
                     {
