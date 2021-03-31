@@ -4112,10 +4112,10 @@ static void prvVerifyInitEC_RSACleanUp( P11Session_t * pxSession )
  * @param[in] ulKeyDataLength   EC/RSA public key size.
  */
 static CK_RV prvVerifyInitEC_RSAKeys( P11Session_t * pxSession,
-                                     CK_MECHANISM_PTR pMechanism,
-                                     CK_OBJECT_HANDLE hKey,
-                                     CK_BYTE_PTR pucKeyData,
-                                     CK_ULONG ulKeyDataLength )
+                                      CK_MECHANISM_PTR pMechanism,
+                                      CK_OBJECT_HANDLE hKey,
+                                      CK_BYTE_PTR pucKeyData,
+                                      CK_ULONG ulKeyDataLength )
 {
     mbedtls_pk_type_t xKeyType;
     int32_t lMbedTLSResult = 1;
