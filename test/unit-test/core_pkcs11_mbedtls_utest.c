@@ -42,6 +42,7 @@
 #include "mock_core_pki_utils.h"
 #include "mock_mbedtls_error.h"
 #include "mock_pk_internal.h"
+#include "mock_md.h"
 
 /* PKCS #11 includes. */
 #include "core_pkcs11_config.h"
@@ -526,6 +527,87 @@ static CK_RV prvCreateEcPub( CK_SESSION_HANDLE_PTR pxSession,
                               sizeof( xTemplate ) / sizeof( CK_ATTRIBUTE ),
                               pxObject );
 
+
+    return xResult;
+}
+
+/*!
+ * @brief Helper function to create an RSA Public Key.
+ *
+ */
+static CK_RV prvCreateRSAPub( CK_SESSION_HANDLE_PTR pxSession,
+                              CK_OBJECT_HANDLE_PTR pxObject )
+{
+    CK_RV xResult = CKR_OK;
+    CK_KEY_TYPE xPublicKeyType = CKK_RSA;
+    CK_OBJECT_CLASS xClass = CKO_PUBLIC_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_BYTE xPublicExponent[] = { 0x01, 0x00, 0x01 };
+    CK_BYTE xModulus[ MODULUS_LENGTH + 1 ] = { 0 };
+    CK_BYTE pucPublicKeyLabel[] = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
+
+    CK_ATTRIBUTE xPublicKeyTemplate[] =
+    {
+        { CKA_CLASS,           &xClass,           sizeof( CK_OBJECT_CLASS )                    },
+        { CKA_KEY_TYPE,        &xPublicKeyType,   sizeof( CK_KEY_TYPE )                        },
+        { CKA_TOKEN,           &xTrue,            sizeof( xTrue )                              },
+        { CKA_MODULUS,         &xModulus + 1,     MODULUS_LENGTH                               },
+        { CKA_VERIFY,          &xTrue,            sizeof( xTrue )                              },
+        { CKA_PUBLIC_EXPONENT, xPublicExponent,   sizeof( xPublicExponent )                    },
+        { CKA_LABEL,           pucPublicKeyLabel, strlen( ( const char * ) pucPublicKeyLabel ) }
+    };
+
+    mbedtls_pk_init_ExpectAnyArgs();
+    mock_osal_calloc_Stub( pvPkcs11CallocCb );
+    mbedtls_rsa_init_CMockIgnore();
+    mbedtls_rsa_import_raw_IgnoreAndReturn( 0 );
+    mbedtls_pk_write_pubkey_der_IgnoreAndReturn( 1 );
+    mbedtls_pk_free_Stub( vMbedPkFree );
+    PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
+    mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+    mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
+    mock_osal_free_Stub( vPkcs11FreeCb );
+    xResult = C_CreateObject( *pxSession,
+                              ( CK_ATTRIBUTE_PTR ) &xPublicKeyTemplate,
+                              sizeof( xPublicKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                              pxObject );
+
+    return xResult;
+}
+
+/*!
+ * @brief Helper function to create a SHA256HMAC Key.
+ *
+ */
+static CK_RV prvCreateSHA256HMAC( CK_SESSION_HANDLE_PTR pxSession,
+                                  CK_OBJECT_HANDLE_PTR pxObject )
+{
+    CK_RV xResult = CKR_OK;
+    CK_KEY_TYPE xKeyType = CKK_SHA256_HMAC;
+    CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_BYTE pcLabel[] = pkcs11configLABEL_HMAC_KEY;
+
+    CK_BYTE pxKeyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
+
+    CK_ATTRIBUTE xSHA256HMACTemplate[] =
+    {
+        { CKA_CLASS,    &xKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &xKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    pcLabel,    sizeof( pcLabel ) - 1     },
+        { CKA_TOKEN,    &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
+    };
+
+    PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
+    mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+    mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
+    xResult = C_CreateObject( *pxSession,
+                              ( CK_ATTRIBUTE_PTR ) &xSHA256HMACTemplate,
+                              sizeof( xSHA256HMACTemplate ) / sizeof( CK_ATTRIBUTE ),
+                              pxObject );
 
     return xResult;
 }
@@ -1275,8 +1357,9 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
 
 
         xPrivateKeyType = CKK_RSA;
-        mock_osal_calloc_Stub( NULL );
-        mock_osal_calloc_ExpectAnyArgsAndReturn( NULL );
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_rsa_init_CMockIgnore();
+        mock_osal_calloc_IgnoreAndReturn( NULL );
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
                                   sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
@@ -3884,6 +3967,194 @@ void test_pkcs11_C_VerifyInitECDSA( void )
 }
 
 /*!
+ * @brief C_VerifyInit SHA256-HMAC happy path.
+ *
+ */
+void test_pkcs11_C_VerifyInitSHA256HMAC( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_MECHANISM xMechanism = { 0 };
+
+    xMechanism.mechanism = CKM_SHA256_HMAC;
+    CK_BBOOL xIsPrivate = CK_FALSE;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateSHA256HMAC( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
+        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
+        mbedtls_md_init_CMockIgnore();
+        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn( &xObject );
+        mbedtls_md_setup_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_md_hmac_starts_ExpectAnyArgsAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_VerifyInit SHA256-HMAC MD info fails
+ *
+ */
+void test_pkcs11_C_VerifyInitSHA256HMACMDInfoFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_MECHANISM xMechanism = { 0 };
+
+    xMechanism.mechanism = CKM_SHA256_HMAC;
+    CK_BBOOL xIsPrivate = CK_FALSE;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateSHA256HMAC( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
+        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
+        mbedtls_md_init_CMockIgnore();
+        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn( NULL );
+        mbedtls_md_free_CMockIgnore();
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_VerifyInit SHA256-HMAC MD setup fails
+ *
+ */
+void test_pkcs11_C_VerifyInitSHA256HMACMDSetupFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_MECHANISM xMechanism = { 0 };
+
+    xMechanism.mechanism = CKM_SHA256_HMAC;
+    CK_BBOOL xIsPrivate = CK_FALSE;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateSHA256HMAC( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
+        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
+        mbedtls_md_init_CMockIgnore();
+        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn( ( mbedtls_md_info_t * ) &xObject );
+        mbedtls_md_setup_ExpectAnyArgsAndReturn( -1 );
+        mbedtls_md_free_CMockIgnore();
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_VerifyInit SHA256-HMAC MD starts fails
+ *
+ */
+void test_pkcs11_C_VerifyInitSHA256HMACMDsStartsFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_MECHANISM xMechanism = { 0 };
+
+    xMechanism.mechanism = CKM_SHA256_HMAC;
+    CK_BBOOL xIsPrivate = CK_FALSE;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateSHA256HMAC( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
+        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
+        mbedtls_md_init_CMockIgnore();
+        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn( ( mbedtls_md_info_t * ) &xObject );
+        mbedtls_md_setup_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_md_hmac_starts_ExpectAnyArgsAndReturn( -1 );
+        mbedtls_md_free_CMockIgnore();
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_VerifyInit SHA256-HMAC MD mutex lock failure
+ *
+ */
+void test_pkcs11_C_VerifyInitSHA256HMACMDLockFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_MECHANISM xMechanism = { 0 };
+
+    xMechanism.mechanism = CKM_SHA256_HMAC;
+    CK_BBOOL xIsPrivate = CK_FALSE;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateSHA256HMAC( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_md_info_from_type_IgnoreAndReturn( 1 );
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mock_osal_mutex_lock_IgnoreAndReturn( -1 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_CANT_LOCK, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
  * @brief C_VerifyInit ECDSA public key API failed, private key API success.
  *
  */
@@ -4132,8 +4403,8 @@ void test_pkcs11_C_VerifyECDSAInvalidSig( void )
 void test_pkcs11_C_VerifyRSA( void )
 {
     CK_RV xResult = CKR_OK;
-    CK_SESSION_HANDLE xSession = 0;
-    CK_OBJECT_HANDLE xObject = 0;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
     CK_MECHANISM xMechanism = { 0 };
     CK_BYTE pxDummyData[ pkcs11RSA_2048_SIGNATURE_LENGTH ] = { 0xAA };
     CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
@@ -4143,11 +4414,19 @@ void test_pkcs11_C_VerifyRSA( void )
     xMechanism.mechanism = CKM_RSA_X_509;
     CK_BBOOL xIsPrivate = CK_FALSE;
 
+    mbedtls_pk_context xMbedContext = { 0 };
+
+    /* These just have to be not NULL so we can hit the proper path. */
+    xMbedContext.pk_ctx = &xObject;
+    xMbedContext.pk_info = &xSession;
+
+    xMechanism.mechanism = CKM_RSA_X_509;
+
     prvCommonInitStubs( &xSession );
 
     if( TEST_PROTECT() )
     {
-        xResult = prvCreateEcPub( &xSession, &xObject );
+        xResult = prvCreateRSAPub( &xSession, &xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         xResult = C_Verify( xSession, pxDummyData, 0, pxDummySignature, ulDummySignatureLen );
@@ -4155,8 +4434,9 @@ void test_pkcs11_C_VerifyRSA( void )
 
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
-        mbedtls_pk_free_CMockIgnore();
-        mbedtls_pk_init_CMockIgnore();
+        mbedtls_pk_init_StopIgnore();
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xMbedContext );
         mbedtls_pk_parse_public_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
         mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );

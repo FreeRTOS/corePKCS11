@@ -198,6 +198,7 @@ pslotlist
 ptemplate
 puc
 pucdata
+puckeydata
 pucsig
 pucsignature
 pucsigptr
@@ -275,6 +276,7 @@ ulcount
 uldatalen
 uldatasize
 ulindex
+ulkeydatalength
 ullabelnamelen
 ulmaxobjectcount
 ulobjectlength
