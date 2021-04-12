@@ -4190,7 +4190,6 @@ static CK_RV prvVerifyInitSHA256HMAC( P11Session_t * pxSession,
                                       CK_BYTE_PTR pucKeyData,
                                       CK_ULONG ulKeyDataLength )
 {
-
     CK_RV xResult = CKR_OK;
 
     xResult = prvInitSHA256HMAC( pxSession,
