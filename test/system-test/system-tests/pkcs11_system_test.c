@@ -33,7 +33,7 @@
 #include "core_pkcs11.h"
 #include "core_test_pkcs11_config.h"
 
-/* Loggign includes. */
+/* Logging includes. */
 #include "logging_levels.h"
 #include "logging_stack.h"
 

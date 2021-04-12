@@ -25,7 +25,7 @@ jobs:
       - name: System Tests
         run: |
           cd build/
-          ctest -E system --output-on-failure
+          ctest --output-on-failure
   unittest:
     runs-on: ubuntu-latest
     steps:
@@ -44,7 +44,7 @@ jobs:
       - name: Unit Tests
         run: |
           cd build/
-          ctest -E system --output-on-failure
+          ctest --output-on-failure
           cd ..
       - name: Coverage
         run: |

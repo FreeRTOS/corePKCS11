@@ -72,7 +72,7 @@ enum eObjectHandles
 /**
  * @brief Checks to see if a file exists
  *
- * @param[in] pcFileName         The name of the file to check for existance.
+ * @param[in] pcFileName         The name of the file to check for existence.
  *
  * @returns CKR_OK if the file exists, CKR_OBJECT_HANDLE_INVALID if not.
  */
@@ -102,7 +102,7 @@ static CK_RV prvFileExists( const char * pcFileName )
  * @brief Checks to see if a file exists
  *
  * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existance.
+ * @param[out] pcFileName        The name of the file to check for existence.
  * @param[out] pHandle           The type of the PKCS #11 object.
  *
  */
@@ -165,7 +165,7 @@ static void prvLabelToFilenameHandle( const char * pcLabel,
  * @brief Maps object handle to file name
  *
  * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existance.
+ * @param[out] pcFileName        The name of the file to check for existence.
  * @param[out] pHandle           The type of the PKCS #11 object.
  *
  */
@@ -226,7 +226,7 @@ static CK_RV prvHandleToFilename( CK_OBJECT_HANDLE xHandle,
  * @brief Reads object value from file system.
  *
  * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existance.
+ * @param[out] pcFileName        The name of the file to check for existence.
  * @param[out] pHandle           The type of the PKCS #11 object.
  *
  */
