@@ -3744,9 +3744,9 @@ void test_pkcs11_C_SignInitSHA256HMAC( void )
 
         PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
         mbedtls_md_init_ExpectAnyArgs();
-        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn(&xObject);
-        mbedtls_md_setup_ExpectAnyArgsAndReturn(0);
-        mbedtls_md_hmac_starts_ExpectAnyArgsAndReturn(0);
+        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn( &xObject );
+        mbedtls_md_setup_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_md_hmac_starts_ExpectAnyArgsAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
         xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
