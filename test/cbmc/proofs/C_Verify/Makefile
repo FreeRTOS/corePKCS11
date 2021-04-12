@@ -28,6 +28,9 @@ REMOVE_FUNCTION_BODY += mbedtls_entropy_init
 REMOVE_FUNCTION_BODY += mbedtls_ctr_drbg_free
 REMOVE_FUNCTION_BODY += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvMbedTLS_Initialize
 
+# SHA256 hashes to 32 bytes always. Need one extra unwind to prove memory safety.
+UNWINDSET += memcmp.0:33
+
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/mbedtls_stubs.c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/core_pkcs11_pal_stubs.c

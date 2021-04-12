@@ -4363,6 +4363,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
     P11Session_t * pxSessionObj;
     int32_t lMbedTLSResult;
     CK_RV xResult = CKR_OK;
+    CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
 
     pxSessionObj = prvSessionPointerFromHandle( hSession );
     xResult = prvCheckValidSessionAndModule( pxSessionObj );
@@ -4381,8 +4382,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
     {
         if( pxSessionObj->xOperationVerifyMechanism == CKM_RSA_X_509 )
         {
-            LogDebug( ( "CKM_RSA_X_509 verify mechanism." ) );
-
             if( ulDataLen != pkcs11RSA_2048_SIGNATURE_LENGTH )
             {
                 LogError( ( "Failed verify operation. Data Length was too "
@@ -4399,8 +4398,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
         }
         else if( pxSessionObj->xOperationVerifyMechanism == CKM_ECDSA )
         {
-            LogDebug( ( "CKM_ECDSA verify mechanism." ) );
-
             if( ulDataLen != pkcs11SHA256_DIGEST_LENGTH )
             {
                 LogError( ( "Failed verify operation. Data Length was too "
@@ -4412,6 +4409,15 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
             {
                 LogError( ( "Failed verify operation. Data Length was too "
                             "short for pkcs11ECDSA_P256_SIGNATURE_LENGTH." ) );
+                xResult = CKR_SIGNATURE_LEN_RANGE;
+            }
+        }
+        else if( pxSessionObj->xOperationVerifyMechanism == CKM_SHA256_HMAC )
+        {
+            if( ulSignatureLen != pkcs11SHA256_DIGEST_LENGTH )
+            {
+                LogError( ( "Failed verify operation. Data Length was too "
+                            "short for pkcs11SHA256_DIGEST_LENGTH." ) );
                 xResult = CKR_SIGNATURE_LEN_RANGE;
             }
         }
@@ -4427,10 +4433,10 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
     /* Verification step. */
     if( xResult == CKR_OK )
     {
-        /* Perform an RSA verification. */
-        if( pxSessionObj->xOperationVerifyMechanism == CKM_RSA_X_509 )
+        if( 0 == mbedtls_mutex_lock( &pxSessionObj->xVerifyMutex ) )
         {
-            if( 0 == mbedtls_mutex_lock( &pxSessionObj->xVerifyMutex ) )
+            /* Perform an RSA verification. */
+            if( pxSessionObj->xOperationVerifyMechanism == CKM_RSA_X_509 )
             {
                 /* Verify the signature. If a public key is present, use it. */
                 if( NULL != pxSessionObj->xVerifyKey.pk_ctx )
@@ -4451,52 +4457,49 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                         xResult = CKR_SIGNATURE_INVALID;
                     }
                 }
+                else
+                {
+                    LogError( ( "Failed verify operation. Verify Key was not "
+                                "present in session context." ) );
 
-                ( void ) mbedtls_mutex_unlock( &pxSessionObj->xVerifyMutex );
+                    xResult = CKR_SIGNATURE_INVALID;
+                }
             }
-            else
+            /* Perform an ECDSA verification. */
+            else if( pxSessionObj->xOperationVerifyMechanism == CKM_ECDSA )
             {
-                LogError( ( "Failed verify operation. Could not take verify mutex." ) );
-                xResult = CKR_CANT_LOCK;
-            }
-        }
-        /* Perform an ECDSA verification. */
-        else if( pxSessionObj->xOperationVerifyMechanism == CKM_ECDSA )
-        {
-            /* An ECDSA signature is comprised of 2 components - R & S.  C_Sign returns them one after another. */
-            mbedtls_ecdsa_context * pxEcdsaContext;
-            mbedtls_mpi xR;
-            mbedtls_mpi xS;
-            mbedtls_mpi_init( &xR );
-            mbedtls_mpi_init( &xS );
+                /* An ECDSA signature is comprised of 2 components - R & S.  C_Sign returns them one after another. */
+                mbedtls_ecdsa_context * pxEcdsaContext;
+                mbedtls_mpi xR;
+                mbedtls_mpi xS;
+                mbedtls_mpi_init( &xR );
+                mbedtls_mpi_init( &xS );
 
-            lMbedTLSResult = mbedtls_mpi_read_binary( &xR, &pSignature[ 0 ], 32 );
-
-            if( lMbedTLSResult != 0 )
-            {
-                xResult = CKR_SIGNATURE_INVALID;
-                LogError( ( "Failed verify operation. Failed to parse R in EC "
-                            "signature: mbed TLS error = %s : %s.",
-                            mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                            mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-            }
-            else
-            {
-                lMbedTLSResult = mbedtls_mpi_read_binary( &xS, &pSignature[ 32 ], 32 );
+                lMbedTLSResult = mbedtls_mpi_read_binary( &xR, &pSignature[ 0 ], 32 );
 
                 if( lMbedTLSResult != 0 )
                 {
                     xResult = CKR_SIGNATURE_INVALID;
-                    LogError( ( "Failed verify operation. Failed to parse S in "
-                                "EC signature: mbed TLS error = %s : %s.",
+                    LogError( ( "Failed verify operation. Failed to parse R in EC "
+                                "signature: mbed TLS error = %s : %s.",
                                 mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                                 mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
                 }
-            }
+                else
+                {
+                    lMbedTLSResult = mbedtls_mpi_read_binary( &xS, &pSignature[ 32 ], 32 );
 
-            if( xResult == CKR_OK )
-            {
-                if( 0 == mbedtls_mutex_lock( &pxSessionObj->xVerifyMutex ) )
+                    if( lMbedTLSResult != 0 )
+                    {
+                        xResult = CKR_SIGNATURE_INVALID;
+                        LogError( ( "Failed verify operation. Failed to parse S in "
+                                    "EC signature: mbed TLS error = %s : %s.",
+                                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                    }
+                }
+
+                if( xResult == CKR_OK )
                 {
                     /* Verify the signature. If a public key is present, use it. */
                     if( NULL != pxSessionObj->xVerifyKey.pk_ctx )
@@ -4504,8 +4507,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                         pxEcdsaContext = pxSessionObj->xVerifyKey.pk_ctx;
                         lMbedTLSResult = mbedtls_ecdsa_verify( &pxEcdsaContext->grp, pData, ulDataLen, &pxEcdsaContext->Q, &xR, &xS );
                     }
-
-                    ( void ) mbedtls_mutex_unlock( &pxSessionObj->xVerifyMutex );
 
                     if( lMbedTLSResult != 0 )
                     {
@@ -4516,18 +4517,56 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                                     mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
                     }
                 }
+
+                mbedtls_mpi_free( &xR );
+                mbedtls_mpi_free( &xS );
+            }
+            else if( pxSessionObj->xOperationVerifyMechanism == CKM_SHA256_HMAC )
+            {
+                lMbedTLSResult = mbedtls_md_hmac_update( &pxSessionObj->xHMACSecretContext, pData, ulDataLen );
+
+                if( lMbedTLSResult != 0 )
+                {
+                    xResult = CKR_SIGNATURE_INVALID;
+                    LogError( ( "Failed verify operation. "
+                                "mbedtls_md_hmac_update failed: mbed TLS error = %s : %s.",
+                                mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                }
                 else
                 {
-                    LogError( ( "Failed verify operation. Could not take verify mutex." ) );
+                    lMbedTLSResult = mbedtls_md_hmac_finish( &pxSessionObj->xHMACSecretContext, pxHMACBuffer );
+
+                    if( lMbedTLSResult != 0 )
+                    {
+                        xResult = CKR_SIGNATURE_INVALID;
+                        LogError( ( "Failed verify operation. "
+                                    "mbedtls_md_hmac_finish failed: mbed TLS error = %s : %s.",
+                                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                    }
+                    else
+                    {
+                        if( 0 != memcmp( pxHMACBuffer, pSignature, pkcs11SHA256_DIGEST_LENGTH ) )
+                        {
+                            xResult = CKR_SIGNATURE_INVALID;
+                            LogError( ( "Failed verify operation. Signature was invalid." ) );
+                        }
+                    }
                 }
             }
+            else
+            {
+                LogError( ( "Failed verify operation. Received an unexpected mechanism." ) );
+            }
 
-            mbedtls_mpi_free( &xR );
-            mbedtls_mpi_free( &xS );
+            ( void ) mbedtls_mutex_unlock( &pxSessionObj->xVerifyMutex );
         }
         else
         {
-            LogError( ( "Failed verify operation. Received an unexpected mechanism." ) );
+            LogError( ( "Failed to initialize verify operation. Could not "
+                        "take xVerifyMutex." ) );
+            xResult = CKR_CANT_LOCK;
         }
     }
 
