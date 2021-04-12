@@ -3753,7 +3753,7 @@ static CK_RV prvSignInitSHA256HMAC( P11Session_t * pxSession,
  * @brief Helper function for cleaning up a sign operation for an EC or RSA key.
  * @param[in] pxSession   Pointer to a valid PKCS #11 session.
  */
-static void prvSignInitECRSACleanUp( P11Session_t * pxSession )
+static void prvSignInitEC_RSACleanUp( P11Session_t * pxSession )
 {
     mbedtls_pk_free( &pxSession->xSignKey );
     pxSession->xSignKeyHandle = CK_INVALID_HANDLE;
@@ -3768,7 +3768,7 @@ static void prvSignInitECRSACleanUp( P11Session_t * pxSession )
  * @param[in] pucKeyData        EC/RSA public key data.
  * @param[in] ulKeyDataLength   EC/RSA public key size.
  */
-static CK_RV prvSignInitECRSAKeys( P11Session_t * pxSession,
+static CK_RV prvSignInitEC_RSAKeys( P11Session_t * pxSession,
                                    CK_MECHANISM_PTR pMechanism,
                                    CK_OBJECT_HANDLE hKey,
                                    CK_BYTE_PTR pucKeyData,
@@ -3796,7 +3796,7 @@ static CK_RV prvSignInitECRSAKeys( P11Session_t * pxSession,
                     "error = %s : %s.",
                     mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                     mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-        prvSignInitECRSACleanUp( pxSession );
+        prvSignInitEC_RSACleanUp( pxSession );
     }
 
     /* Check that the mechanism and key type are compatible, supported. */
@@ -3819,7 +3819,7 @@ static CK_RV prvSignInitECRSAKeys( P11Session_t * pxSession,
                         "RSA or EC mechanism.",
                         ( unsigned long int ) xKeyType ) );
             xResult = CKR_KEY_TYPE_INCONSISTENT;
-            prvSignInitECRSACleanUp( pxSession );
+            prvSignInitEC_RSACleanUp( pxSession );
         }
     }
 
@@ -3943,7 +3943,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
                     }
                     else if( ( pxSession->xSignKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xSignKeyHandle != hKey ) )
                     {
-                        xResult = prvSignInitECRSAKeys( pxSession, pMechanism, hKey, pucKeyData, ulKeyDataLength );
+                        xResult = prvSignInitEC_RSAKeys( pxSession, pMechanism, hKey, pucKeyData, ulKeyDataLength );
                     }
                     else
                     {
