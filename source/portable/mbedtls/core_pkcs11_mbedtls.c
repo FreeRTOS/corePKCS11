@@ -3769,10 +3769,10 @@ static void prvSignInitEC_RSACleanUp( P11Session_t * pxSession )
  * @param[in] ulKeyDataLength   EC/RSA public key size.
  */
 static CK_RV prvSignInitEC_RSAKeys( P11Session_t * pxSession,
-                                   CK_MECHANISM_PTR pMechanism,
-                                   CK_OBJECT_HANDLE hKey,
-                                   CK_BYTE_PTR pucKeyData,
-                                   CK_ULONG ulKeyDataLength )
+                                    CK_MECHANISM_PTR pMechanism,
+                                    CK_OBJECT_HANDLE hKey,
+                                    CK_BYTE_PTR pucKeyData,
+                                    CK_ULONG ulKeyDataLength )
 {
     /* See explanation in prvCheckValidSessionAndModule for this exception. */
     /* coverity[misra_c_2012_rule_10_5_violation] */
