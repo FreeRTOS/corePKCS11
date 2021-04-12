@@ -4179,16 +4179,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
 /* @[declare_pkcs11_mbedtls_c_sign] */
 
 /**
- * @brief Helper function for cleaning up an HMAC verify operation.
- * @param[in] pxSession  Pointer to a valid PKCS #11 session.
- */
-static void prvVerifyInitHMACCleanUp( P11Session_t * pxSession )
-{
-    pxSession->xHMACKeyHandle = CK_INVALID_HANDLE;
-    mbedtls_md_free( &pxSession->xHMACSecretContext );
-}
-
-/**
  * @brief Helper function for initializing a verify operation for SHA256-HMAC.
  * @param[in] pxSession         Pointer to a valid PKCS #11 session.
  * @param[in] hKey              HMAC secret key handle.
@@ -4200,60 +4190,13 @@ static CK_RV prvVerifyInitSHA256HMAC( P11Session_t * pxSession,
                                       CK_BYTE_PTR pucKeyData,
                                       CK_ULONG ulKeyDataLength )
 {
+
     CK_RV xResult = CKR_OK;
-    int32_t lMbedTLSResult = -1;
-    const mbedtls_md_info_t * pxMdInfo = NULL;
 
-    mbedtls_md_init( &pxSession->xHMACSecretContext );
-    pxMdInfo = mbedtls_md_info_from_type( MBEDTLS_MD_SHA256 );
-
-    if( pxMdInfo == NULL )
-    {
-        LogError( ( "Failed to initialize verify operation. "
-                    "mbedtls_md_info_from_type failed. Consider "
-                    "double checking the mbedtls_md_type_t object "
-                    "that was used." ) );
-        xResult = CKR_FUNCTION_FAILED;
-        prvVerifyInitHMACCleanUp( pxSession );
-    }
-
-    if( xResult == CKR_OK )
-    {
-        lMbedTLSResult = mbedtls_md_setup( &pxSession->xHMACSecretContext,
-                                           pxMdInfo,
-                                           PKCS11_USING_HMAC );
-
-        if( lMbedTLSResult != 0 )
-        {
-            LogError( ( "Failed to initialize verify operation. "
-                        "mbedtls_md_setup failed: mbed TLS error = %s : %s.",
-                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-            prvVerifyInitHMACCleanUp( pxSession );
-            xResult = CKR_KEY_HANDLE_INVALID;
-        }
-    }
-
-    if( xResult == CKR_OK )
-    {
-        lMbedTLSResult = mbedtls_md_hmac_starts( &pxSession->xHMACSecretContext,
-                                                 pucKeyData, ulKeyDataLength );
-
-        if( lMbedTLSResult != 0 )
-        {
-            LogError( ( "Failed to initialize verify operation. "
-                        "mbedtls_md_setup failed: mbed TLS error = %s : %s.",
-                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-            prvVerifyInitHMACCleanUp( pxSession );
-            xResult = CKR_KEY_HANDLE_INVALID;
-        }
-    }
-
-    if( xResult == CKR_OK )
-    {
-        pxSession->xHMACKeyHandle = hKey;
-    }
+    xResult = prvInitSHA256HMAC( pxSession,
+                                 hKey,
+                                 pucKeyData,
+                                 ulKeyDataLength );
 
     return xResult;
 }
