@@ -3721,6 +3721,42 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
         prvCommonDeinitStubs( &xSession );
     }
 }
+
+/*!
+ * @brief C_SignInit SHA256-HMAC happy path.
+ *
+ */
+void test_pkcs11_C_SignInitSHA256HMAC( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_MECHANISM xMechanism = { 0 };
+
+    xMechanism.mechanism = CKM_SHA256_HMAC;
+    CK_OBJECT_HANDLE xObject = 0;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateSHA256HMAC( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mbedtls_md_init_ExpectAnyArgs();
+        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn(&xObject);
+        mbedtls_md_setup_ExpectAnyArgsAndReturn(0);
+        mbedtls_md_hmac_starts_ExpectAnyArgsAndReturn(0);
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_SignInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
 /* ======================  TESTING C_Sign  ============================ */
 
 /*!
