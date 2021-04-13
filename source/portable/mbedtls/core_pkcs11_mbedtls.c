@@ -3671,14 +3671,12 @@ static CK_RV prvInitSHA256HMAC( P11Session_t * pxSession,
     int32_t lMbedTLSResult = 0;
     const mbedtls_md_info_t * pxMdInfo = NULL;
 
-    /* Grab the verify mutex.  This ensures that no signing operation
-     * is underway on another thread where modification of key would lead to hard fault.*/
     mbedtls_md_init( &pxSession->xHMACSecretContext );
     pxMdInfo = mbedtls_md_info_from_type( MBEDTLS_MD_SHA256 );
 
     if( pxMdInfo == NULL )
     {
-        LogError( ( "Failed to initialize verify operation. "
+        LogError( ( "Failed to initialize SHA256HMAC operation. "
                     "mbedtls_md_info_from_type failed. Consider "
                     "double checking the mbedtls_md_type_t object "
                     "that was used." ) );
@@ -3694,7 +3692,7 @@ static CK_RV prvInitSHA256HMAC( P11Session_t * pxSession,
 
         if( lMbedTLSResult != 0 )
         {
-            LogError( ( "Failed to initialize verify operation. "
+            LogError( ( "Failed to initialize SHA256HMAC operation. "
                         "mbedtls_md_setup failed: mbed TLS error = %s : %s.",
                         mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                         mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
@@ -3710,7 +3708,7 @@ static CK_RV prvInitSHA256HMAC( P11Session_t * pxSession,
 
         if( lMbedTLSResult != 0 )
         {
-            LogError( ( "Failed to initialize verify operation. "
+            LogError( ( "Failed to initialize SHA256HMAC operation. "
                         "mbedtls_md_setup failed: mbed TLS error = %s : %s.",
                         mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                         mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
@@ -3926,7 +3924,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
     /* Convert the private key from storage format to mbedTLS usable format. */
     if( xResult == CKR_OK )
     {
-        if( 0 == mbedtls_mutex_lock( &pxSession->xVerifyMutex ) )
+        if( 0 == mbedtls_mutex_lock( &pxSession->xSignMutex ) )
         {
             switch( pMechanism->mechanism )
             {
