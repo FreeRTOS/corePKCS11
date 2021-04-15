@@ -3993,7 +3993,7 @@ void test_pkcs11_C_SignSHA256HMACUpdateFail( void )
 
         mbedtls_md_hmac_update_ExpectAnyArgsAndReturn( -1 );
         xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
-        TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
     }
 
     if( TEST_PROTECT() )

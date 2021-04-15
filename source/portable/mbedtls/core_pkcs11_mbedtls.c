@@ -4101,16 +4101,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                     {
                         lMbedTLSResult = mbedtls_md_hmac_update( &pxSessionObj->xHMACSecretContext, pData, ulDataLen );
 
-                        if( lMbedTLSResult != 0 )
+                        if( lMbedTLSResult == 0 )
                         {
-                            xResult = CKR_SIGNATURE_INVALID;
-                            LogError( ( "Failed sign operation. "
-                                        "mbedtls_md_hmac_update failed: mbed TLS error = %s : %s.",
-                                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                            lMbedTLSResult = mbedtls_md_hmac_finish( &pxSessionObj->xHMACSecretContext, pxSignatureBuffer );
                         }
 
-                        lMbedTLSResult = mbedtls_md_hmac_finish( &pxSessionObj->xHMACSecretContext, pxSignatureBuffer );
                         pxSessionObj->xHMACKeyHandle = CK_INVALID_HANDLE;
                     }
                     else
@@ -4143,7 +4138,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                         }
                     }
 
-                    if( lMbedTLSResult != 0 )
+                    if( ( xResult == CKR_OK ) && ( lMbedTLSResult != 0 ) )
                     {
                         LogError( ( "Failed sign operation. mbed TLS error = %s : %s.",
                                     mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
