@@ -3744,7 +3744,7 @@ void test_pkcs11_C_SignInitSHA256HMAC( void )
 
         PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
         mbedtls_md_init_ExpectAnyArgs();
-        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn( &xObject );
+        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn( ( const mbedtls_md_info_t * ) &xObject );
         mbedtls_md_setup_ExpectAnyArgsAndReturn( 0 );
         mbedtls_md_hmac_starts_ExpectAnyArgsAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
@@ -3809,6 +3809,56 @@ void test_pkcs11_C_SignECDSA( void )
 }
 
 /*!
+ * @brief C_Sign ECDSA get size.
+ *
+ */
+void test_pkcs11_C_SignECDSAGetSize( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
+    CK_MECHANISM xMechanism = { 0 };
+    mbedtls_pk_context xSignAndVerifyKey;
+
+    CK_BYTE pxDummyData[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
+    CK_BYTE pxDummySignature[ pkcs11ECDSA_P256_SIGNATURE_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
+
+    xSignAndVerifyKey.pk_ctx = &xResult;
+    xMechanism.mechanism = CKM_ECDSA;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateEcPriv( &xSession, &xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mbedtls_pk_free_CMockIgnore();
+        mbedtls_pk_init_CMockIgnore();
+        mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_pk_sign_IgnoreAndReturn( 0 );
+        mbedtls_pk_sign_ReturnThruPtr_ctx( &xSignAndVerifyKey );
+        PKI_mbedTLSSignatureToPkcs11Signature_IgnoreAndReturn( 0 );
+        xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, NULL, &ulDummySignatureLen );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+        TEST_ASSERT_EQUAL( pkcs11ECDSA_P256_SIGNATURE_LENGTH, ulDummySignatureLen );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
  * @brief C_Sign RSA happy path.
  *
  */
@@ -3849,6 +3899,101 @@ void test_pkcs11_C_SignRSA( void )
         PKI_mbedTLSSignatureToPkcs11Signature_IgnoreAndReturn( 0 );
         xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_Sign SHA256-HMAC happy path.
+ *
+ */
+void test_pkcs11_C_SignSHA256HMAC( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
+    CK_MECHANISM xMechanism = { 0 };
+    mbedtls_pk_context xSignAndVerifyKey;
+
+    CK_BYTE pxDummyData[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
+    CK_BYTE pxDummySignature[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
+
+    xSignAndVerifyKey.pk_ctx = &xResult;
+    xMechanism.mechanism = CKM_SHA256_HMAC;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateSHA256HMAC( &xSession, &xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mbedtls_md_init_ExpectAnyArgs();
+        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn( ( const mbedtls_md_info_t * ) &xMechanism );
+        mbedtls_md_setup_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_md_hmac_starts_ExpectAnyArgsAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_md_hmac_update_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_md_hmac_finish_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_Sign SHA256-HMAC update fail.
+ *
+ */
+void test_pkcs11_C_SignSHA256HMACUpdateFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
+    CK_MECHANISM xMechanism = { 0 };
+    mbedtls_pk_context xSignAndVerifyKey;
+
+    CK_BYTE pxDummyData[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
+    CK_BYTE pxDummySignature[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
+
+    xSignAndVerifyKey.pk_ctx = &xResult;
+    xMechanism.mechanism = CKM_SHA256_HMAC;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateSHA256HMAC( &xSession, &xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mbedtls_md_init_ExpectAnyArgs();
+        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn( ( const mbedtls_md_info_t * ) &xMechanism );
+        mbedtls_md_setup_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_md_hmac_starts_ExpectAnyArgsAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_md_hmac_update_ExpectAnyArgsAndReturn( -1 );
+        xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
+        TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
     }
 
     if( TEST_PROTECT() )

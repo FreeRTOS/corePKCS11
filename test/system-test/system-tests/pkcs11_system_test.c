@@ -1163,6 +1163,12 @@ void test_Verify_EC( void )
 
         result = globalFunctionList->C_Verify( globalSession, hashedMessage, pkcs11SHA256_DIGEST_LENGTH, signaturePKCS, sizeof( signaturePKCS ) );
         TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Verify failed." );
+
+        result = globalFunctionList->C_VerifyInit( globalSession, &mechanism, publicKeyHandle );
+        TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "VerifyInit failed." );
+
+        result = globalFunctionList->C_Verify( globalSession, hashedMessage, pkcs11SHA256_DIGEST_LENGTH, signaturePKCS, sizeof( signaturePKCS ) );
+        TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Verify failed." );
     #endif /* if ( pkcs11testIMPORT_PRIVATE_KEY_SUPPORT == 1 ) */
     /* Modify signature value and make sure verification fails. */
 }
@@ -2118,5 +2124,15 @@ void test_SHA256_HMAC( void )
 
     result = globalFunctionList->C_SignInit( globalSession, &mechanism, hMacKey );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to C_SignInit SHA256 HMAC." );
+
+    result = globalFunctionList->C_Sign( globalSession,
+                                         message,
+                                         sizeof( message ) - 1,
+                                         signature,
+                                         &signatureLength );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "SHA256 HMAC failed." );
+    TEST_ASSERT_EQUAL_MESSAGE( pkcs11SHA256_DIGEST_LENGTH, signatureLength, "SHA 256 HMAC returned an unexpected size." );
+    TEST_ASSERT_EQUAL_MESSAGE( sizeof( knownSignature ), signatureLength, "SHA 256 HMAC returned a size different to the know signature." );
+    TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE( knownSignature, signature, sizeof( knownSignature ), "The PKCS #11 generated signature was different to the known signature." );
 }
 /*-----------------------------------------------------------*/
