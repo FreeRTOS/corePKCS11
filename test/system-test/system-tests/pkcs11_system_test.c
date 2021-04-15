@@ -1163,12 +1163,6 @@ void test_Verify_EC( void )
 
         result = globalFunctionList->C_Verify( globalSession, hashedMessage, pkcs11SHA256_DIGEST_LENGTH, signaturePKCS, sizeof( signaturePKCS ) );
         TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Verify failed." );
-
-        result = globalFunctionList->C_VerifyInit( globalSession, &mechanism, publicKeyHandle );
-        TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "VerifyInit failed." );
-
-        result = globalFunctionList->C_Verify( globalSession, hashedMessage, pkcs11SHA256_DIGEST_LENGTH, signaturePKCS, sizeof( signaturePKCS ) );
-        TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Verify failed." );
     #endif /* if ( pkcs11testIMPORT_PRIVATE_KEY_SUPPORT == 1 ) */
     /* Modify signature value and make sure verification fails. */
 }
