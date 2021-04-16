@@ -3858,7 +3858,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
     CK_OBJECT_HANDLE xPalHandle;
     CK_BYTE_PTR pxLabel = NULL;
     CK_ULONG xLabelLength = 0;
-    mbedtls_pk_type_t xKeyType;
 
     CK_BYTE_PTR pucKeyData = NULL;
     CK_ULONG ulKeyDataLength = 0;
@@ -4003,7 +4002,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
  * @param[in] pData                         Data to be signed.
  *                                          Note: Some applications may require this data to
  *                                          be hashed before passing to C_Sign().
- * @param[in] ulDataLen                      Length of pucData, in bytes.
+ * @param[in] ulDataLen                     Length of pucData, in bytes.
  * @param[out] pSignature                   Buffer where signature will be placed.
  *                                          Caller is responsible for allocating memory.
  *                                          Providing NULL for this input will cause
@@ -4037,7 +4036,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
 
     /* 8 bytes added to hold ASN.1 encoding information. */
     uint8_t ecSignature[ pkcs11ECDSA_P256_SIGNATURE_LENGTH + 8 ];
-    int32_t lMbedTLSResult;
+
+    int32_t lMbedTLSResult = -1;
     mbedtls_md_type_t xHashType = MBEDTLS_MD_NONE;
 
 
@@ -4060,6 +4060,13 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
             xSignatureLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
             xExpectedInputLength = pkcs11SHA256_DIGEST_LENGTH;
             pxSignatureBuffer = ecSignature;
+            xHashType = MBEDTLS_MD_SHA256;
+        }
+        else if( pxSessionObj->xOperationSignMechanism == CKM_SHA256_HMAC )
+        {
+            xSignatureLength = pkcs11SHA256_DIGEST_LENGTH;
+            /* At least 32 bytes, can be longer. */
+            xExpectedInputLength = pkcs11SHA256_DIGEST_LENGTH;
             xHashType = MBEDTLS_MD_SHA256;
         }
         else
@@ -4086,43 +4093,54 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                 xResult = CKR_BUFFER_TOO_SMALL;
             }
 
-            /* Check that input data to be signed is the expected length. */
-            if( CKR_OK == xResult )
-            {
-                if( xExpectedInputLength != ulDataLen )
-                {
-                    LogError( ( "Failed sign operation. The data buffer was "
-                                "too small. Expected: %lu bytes and received "
-                                "%lu bytes.",
-                                ( unsigned long int ) xExpectedInputLength,
-                                ( unsigned long int ) ulDataLen ) );
-                    xResult = CKR_DATA_LEN_RANGE;
-                }
-            }
-
-            /* Sign the data.*/
             if( CKR_OK == xResult )
             {
                 if( 0 == mbedtls_mutex_lock( &pxSessionObj->xSignMutex ) )
                 {
-                    /* Per mbed TLS documentation, if using RSA, md_alg should
-                     * be MBEDTLS_MD_NONE. If ECDSA, md_alg should never be
-                     * MBEDTLS_MD_NONE. SHA-256 will be used for ECDSA for
-                     * consistency with the rest of the port.
-                     */
-                    lMbedTLSResult = mbedtls_pk_sign( &pxSessionObj->xSignKey,
-                                                      xHashType,
-                                                      pData,
-                                                      ulDataLen,
-                                                      pxSignatureBuffer,
-                                                      &xExpectedInputLength,
-                                                      mbedtls_ctr_drbg_random,
-                                                      &xP11Context.xMbedDrbgCtx );
-
-                    if( lMbedTLSResult != 0 )
+                    if( pxSessionObj->xOperationSignMechanism == CKM_SHA256_HMAC )
                     {
-                        LogError( ( "Failed sign operation. mbedtls_pk_sign "
-                                    "failed: mbed TLS error = %s : %s.",
+                        lMbedTLSResult = mbedtls_md_hmac_update( &pxSessionObj->xHMACSecretContext, pData, ulDataLen );
+
+                        if( lMbedTLSResult == 0 )
+                        {
+                            lMbedTLSResult = mbedtls_md_hmac_finish( &pxSessionObj->xHMACSecretContext, pxSignatureBuffer );
+                        }
+
+                        pxSessionObj->xHMACKeyHandle = CK_INVALID_HANDLE;
+                    }
+                    else
+                    {
+                        /* Check that input data to be signed is the expected length. */
+                        if( xExpectedInputLength > ulDataLen )
+                        {
+                            LogError( ( "Failed sign operation. The data buffer was "
+                                        "too small. Expected at least %lu bytes and received "
+                                        "%lu bytes.",
+                                        ( unsigned long int ) xExpectedInputLength,
+                                        ( unsigned long int ) ulDataLen ) );
+                            xResult = CKR_DATA_LEN_RANGE;
+                        }
+                        else
+                        {
+                            /* Per mbed TLS documentation, if using RSA, md_alg should
+                             * be MBEDTLS_MD_NONE. If ECDSA, md_alg should never be
+                             * MBEDTLS_MD_NONE. SHA-256 will be used for ECDSA for
+                             * consistency with the rest of the port.
+                             */
+                            lMbedTLSResult = mbedtls_pk_sign( &pxSessionObj->xSignKey,
+                                                              xHashType,
+                                                              pData,
+                                                              ulDataLen,
+                                                              pxSignatureBuffer,
+                                                              &xExpectedInputLength,
+                                                              mbedtls_ctr_drbg_random,
+                                                              &xP11Context.xMbedDrbgCtx );
+                        }
+                    }
+
+                    if( ( xResult == CKR_OK ) && ( lMbedTLSResult != 0 ) )
+                    {
+                        LogError( ( "Failed sign operation. mbed TLS error = %s : %s.",
                                     mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                                     mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
                         xResult = CKR_FUNCTION_FAILED;
@@ -4139,6 +4157,10 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                     xResult = CKR_CANT_LOCK;
                 }
             }
+        }
+        else
+        {
+            *pulSignatureLen = xSignatureLength;
         }
     }
 
@@ -4642,6 +4664,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                 else
                 {
                     lMbedTLSResult = mbedtls_md_hmac_finish( &pxSessionObj->xHMACSecretContext, pxHMACBuffer );
+                    pxSessionObj->xHMACKeyHandle = CK_INVALID_HANDLE;
 
                     if( lMbedTLSResult != 0 )
                     {
