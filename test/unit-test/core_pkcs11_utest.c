@@ -1,5 +1,5 @@
 /*
- * corePKCS11 V3.0.0
+ * corePKCS11 V3.0.1
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -470,6 +470,7 @@ void test_IotPkcs11_xGetSlotListFreeMemory( void )
     mock_osal_free_Stub( vPkcs11FreeCb );
     xResult = xGetSlotList( &pxSlotId, &xSlotCount );
 
+    TEST_ASSERT_EQUAL( pxSlotId, NULL );
     TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 }
 

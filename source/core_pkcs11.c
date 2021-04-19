@@ -1,5 +1,5 @@
 /*
- * corePKCS11 V3.0.0
+ * corePKCS11 V3.0.1
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -121,6 +121,7 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
     if( ( xResult != CKR_OK ) && ( pxSlotId != NULL ) )
     {
         PKCS11_FREE( pxSlotId );
+        *ppxSlotId = NULL;
     }
 
     return xResult;

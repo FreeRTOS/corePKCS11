@@ -1,6 +1,6 @@
 cmake_minimum_required ( VERSION 3.13.0 )
 project ( "corePKCS11 unit test"
-          VERSION 3.0.0
+          VERSION 3.0.1
           LANGUAGES C )
 
 # Allow the project to be organized into folders.
@@ -81,7 +81,14 @@ add_cmock_targets()
 include( ${MODULE_ROOT_DIR}/tools/cmock/create_test.cmake )
 
 # Include build configuration for unit tests.
+if(UNIT_TESTS)
 add_subdirectory( unit-test )
+endif()
+
+# Include build configuration for system tests.
+if(SYSTEM_TESTS)
+add_subdirectory( system-test )
+endif()
 
 
 #  ==================================== Coverage Analysis configuration ========================================

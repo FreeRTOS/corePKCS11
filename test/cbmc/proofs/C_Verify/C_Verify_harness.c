@@ -1,5 +1,5 @@
 /*
- * corePKCS11 V3.0.0
+ * corePKCS11 V3.0.1
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -57,6 +57,8 @@ typedef struct P11Session
     CK_OBJECT_HANDLE xSignKeyHandle;
     mbedtls_pk_context xSignKey;
     mbedtls_sha256_context xSHA256Context;
+    CK_OBJECT_HANDLE xHMACKeyHandle;
+    mbedtls_md_context_t xHMACSecretContext;
 } P11Session_t;
 
 

@@ -34,6 +34,7 @@ configlabel
 configmax
 configpal
 configsuppress
+copydoc
 copyobject
 coverity
 createmutex
@@ -68,6 +69,7 @@ eawscodesigningkey
 eawsdevicecertificate
 eawsdeviceprivatekey
 eawsdevicepublickey
+eawshmacsecretkey
 ec
 ecdsa
 einvalidhandle
@@ -78,7 +80,6 @@ encryptupdate
 enddot
 endif
 enums
-existance
 exportable
 fillcolor
 findobject
@@ -113,6 +114,7 @@ hbasekey
 helvetica
 hencryptionkey
 hkey
+hmac
 hobject
 href
 hsession
@@ -123,6 +125,7 @@ https
 hunwrappingkey
 iattrib
 ietf
+ifdef
 ifndef
 inc
 ingroup
@@ -224,6 +227,7 @@ pslotlist
 ptemplate
 puc
 pucdata
+puckeydata
 pucsig
 pucsignature
 pucsigptr
@@ -314,6 +318,7 @@ uldatasize
 ulencrypteddatalen
 ulencryptedpartlen
 ulindex
+ulkeydatalength
 ullabelnamelen
 ulmaxobjectcount
 ulnewlen
@@ -356,6 +361,8 @@ xfindobjectlabellen
 xfindobjectwithlabelandclass
 xgetslotlist
 xhandle
+xhmackeyhandle
+xhmacsecretcontext
 xinitializepkcs
 xisinitialized
 xisprivate

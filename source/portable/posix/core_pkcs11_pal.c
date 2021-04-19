@@ -48,7 +48,9 @@
  */
 #define pkcs11palFILE_NAME_CLIENT_CERTIFICATE    "FreeRTOS_P11_Certificate.dat"       /**< The file name of the Certificate object. */
 #define pkcs11palFILE_NAME_KEY                   "FreeRTOS_P11_Key.dat"               /**< The file name of the Key object. */
+#define pkcs11palFILE_NAME_PUBLIC_KEY            "FreeRTOS_P11_PubKey.dat"            /**< The file name of the Public Key object. */
 #define pkcs11palFILE_CODE_SIGN_PUBLIC_KEY       "FreeRTOS_P11_CodeSignKey.dat"       /**< The file name of the Code Sign Key object. */
+#define pkcs11palFILE_HMAC_SECRET_KEY            "FreeRTOS_P11_HMACKey.dat"           /**< The file name of the HMAC Secret Key object. */
 
 /**
  * @ingroup pkcs11_enums
@@ -61,7 +63,8 @@ enum eObjectHandles
     eAwsDevicePrivateKey = 1, /**< Private Key. */
     eAwsDevicePublicKey,      /**< Public Key. */
     eAwsDeviceCertificate,    /**< Certificate. */
-    eAwsCodeSigningKey        /**< Code Signing Key. */
+    eAwsCodeSigningKey,       /**< Code Signing Key. */
+    eAwsHMACSecretKey         /**< HMAC Secret Key. */
 };
 
 /*-----------------------------------------------------------*/
@@ -69,7 +72,7 @@ enum eObjectHandles
 /**
  * @brief Checks to see if a file exists
  *
- * @param[in] pcFileName         The name of the file to check for existance.
+ * @param[in] pcFileName         The name of the file to check for existence.
  *
  * @returns CKR_OK if the file exists, CKR_OBJECT_HANDLE_INVALID if not.
  */
@@ -99,7 +102,7 @@ static CK_RV prvFileExists( const char * pcFileName )
  * @brief Checks to see if a file exists
  *
  * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existance.
+ * @param[out] pcFileName        The name of the file to check for existence.
  * @param[out] pHandle           The type of the PKCS #11 object.
  *
  */
@@ -127,7 +130,7 @@ static void prvLabelToFilenameHandle( const char * pcLabel,
                                pcLabel,
                                sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
         {
-            *pcFileName = pkcs11palFILE_NAME_KEY;
+            *pcFileName = pkcs11palFILE_NAME_PUBLIC_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsDevicePublicKey;
         }
         else if( 0 == strncmp( pkcs11configLABEL_CODE_VERIFICATION_KEY,
@@ -136,6 +139,13 @@ static void prvLabelToFilenameHandle( const char * pcLabel,
         {
             *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsCodeSigningKey;
+        }
+        else if( 0 == strncmp( pkcs11configLABEL_HMAC_KEY,
+                               pcLabel,
+                               sizeof( pkcs11configLABEL_HMAC_KEY ) ) )
+        {
+            *pcFileName = pkcs11palFILE_HMAC_SECRET_KEY;
+            *pHandle = ( CK_OBJECT_HANDLE ) eAwsHMACSecretKey;
         }
         else
         {
@@ -155,7 +165,7 @@ static void prvLabelToFilenameHandle( const char * pcLabel,
  * @brief Maps object handle to file name
  *
  * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existance.
+ * @param[out] pcFileName        The name of the file to check for existence.
  * @param[out] pHandle           The type of the PKCS #11 object.
  *
  */
@@ -182,7 +192,7 @@ static CK_RV prvHandleToFilename( CK_OBJECT_HANDLE xHandle,
                 break;
 
             case eAwsDevicePublicKey:
-                *pcFileName = pkcs11palFILE_NAME_KEY;
+                *pcFileName = pkcs11palFILE_NAME_PUBLIC_KEY;
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
                 break;
@@ -191,6 +201,12 @@ static CK_RV prvHandleToFilename( CK_OBJECT_HANDLE xHandle,
                 *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
+                break;
+
+            case eAwsHMACSecretKey:
+                *pcFileName = pkcs11palFILE_HMAC_SECRET_KEY;
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
                 break;
 
             default:
@@ -210,7 +226,7 @@ static CK_RV prvHandleToFilename( CK_OBJECT_HANDLE xHandle,
  * @brief Reads object value from file system.
  *
  * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existance.
+ * @param[out] pcFileName        The name of the file to check for existence.
  * @param[out] pHandle           The type of the PKCS #11 object.
  *
  */
@@ -422,7 +438,6 @@ CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
     const char * pcFileName = NULL;
     CK_BBOOL xIsPrivate = CK_TRUE;
     CK_RV xResult = CKR_OBJECT_HANDLE_INVALID;
-    FILE * pxFile = NULL;
     int ret = 0;
 
 

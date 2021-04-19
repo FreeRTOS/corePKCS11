@@ -11,3 +11,6 @@ build/
 *.gcda
 *.gcno
 *.gcov
+
+**/*.dat
+**/*.DS_STORE

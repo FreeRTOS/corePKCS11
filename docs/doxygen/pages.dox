@@ -233,6 +233,14 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 
 <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
 <b>Default value (if undefined): </b> `Root Cert`
+
+@section pkcs11configLABEL_HMAC_KEY
+@brief The PKCS #11 label for the AWS Trusted Root Certificate.
+
+The PKCS #11 label for the object to be used for HMAC operations.
+
+<b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
+<b>Default value (if undefined): </b> `HMAC Key`
 */
 
 /**
@@ -265,52 +273,100 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 
 @page pkcs11_mbedtls_function_c_initialize C_Initialize
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_initialize
+@copydoc C_Initialize
+
 @page pkcs11_mbedtls_function_c_finalize C_Finalize
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_finalize
+@copydoc C_Finalize
+
 @page pkcs11_mbedtls_function_c_getfunctionlist C_GetFunctionList
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getfunctionlist
+@copydoc C_GetFunctionList
+
 @page pkcs11_mbedtls_function_c_getslotlist C_GetSlotList
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getslotlist
+@copydoc C_GetSlotList
+
 @page pkcs11_mbedtls_function_c_gettokeninfo C_GetTokenInfo
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_gettokeninfo
+@copydoc C_GetTokenInfo
+
 @page pkcs11_mbedtls_function_c_getmechanisminfo C_GetMechanismInfo
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getmechanisminfo
+@copydoc C_GetMechanismInfo
+
 @page pkcs11_mbedtls_function_c_inittoken C_InitToken
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_inittoken
+@copydoc C_InitToken
+
 @page pkcs11_mbedtls_function_c_opensession C_OpenSession
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_opensession
+@copydoc C_OpenSession
+
 @page pkcs11_mbedtls_function_c_closesession C_CloseSession
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_closesession
+@copydoc C_CloseSession
+
 @page pkcs11_mbedtls_function_c_login C_Login
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_login
+@copydoc C_Login
+
 @page pkcs11_mbedtls_function_c_createobject C_CreateObject
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_createobject
+@copydoc C_CreateObject
+
 @page pkcs11_mbedtls_function_c_destroyobject C_DestroyObject
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_destroyobject
+@copydoc C_DestroyObject
+
 @page pkcs11_mbedtls_function_c_getattributevalue C_GetAttributeValue
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_getattributevalue
+@copydoc C_GetAttributeValue
+
 @page pkcs11_mbedtls_function_c_findobjectsinit C_FindObjectsInit
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_findobjectsinit
+@copydoc C_FindObjectsInit
+
 @page pkcs11_mbedtls_function_c_findobjects C_FindObjects
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_findobjects
+@copydoc C_FindObjects
+
 @page pkcs11_mbedtls_function_c_findobjectsfinal C_FindObjectsFinal
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_findobjectsfinal
+@copydoc C_FindObjectsFinal
+
 @page pkcs11_mbedtls_function_c_digestinit C_DigestInit
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_digestinit
+@copydoc C_DigestInit
+
 @page pkcs11_mbedtls_function_c_digestupdate C_DigestUpdate
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_digestupdate
+@copydoc C_DigestUpdate
+
 @page pkcs11_mbedtls_function_c_digestfinal C_DigestFinal
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_digestfinal
+@copydoc C_DigestFinal
+
 @page pkcs11_mbedtls_function_c_signinit C_SignInit
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_signinit
+@copydoc C_SignInit
+
 @page pkcs11_mbedtls_function_c_verifyinit C_VerifyInit
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_verifyinit
+@copydoc C_VerifyInit
+
 @page pkcs11_mbedtls_function_c_verify C_Verify
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_verify
+@copydoc C_Verify
+
 @page pkcs11_mbedtls_function_c_generatekeypair C_GenerateKeyPair
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_generatekeypair
+@copydoc C_GenerateKeyPair
+
 @page pkcs11_mbedtls_function_c_generate_random C_GenerateRandom
 @snippet core_pkcs11_mbedtls.c declare_pkcs11_mbedtls_c_generate_random
+@copydoc C_GenerateRandom
+
 */
 
 
@@ -326,21 +382,27 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 
 @page pkcs11_core_xinitializepkcs11 xInitializePKCS11
 @snippet core_pkcs11.h declare_pkcs11_core_xinitializepkcs11
+@copydoc xInitializePKCS11
 
 @page pkcs11_core_xgetslotlist xGetSlotList
 @snippet core_pkcs11.h declare_pkcs11_core_xgetslotlist
+@copydoc xGetSlotList
 
 @page pkcs11_core_xinitializepkcs11token xInitializePkcs11Token
 @snippet core_pkcs11.h declare_pkcs11_core_xinitializepkcs11token
+@copydoc xInitializePkcs11Token
 
 @page pkcs11_core_xinitializepkcs11session  xInitializePkcs11Session
 @snippet core_pkcs11.h declare_pkcs11_core_xinitializepkcs11session
+@copydoc xInitializePkcs11Session
 
 @page pkcs11_core_xfindobjectwithlabelandclass  xFindObjectWithLabelAndClass
 @snippet core_pkcs11.h declare_pkcs11_core_xfindobjectwithlabelandclass
+@copydoc xFindObjectWithLabelAndClass
 
 @page pkcs11_core_vappendsha256algorithmidentifiersequence  vAppendSHA256AlgorithmIdentifierSequence
 @snippet core_pkcs11.h declare_pkcs11_core_vappendsha256algorithmidentifiersequence
+@copydoc vAppendSHA256AlgorithmIdentifierSequence
 */
 
 /**
@@ -355,21 +417,27 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 
 @page pkcs11_pal_initialize PKCS11_PAL_Initialize
 @snippet core_pkcs11_pal.h declare_pkcs11_pal_initialize
+@copydoc PKCS11_PAL_Initialize
 
 @page pkcs11_pal_saveobject PKCS11_PAL_SaveObject
 @snippet core_pkcs11_pal.h declare_pkcs11_pal_saveobject
+@copydoc PKCS11_PAL_SaveObject
 
 @page pkcs11_pal_destroyobject PKCS11_PAL_DestroyObject
 @snippet core_pkcs11_pal.h declare_pkcs11_pal_destroyobject
+@copydoc PKCS11_PAL_DestroyObject
 
 @page pkcs11_pal_findobject PKCS11_PAL_FindObject
 @snippet core_pkcs11_pal.h declare_pkcs11_pal_findobject
+@copydoc PKCS11_PAL_FindObject
 
 @page pkcs11_pal_getobjectvalue PKCS11_PAL_GetObjectValue
 @snippet core_pkcs11_pal.h declare_pkcs11_pal_getobjectvalue
+@copydoc PKCS11_PAL_GetObjectValue
 
 @page pkcs11_pal_getobjectvaluecleanup PKCS11_PAL_GetObjectValueCleanup
 @snippet core_pkcs11_pal.h declare_pkcs11_pal_getobjectvaluecleanup
+@copydoc PKCS11_PAL_GetObjectValueCleanup
 */
 
 /**
@@ -380,7 +448,9 @@ The PKCS #11 label for the AWS Trusted Root Certificate.
 
 @page pkcs11_utils_pkipkcs11signaturetombedtlssignature PKI_mbedTLSSignatureToPkcs11Signature
 @snippet core_pki_utils.h declare_pkcs11_utils_pkipkcs11signaturetombedtlssignature
+@copydoc PKI_mbedTLSSignatureToPkcs11Signature
 
 @page pkcs11_utils_pkimbedtlssignaturetopkcs11signature PKI_pkcs11SignatureTombedTLSSignature
 @snippet core_pki_utils.h declare_pkcs11_utils_pkimbedtlssignaturetopkcs11signature
+@copydoc PKI_pkcs11SignatureTombedTLSSignature
 */

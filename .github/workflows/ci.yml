@@ -8,6 +8,24 @@ on:
   workflow_dispatch:
 
 jobs:
+  systemtests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone This Repo
+        uses: actions/checkout@v2
+      - name: Build
+        run: |
+          cmake -S test -B build/ \
+          -G "Unix Makefiles" \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DBUILD_CLONE_SUBMODULES=ON \
+          -DSYSTEM_TESTS=1 \
+          -DCMAKE_C_FLAGS='-Wall -Wextra -DNDEBUG'
+          make -C build/ all
+      - name: System Tests
+        run: |
+          cd build/
+          ctest --output-on-failure
   unittest:
     runs-on: ubuntu-latest
     steps:
@@ -20,12 +38,13 @@ jobs:
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
           -DBUILD_CLONE_SUBMODULES=ON \
+          -DUNIT_TESTS=1 \
           -DCMAKE_C_FLAGS='--coverage -Wall -Wextra -DNDEBUG'
           make -C build/ all
-      - name: Test
+      - name: Unit Tests
         run: |
           cd build/
-          ctest -E system --output-on-failure
+          ctest --output-on-failure
           cd ..
       - name: Coverage
         run: |
@@ -143,6 +162,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: git submodule update --init --recursive --checkout
+      - name: Install Python3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7.10'
       - name: Measure sizes
         uses: FreeRTOS/CI-CD-Github-Actions/memory_statistics@main
         with:
