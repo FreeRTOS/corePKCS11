@@ -46,6 +46,7 @@
 #include "mbedtls/platform.h"
 #include "mbedtls/threading.h"
 #include "mbedtls/cipher.h"
+#include "mbedtls/cmac.h"
 
 /* Custom mbedtls utils include. */
 #include "mbedtls_error.h"
@@ -4346,6 +4347,16 @@ static CK_RV prvVerifyInitSHA256HMAC( P11Session_t * pxSession,
     return xResult;
 }
 
+/**
+ * @brief Helper function for cleaning up an CMAC verify operation.
+ * @param[in] pxSession  Pointer to a valid PKCS #11 session.
+ */
+static void prvVerifyInitCMACCleanUp( P11Session_t * pxSession )
+{
+    pxSession->xHMACKeyHandle = CK_INVALID_HANDLE;
+    mbedtls_cipher_free(&pxSession->xCMACSecretContext);
+}
+
 static CK_RV prvVerifyInitAESCMAC( P11Session_t * pxSession,
                                    CK_OBJECT_HANDLE hKey,
                                    CK_BYTE_PTR pucKeyData,
@@ -4353,10 +4364,59 @@ static CK_RV prvVerifyInitAESCMAC( P11Session_t * pxSession,
 {
     CK_RV xResult = CKR_OK;
     int32_t lMbedTLSResult = -1;
-    const mbedtls_cipher_context_t * pxMdInfo = NULL;
+    const mbedtls_cipher_info_t * pxCipherInfo = NULL;
 
+    mbedtls_cipher_init(&pxSession->xCMACSecretContext);
+    pxCipherInfo = mbedtls_cipher_info_from_type( MBEDTLS_CIPHER_AES_128_ECB );
 
+    if( pxCipherInfo == NULL )
+    {
+        LogError( ( "Failed to initialize verify operation. "
+                    "mbedtls_ciphre_info_from_type failed. Consider "
+                    "double checking the mbedtls_md_type_t object "
+                    "that was used." ) );
+        xResult = CKR_FUNCTION_FAILED;
+        prvVerifyInitHMACCleanUp( pxSession );
+    }
 
+    if( xResult == CKR_OK )
+    {
+        lMbedTLSResult = mbedtls_cipher_setup( &pxSession->xCMACSecretContext,
+                                               pxCipherInfo );
+
+        if( lMbedTLSResult != 0 )
+        {
+            LogError( ( "Failed to initialize verify operation. "
+                        "mbedtls_cipher_setup failed: mbed TLS error = %s : %s.",
+                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+            prvVerifyInitCMACCleanUp( pxSession );
+            xResult = CKR_KEY_HANDLE_INVALID;
+        }
+    }
+
+    if( xResult == CKR_OK )
+    {
+        lMbedTLSResult = mbedtls_cipher_cmac_starts( &pxSession->xCMACSecretContext,
+                                                     pucKeyData, 8 * ulKeyDataLength );
+
+        if( lMbedTLSResult != 0 )
+        {
+            LogError( ( "Failed to initialize verify operation. "
+                        "mbedtls_md_setup failed: mbed TLS error = %s : %s.",
+                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+            prvVerifyInitCMACCleanUp( pxSession );
+            xResult = CKR_KEY_HANDLE_INVALID;
+        }
+    }
+
+    if( xResult == CKR_OK )
+    {
+        pxSession->xHMACKeyHandle = hKey;
+    }
+
+    return xResult;
 }
 
 /**
