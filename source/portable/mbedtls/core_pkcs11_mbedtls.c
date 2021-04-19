@@ -3772,9 +3772,6 @@ static CK_RV prvSignInitEC_RSAKeys( P11Session_t * pxSession,
                                     CK_BYTE_PTR pucKeyData,
                                     CK_ULONG ulKeyDataLength )
 {
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
-    /* coverity[misra_c_2012_rule_10_5_violation] */
-    CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
     mbedtls_pk_type_t xKeyType;
     int32_t lMbedTLSResult = 0;
     CK_RV xResult = CKR_KEY_HANDLE_INVALID;
@@ -3861,7 +3858,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
 
     CK_BYTE_PTR pucKeyData = NULL;
     CK_ULONG ulKeyDataLength = 0;
-    int32_t lMbedTLSResult = 0;
 
     P11Session_t * pxSession = prvSessionPointerFromHandle( hSession );
     CK_RV xResult = prvCheckValidSessionAndModule( pxSession );
@@ -3930,15 +3926,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
                 case CKM_RSA_PKCS:
                 case CKM_ECDSA:
 
-                    /* See explanation in prvCheckValidSessionAndModule for this exception. */
-                    /* coverity[misra_c_2012_rule_10_5_violation] */
-                    if( xIsPrivate != ( CK_BBOOL ) CK_TRUE )
-                    {
-                        LogError( ( "Failed to initialize sign operation. Sign "
-                                    "operation attempted with private key." ) );
-                        xResult = CKR_KEY_TYPE_INCONSISTENT;
-                    }
-                    else if( ( pxSession->xSignKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xSignKeyHandle != hKey ) )
+                    if( ( pxSession->xSignKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xSignKeyHandle != hKey ) )
                     {
                         xResult = prvSignInitEC_RSAKeys( pxSession, pMechanism, hKey, pucKeyData, ulKeyDataLength );
                     }
