@@ -4168,6 +4168,42 @@ void test_pkcs11_C_SignInitSHA256HMAC( void )
         prvCommonDeinitStubs( &xSession );
     }
 }
+
+/*!
+ * @brief C_SignInit AES-CMAC happy path.
+ *
+ */
+void test_pkcs11_C_SignInitAESCMAC( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_MECHANISM xMechanism = { 0 };
+
+    xMechanism.mechanism = CKM_AES_CMAC;
+    CK_OBJECT_HANDLE xObject = 0;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateAESCMAC( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mbedtls_cipher_init_ExpectAnyArgs();
+        mbedtls_cipher_info_from_type_ExpectAnyArgsAndReturn( ( const mbedtls_md_info_t * ) &xObject );
+        mbedtls_cipher_setup_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_cipher_cmac_starts_ExpectAnyArgsAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_SignInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
 /* ======================  TESTING C_Sign  ============================ */
 
 /*!
@@ -4403,6 +4439,101 @@ void test_pkcs11_C_SignSHA256HMACUpdateFail( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         mbedtls_md_hmac_update_ExpectAnyArgsAndReturn( -1 );
+        xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_Sign AES-CMAC happy path.
+ *
+ */
+void test_pkcs11_C_SignAESCMAC( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
+    CK_MECHANISM xMechanism = { 0 };
+    mbedtls_pk_context xSignAndVerifyKey;
+
+    CK_BYTE pxDummyData[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
+    CK_BYTE pxDummySignature[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
+
+    xSignAndVerifyKey.pk_ctx = &xResult;
+    xMechanism.mechanism = CKM_AES_CMAC;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateAESCMAC( &xSession, &xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mbedtls_cipher_init_ExpectAnyArgs();
+        mbedtls_cipher_info_from_type_ExpectAnyArgsAndReturn( ( const mbedtls_md_info_t * ) &xMechanism );
+        mbedtls_cipher_setup_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_cipher_cmac_starts_ExpectAnyArgsAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_cipher_cmac_update_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_cipher_cmac_finish_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_Sign AES-CMAC update fail.
+ *
+ */
+void test_pkcs11_C_SignAESCMACUpdateFail( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
+    CK_MECHANISM xMechanism = { 0 };
+    mbedtls_pk_context xSignAndVerifyKey;
+
+    CK_BYTE pxDummyData[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
+    CK_BYTE pxDummySignature[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
+
+    xSignAndVerifyKey.pk_ctx = &xResult;
+    xMechanism.mechanism = CKM_AES_CMAC;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateAESCMAC( &xSession, &xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mbedtls_cipher_init_ExpectAnyArgs();
+        mbedtls_cipher_info_from_type_ExpectAnyArgsAndReturn( ( const mbedtls_md_info_t * ) &xMechanism );
+        mbedtls_cipher_setup_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_cipher_cmac_starts_ExpectAnyArgsAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_SignInit( xSession, &xMechanism, xKey );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_cipher_cmac_update_ExpectAnyArgsAndReturn( -1 );
         xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
     }
