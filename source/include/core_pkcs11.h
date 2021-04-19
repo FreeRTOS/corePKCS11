@@ -93,6 +93,12 @@
 
 /**
  * @ingroup pkcs11_wrapper_macros
+ * @brief Length of a CMAC signarutre, in bytes.
+ */
+#define pkcs11AES_CMAC_SIGNATURE_LENGTH           32UL
+
+/**
+ * @ingroup pkcs11_wrapper_macros
  * @brief Length of a curve P-256 ECDSA signature, in bytes.
  * PKCS #11 EC signatures are represented as a 32-bit R followed
  * by a 32-bit S value, and not ASN.1 encoded.

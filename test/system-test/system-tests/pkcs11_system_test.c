@@ -2130,3 +2130,76 @@ void test_SHA256_HMAC( void )
     TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE( knownSignature, signature, sizeof( knownSignature ), "The PKCS #11 generated signature was different to the known signature." );
 }
 /*-----------------------------------------------------------*/
+
+void test_AES_CMAC( void )
+{
+    CK_RV result;
+    CK_FUNCTION_LIST_PTR functionList;
+
+    CK_BYTE label[] = pkcs11testLABEL_CMAC_KEY;
+    CK_KEY_TYPE cmacKeyType = CKK_AES;
+    CK_OBJECT_CLASS cmacKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL trueObject = CK_TRUE;
+
+    CK_OBJECT_HANDLE cMacKey;
+
+    /* Min Key Size is 16 Bytes */
+    CK_BYTE keyValue[] = { 0x11, 0x22, 0x33, 0x44,
+                           0x11, 0x22, 0x33, 0x44,
+                           0x11, 0x22, 0x33, 0x44,
+                           0x11, 0x22, 0x33, 0x44 };
+    CK_BYTE message[] = "Hello world";
+    CK_BYTE signature[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0 };
+    size_t signatureLength = sizeof( signature );
+
+    CK_MECHANISM mechanism =
+    {
+        CKM_AES_CMAC, NULL_PTR, 0
+    };
+
+    /* Generated with: */
+    /* $ echo -n "Hello world" | openssl dgst -mac cmac -macopt cipher:aes-128-cbc -macopt hexkey:11223344112233441122334411223344 */
+    CK_BYTE knownSignature[] =
+    {
+        0x36, 0xcd, 0xa8, 0x42,
+        0x6c, 0xbb, 0xec, 0xae, 
+        0x10, 0x78, 0x3e, 0xb7,
+        0x2e, 0x52, 0x62, 0xb7
+    };
+
+    result = C_GetFunctionList( &functionList );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to get PKCS #11 function list." );
+
+    CK_ATTRIBUTE aes_cmac_template[] =
+    {
+        { CKA_CLASS,    &cmacKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &cmacKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    label,         sizeof( label ) - 1       },
+        { CKA_TOKEN,    &trueObject,   sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &trueObject,   sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &trueObject,   sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    keyValue,      sizeof( keyValue ) - 1    }
+    };
+
+
+    /* Create the template objects */
+    result = functionList->C_CreateObject( globalSession,
+                                           ( CK_ATTRIBUTE_PTR ) &aes_cmac_template,
+                                           sizeof( aes_cmac_template ) / sizeof( CK_ATTRIBUTE ),
+                                           &cMacKey );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to create AES CMAC object." );
+    TEST_ASSERT_NOT_EQUAL_MESSAGE( CK_INVALID_HANDLE, cMacKey, "AES CMAC key is invalid." );
+
+
+    result = globalFunctionList->C_VerifyInit( globalSession, &mechanism, cMacKey );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to C_VerifyInit SHA256 HMAC." );
+
+
+    /* Verify the precomputed signature */
+    result = globalFunctionList->C_Verify( globalSession,
+                                           message,
+                                           sizeof( message ) - 1,
+                                           knownSignature,
+                                           sizeof( knownSignature ) );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "AES CMAC failed to verify the known signature." );
+}
