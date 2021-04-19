@@ -299,7 +299,7 @@ typedef struct P11Session
     CK_OBJECT_HANDLE xHMACKeyHandle;             /**< @brief Object handle to the HMAC key. */
     mbedtls_md_context_t xHMACSecretContext;     /**< @brief Context for in progress HMAC operation. Set during C_SignInit or C_VerifyInit. */
     CK_OBJECT_HANDLE xCMACKeyHandle;             /**< @brief Object handle to the CMAC key. */
-    mbedtls_cipher_context_t xCMACSecretContext; /**< @brief Context for in progress CHMAC operation. Set during C_SignInit or C_VerifyInit. */
+    mbedtls_cipher_context_t xCMACSecretContext; /**< @brief Context for in progress CMAC operation. Set during C_SignInit or C_VerifyInit. */
 } P11Session_t;
 
 /*-----------------------------------------------------------*/

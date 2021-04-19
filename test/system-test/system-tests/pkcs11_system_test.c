@@ -2077,12 +2077,6 @@ void test_AES_CMAC( void )
         CKM_AES_CMAC, NULL_PTR, 0
     };
 
-    /* Generated with:
-     * $ echo -n "Hello world" | openssl dgst -mac cmac -macopt cipher:aes-128-cbc -macopt hexkey:11223344556677889900112233445566 -binary | hexdump
-     */
-    CK_BYTE knownSignature[] = { 0xe8, 0x6c, 0x61, 0xd5, 0x46, 0x42, 0x84, 0x19, 0x1a, 0x95, 0xf3, 0x2d, 0x61, 0x2a, 0x2d, 0x19 };
-
-
     result = C_GetFunctionList( &functionList );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to get PKCS #11 function list." );
 
