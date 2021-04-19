@@ -155,6 +155,8 @@ list(APPEND mock_list
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/pk.h"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/x509_crt.h"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/md.h"
+            "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/cmac.h"
+            "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/cipher.h"
             "${MODULE_ROOT_DIR}/source/include/core_pki_utils.h"
     )
 
