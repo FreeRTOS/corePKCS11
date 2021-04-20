@@ -2161,7 +2161,7 @@ void test_AES_CMAC( void )
     };
 
     /* Generated with: */
-    /* $ echo -n "Hello world" | openssl dgst -mac cmac -macopt cipher:aes-128-cbc -macopt hexkey:11223344112233441122334411223344 */
+    /* $ echo -n "Hello world" | openssl dgst -mac cmac -macopt cipher:aes-128-ecb -macopt hexkey:11223344112233441122334411223344 */
     CK_BYTE knownSignature[] =
     {
         0x36, 0xcd, 0xa8, 0x42,

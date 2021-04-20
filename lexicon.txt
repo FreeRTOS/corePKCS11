@@ -1,3 +1,4 @@
+aes
 alg
 algorithmidentifier
 algorithmidentifiersequence
@@ -23,6 +24,7 @@ cko
 ckr
 closeallsessions
 closesession
+cmac
 codesignkey
 colspan
 com
@@ -61,6 +63,7 @@ digestinit
 digestkey
 digestupdate
 drbg
+eawscmacsecretkey
 eawscodesigningkey
 eawsdevicecertificate
 eawsdeviceprivatekey
@@ -308,6 +311,8 @@ www
 xapphandle
 xbyte
 xcertificatetype
+xcmackeyhandle
+xcmacsecretcontext
 xclass
 xfindobjectlabellen
 xfindobjectwithlabelandclass

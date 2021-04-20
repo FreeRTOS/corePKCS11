@@ -93,7 +93,7 @@
 
 /**
  * @ingroup pkcs11_wrapper_macros
- * @brief Length of a CMAC signarutre, in bytes.
+ * @brief Length of a CMAC signature, in bytes.
  */
 #define pkcs11AES_CMAC_SIGNATURE_LENGTH      32UL
 

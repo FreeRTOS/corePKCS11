@@ -2588,7 +2588,6 @@ static CK_RV prvCreateAESCMAC( CK_ATTRIBUTE * pxTemplate,
         xResult = CKR_ARGUMENTS_BAD;
     }
 
-    /* TODO: Why is this called "creating key" when the key already exists? Perhaps "load key"? */
     if( xResult == CKR_OK )
     {
         for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
@@ -2602,7 +2601,6 @@ static CK_RV prvCreateAESCMAC( CK_ATTRIBUTE * pxTemplate,
         }
     }
 
-    /* TODO: Check with Carl on what size checks are appropriate and where to source the size vars/macros */
     if( ( xResult == CKR_OK ) && ( pxSecretKeyValue != NULL ) )
     {
         xPalHandle = PKCS11_PAL_SaveObject( pxLabel,
@@ -4936,7 +4934,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                     }
                     else
                     {
-                        /* TODO: Verify output sizes and use appropriate */
                         if( 0 != memcmp( pxCMACBuffer, pSignature, MBEDTLS_AES_BLOCK_SIZE ) )
                         {
                             xResult = CKR_SIGNATURE_INVALID;
