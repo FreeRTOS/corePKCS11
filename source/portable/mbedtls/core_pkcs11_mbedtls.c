@@ -4357,6 +4357,13 @@ static void prvVerifyInitCMACCleanUp( P11Session_t * pxSession )
     mbedtls_cipher_free(&pxSession->xCMACSecretContext);
 }
 
+/**
+ * @brief Helper function for initializing a verify operation for AES-CMAC.
+ * @param[in] pxSession         Pointer to a valid PKCS #11 session.
+ * @param[in] hKey              CMAC secret key handle.
+ * @param[in] pucKeyData        CMAC secret key data.
+ * @param[in] ulKeyDataLength   CMAC key Size.
+ */
 static CK_RV prvVerifyInitAESCMAC( P11Session_t * pxSession,
                                    CK_OBJECT_HANDLE hKey,
                                    CK_BYTE_PTR pucKeyData,
