@@ -232,7 +232,7 @@
  * @ingroup pkcs11_macros
  * @brief Private define for minimum AES-CMAC key size, in bytes.
  */
-#define PKCS11_AES_CMAC_MIN_SIZE        ( 16UL )
+#define PKCS11_AES_CMAC_MIN_SIZE           ( 16UL )
 
 /**
  * @ingroup pkcs11_macros
@@ -2538,6 +2538,7 @@ static CK_RV prvCMACKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             break;
 
         case ( CKA_VALUE ):
+
             if( ( pxAttribute->ulValueLen >= PKCS11_AES_CMAC_MIN_SIZE ) &&
                 ( pxAttribute->pValue != NULL ) )
             {
@@ -2736,8 +2737,8 @@ static CK_RV prvCreateSecretKey( CK_ATTRIBUTE * pxTemplate,
     }
     else if( xKeyType == CKK_AES )
     {
-        xResult = prvCreateAESCMAC( pxTemplate, 
-                                    ulCount, 
+        xResult = prvCreateAESCMAC( pxTemplate,
+                                    ulCount,
                                     pxObject );
     }
     else
@@ -4354,7 +4355,7 @@ static CK_RV prvVerifyInitSHA256HMAC( P11Session_t * pxSession,
 static void prvVerifyInitCMACCleanUp( P11Session_t * pxSession )
 {
     pxSession->xHMACKeyHandle = CK_INVALID_HANDLE;
-    mbedtls_cipher_free(&pxSession->xCMACSecretContext);
+    mbedtls_cipher_free( &pxSession->xCMACSecretContext );
 }
 
 /**
@@ -4373,7 +4374,7 @@ static CK_RV prvVerifyInitAESCMAC( P11Session_t * pxSession,
     int32_t lMbedTLSResult = -1;
     const mbedtls_cipher_info_t * pxCipherInfo = NULL;
 
-    mbedtls_cipher_init(&pxSession->xCMACSecretContext);
+    mbedtls_cipher_init( &pxSession->xCMACSecretContext );
     pxCipherInfo = mbedtls_cipher_info_from_type( MBEDTLS_CIPHER_AES_128_ECB );
 
     if( pxCipherInfo == NULL )
@@ -4635,12 +4636,14 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
                     }
 
                     break;
-                
+
                 case CKM_AES_CMAC:
+
                     if( ( pxSession->xHMACKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xCMACKeyHandle != hKey ) )
                     {
                         xResult = prvVerifyInitAESCMAC( pxSession, hKey, pucKeyData, ulKeyDataLength );
                     }
+
                     break;
 
                 default:
@@ -4910,7 +4913,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
             else if( pxSessionObj->xOperationVerifyMechanism == CKM_AES_CMAC )
             {
                 lMbedTLSResult = mbedtls_cipher_cmac_update( &pxSessionObj->xCMACSecretContext, pData, ulDataLen );
-                
+
                 if( lMbedTLSResult != 0 )
                 {
                     xResult = CKR_SIGNATURE_INVALID;
@@ -4933,7 +4936,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                     }
                     else
                     {
-                        // TODO: Verify output sizes and use appropriate 
+                        /* TODO: Verify output sizes and use appropriate */
                         if( 0 != memcmp( pxCMACBuffer, pSignature, MBEDTLS_AES_BLOCK_SIZE ) )
                         {
                             xResult = CKR_SIGNATURE_INVALID;

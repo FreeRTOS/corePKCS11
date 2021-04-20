@@ -218,7 +218,7 @@ static CK_RV prvHandleToFilename( CK_OBJECT_HANDLE xHandle,
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
                 break;
-            
+
             case eAwsCMACSecretKey:
                 *pcFileName = pkcs11palFILE_CMAC_SECRET_KEY;
                 /* coverity[misra_c_2012_rule_10_5_violation] */

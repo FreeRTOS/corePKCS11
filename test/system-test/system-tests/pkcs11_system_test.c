@@ -2144,10 +2144,13 @@ void test_AES_CMAC( void )
     CK_OBJECT_HANDLE cMacKey;
 
     /* Min Key Size is 16 Bytes */
-    CK_BYTE keyValue[] = { 0x11, 0x22, 0x33, 0x44,
-                           0x11, 0x22, 0x33, 0x44,
-                           0x11, 0x22, 0x33, 0x44,
-                           0x11, 0x22, 0x33, 0x44 };
+    CK_BYTE keyValue[] =
+    {
+        0x11, 0x22, 0x33, 0x44,
+        0x11, 0x22, 0x33, 0x44,
+        0x11, 0x22, 0x33, 0x44,
+        0x11, 0x22, 0x33, 0x44
+    };
     CK_BYTE message[] = "Hello world";
     CK_BYTE signature[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0 };
     size_t signatureLength = sizeof( signature );
@@ -2162,7 +2165,7 @@ void test_AES_CMAC( void )
     CK_BYTE knownSignature[] =
     {
         0x36, 0xcd, 0xa8, 0x42,
-        0x6c, 0xbb, 0xec, 0xae, 
+        0x6c, 0xbb, 0xec, 0xae,
         0x10, 0x78, 0x3e, 0xb7,
         0x2e, 0x52, 0x62, 0xb7
     };
@@ -2178,7 +2181,7 @@ void test_AES_CMAC( void )
         { CKA_TOKEN,    &trueObject,   sizeof( CK_BBOOL )        },
         { CKA_SIGN,     &trueObject,   sizeof( CK_BBOOL )        },
         { CKA_VERIFY,   &trueObject,   sizeof( CK_BBOOL )        },
-        { CKA_VALUE,    keyValue,      sizeof( keyValue )    }
+        { CKA_VALUE,    keyValue,      sizeof( keyValue )        }
     };
 
 
