@@ -51,6 +51,8 @@
 #define pkcs11palFILE_NAME_PUBLIC_KEY            "FreeRTOS_P11_PubKey.dat"            /**< The file name of the Public Key object. */
 #define pkcs11palFILE_CODE_SIGN_PUBLIC_KEY       "FreeRTOS_P11_CodeSignKey.dat"       /**< The file name of the Code Sign Key object. */
 #define pkcs11palFILE_HMAC_SECRET_KEY            "FreeRTOS_P11_HMACKey.dat"           /**< The file name of the HMAC Secret Key object. */
+#define pkcs11palFILE_CMAC_SECRET_KEY            "FreeRTOS_P11_CMACKey.dat"           /**< The file name of the CMAC Secret Key object. */
+
 
 /**
  * @ingroup pkcs11_enums
@@ -64,7 +66,8 @@ enum eObjectHandles
     eAwsDevicePublicKey,      /**< Public Key. */
     eAwsDeviceCertificate,    /**< Certificate. */
     eAwsCodeSigningKey,       /**< Code Signing Key. */
-    eAwsHMACSecretKey         /**< HMAC Secret Key. */
+    eAwsHMACSecretKey,        /**< HMAC Secret Key. */
+    eAwsCMACSecretKey         /**< HMAC Secret Key. */
 };
 
 /*-----------------------------------------------------------*/
@@ -147,6 +150,13 @@ static void prvLabelToFilenameHandle( const char * pcLabel,
             *pcFileName = pkcs11palFILE_HMAC_SECRET_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsHMACSecretKey;
         }
+        else if( 0 == strncmp( pkcs11configLABEL_CMAC_KEY,
+                               pcLabel,
+                               sizeof( pkcs11configLABEL_CMAC_KEY ) ) )
+        {
+            *pcFileName = pkcs11palFILE_CMAC_SECRET_KEY;
+            *pHandle = ( CK_OBJECT_HANDLE ) eAwsCMACSecretKey;
+        }
         else
         {
             *pcFileName = NULL;
@@ -205,6 +215,12 @@ static CK_RV prvHandleToFilename( CK_OBJECT_HANDLE xHandle,
 
             case eAwsHMACSecretKey:
                 *pcFileName = pkcs11palFILE_HMAC_SECRET_KEY;
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
+                break;
+            
+            case eAwsCMACSecretKey:
+                *pcFileName = pkcs11palFILE_CMAC_SECRET_KEY;
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
                 break;

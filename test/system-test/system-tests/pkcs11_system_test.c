@@ -2178,7 +2178,7 @@ void test_AES_CMAC( void )
         { CKA_TOKEN,    &trueObject,   sizeof( CK_BBOOL )        },
         { CKA_SIGN,     &trueObject,   sizeof( CK_BBOOL )        },
         { CKA_VERIFY,   &trueObject,   sizeof( CK_BBOOL )        },
-        { CKA_VALUE,    keyValue,      sizeof( keyValue ) - 1    }
+        { CKA_VALUE,    keyValue,      sizeof( keyValue )    }
     };
 
 

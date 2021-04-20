@@ -4698,6 +4698,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
     int32_t lMbedTLSResult;
     CK_RV xResult = CKR_OK;
     CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
+    CK_BYTE pxCMACBuffer[ MBEDTLS_AES_BLOCK_SIZE ] = { 0 };
 
     pxSessionObj = prvSessionPointerFromHandle( hSession );
     xResult = prvCheckValidSessionAndModule( pxSessionObj );
@@ -4752,6 +4753,15 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
             {
                 LogError( ( "Failed verify operation. Data Length was too "
                             "short for pkcs11SHA256_DIGEST_LENGTH." ) );
+                xResult = CKR_SIGNATURE_LEN_RANGE;
+            }
+        }
+        else if( pxSessionObj->xOperationVerifyMechanism == CKM_AES_CMAC )
+        {
+            if( ulSignatureLen != MBEDTLS_AES_BLOCK_SIZE )
+            {
+                LogError( ( "Failed verify operation. Data Length was too "
+                            "short for MBEDTLS_AES_BLOCK_SIZE." ) );
                 xResult = CKR_SIGNATURE_LEN_RANGE;
             }
         }
@@ -4883,6 +4893,41 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                     else
                     {
                         if( 0 != memcmp( pxHMACBuffer, pSignature, pkcs11SHA256_DIGEST_LENGTH ) )
+                        {
+                            xResult = CKR_SIGNATURE_INVALID;
+                            LogError( ( "Failed verify operation. Signature was invalid." ) );
+                        }
+                    }
+                }
+            }
+            else if( pxSessionObj->xOperationVerifyMechanism == CKM_AES_CMAC )
+            {
+                lMbedTLSResult = mbedtls_cipher_cmac_update( &pxSessionObj->xCMACSecretContext, pData, ulDataLen );
+                
+                if( lMbedTLSResult != 0 )
+                {
+                    xResult = CKR_SIGNATURE_INVALID;
+                    LogError( ( "Failed verify operation. "
+                                "mbedtls_md_hmac_update failed: mbed TLS error = %s : %s.",
+                                mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                }
+                else
+                {
+                    lMbedTLSResult = mbedtls_cipher_cmac_finish( &pxSessionObj->xCMACSecretContext, pxCMACBuffer );
+
+                    if( lMbedTLSResult != 0 )
+                    {
+                        xResult = CKR_SIGNATURE_INVALID;
+                        LogError( ( "Failed verify operation. "
+                                    "mbedtls_md_hmac_finish failed: mbed TLS error = %s : %s.",
+                                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                    }
+                    else
+                    {
+                        // TODO: Verify output sizes and use appropriate 
+                        if( 0 != memcmp( pxCMACBuffer, pSignature, MBEDTLS_AES_BLOCK_SIZE ) )
                         {
                             xResult = CKR_SIGNATURE_INVALID;
                             LogError( ( "Failed verify operation. Signature was invalid." ) );
