@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mbedtls/ecp.h"
+#include "mbedtls/cmac.h"
 #include "mbedtls/oid.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/pk.h"
@@ -61,7 +62,7 @@ typedef struct P11Session
     mbedtls_sha256_context xSHA256Context;
     CK_OBJECT_HANDLE xHMACKeyHandle;
     mbedtls_md_context_t xHMACSecretContext;
-    CK_OBJECT_HANDLE xCMACKeyHandle; 
+    CK_OBJECT_HANDLE xCMACKeyHandle;
     mbedtls_cipher_context_t xCMACSecretContext;
 } P11Session_t;
 
