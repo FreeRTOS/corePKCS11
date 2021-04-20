@@ -4376,7 +4376,7 @@ static CK_RV prvVerifyInitAESCMAC( P11Session_t * pxSession,
                     "double checking the mbedtls_md_type_t object "
                     "that was used." ) );
         xResult = CKR_FUNCTION_FAILED;
-        prvVerifyInitHMACCleanUp( pxSession );
+        prvVerifyInitCMACCleanUp( pxSession );
     }
 
     if( xResult == CKR_OK )
