@@ -2091,10 +2091,10 @@ void test_AES_CMAC( void )
     };
 
     result = functionList->C_CreateObject( globalSession,
-                                           ( CK_ATTRIBUTE_PTR ) &sha256_hmac_template,
-                                           sizeof( sha256_hmac_template ) / sizeof( CK_ATTRIBUTE ),
-                                           &hMacKey );
-    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to create SHA256 HMAC object." );
-    TEST_ASSERT_NOT_EQUAL_MESSAGE( CK_INVALID_HANDLE, hMacKey, "SHA256 HMAC key is invalid." );
+                                           ( CK_ATTRIBUTE_PTR ) &aes_cmac_template,
+                                           sizeof( aes_cmac_template ) / sizeof( CK_ATTRIBUTE ),
+                                           &hAesKey );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to create AES CMAC object." );
+    TEST_ASSERT_NOT_EQUAL_MESSAGE( CK_INVALID_HANDLE, hAesKey, "AES CMAC key is invalid." );
 }
 /*-----------------------------------------------------------*/
