@@ -4309,6 +4309,12 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
             xExpectedInputLength = pkcs11SHA256_DIGEST_LENGTH;
             xHashType = MBEDTLS_MD_SHA256;
         }
+        else if( pxSessionObj->xOperationSignMechanism == CKM_AES_CMAC )
+        {
+            xSignatureLength = pkcs11AES_CMAC_SIGNATURE_LENGTH;
+            xExpectedInputLength = pkcs11AES_CMAC_SIGNATURE_LENGTH;
+            xHashType = MBEDTLS_CIPHER_AES_128_ECB;
+        }       
         else
         {
             LogError( ( "Failed sign operation. The sign operation was not "
@@ -4347,6 +4353,18 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                         }
 
                         pxSessionObj->xHMACKeyHandle = CK_INVALID_HANDLE;
+                    }
+                    else if( pxSessionObj->xOperationSignMechanism == CKM_AES_CMAC )
+                    {
+                        lMbedTLSResult = mbedtls_cipher_cmac_update( &pxSessionObj->xCMACSecretContext, pData, ulDataLen);
+
+                        if( lMbedTLSResult == 0 )
+                        {
+                            lMbedTLSResult = mbedtls_cipher_cmac_finish( &pxSessionObj->xCMACSecretContext, pxSignatureBuffer );
+                        }
+                        
+                        pxSessionObj->xHMACKeyHandle = CK_INVALID_HANDLE;
+
                     }
                     else
                     {

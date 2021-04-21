@@ -2209,4 +2209,14 @@ void test_AES_CMAC( void )
     /* Test SignInit and Sign */
     result = globalFunctionList->C_SignInit( globalSession, &mechanism, cMacKey );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to C_SignInit AES CMAC." );
+
+        result = globalFunctionList->C_Sign( globalSession,
+                                             message,
+                                            sizeof( message ) - 1,
+                                            signature,
+                                            &signatureLength );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "SHA256 HMAC failed." );
+    TEST_ASSERT_EQUAL_MESSAGE( pkcs11AES_CMAC_SIGNATURE_LENGTH, signatureLength, "AES CMAC returned an unexpected size." );
+    TEST_ASSERT_EQUAL_MESSAGE( sizeof( knownSignature ), signatureLength, "AES CMAC returned a size different to the know signature." );
+    TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE( knownSignature, signature, sizeof( knownSignature ), "The PKCS #11 generated signature was different to the known signature." );
 }
