@@ -3886,6 +3886,107 @@ static CK_RV prvSignInitSHA256HMAC( P11Session_t * pxSession,
 }
 
 /**
+ * @brief Helper function for cleaning up an CMAC verify operation.
+ * @param[in] pxSession  Pointer to a valid PKCS #11 session.
+ */
+static void prvCMACCleanUp( P11Session_t * pxSession )
+{
+    pxSession->xHMACKeyHandle = CK_INVALID_HANDLE;
+    mbedtls_cipher_free( &pxSession->xCMACSecretContext );
+}
+
+/**
+ * @brief Helper function for initializing a AES-CMAC operation.
+ * @param[in] pxSession         Pointer to a valid PKCS #11 session.
+ * @param[in] hKey              CMAC secret key handle.
+ * @param[in] pucKeyData        CMAC secret key data.
+ * @param[in] ulKeyDataLength   CMAC key Size.
+ */
+static CK_RV prvInitAESCMAC( P11Session_t * pxSession,
+                             CK_OBJECT_HANDLE hKey,
+                             CK_BYTE_PTR pucKeyData,
+                             CK_ULONG ulKeyDataLength )
+{
+    CK_RV xResult = CKR_OK;
+    int32_t lMbedTLSResult = -1;
+    const mbedtls_cipher_info_t * pxCipherInfo = NULL;
+
+    mbedtls_cipher_init( &pxSession->xCMACSecretContext );
+    pxCipherInfo = mbedtls_cipher_info_from_type( MBEDTLS_CIPHER_AES_128_ECB );
+
+    if( pxCipherInfo == NULL )
+    {
+        LogError( ( "Failed to initialize AESCMAC operation. "
+                    "mbedtls_ciphre_info_from_type failed. Consider "
+                    "double checking the mbedtls_md_type_t object "
+                    "that was used." ) );
+        xResult = CKR_FUNCTION_FAILED;
+        prvCMACCleanUp( pxSession );
+    }
+
+    if( xResult == CKR_OK )
+    {
+        lMbedTLSResult = mbedtls_cipher_setup( &pxSession->xCMACSecretContext,
+                                               pxCipherInfo );
+
+        if( lMbedTLSResult != 0 )
+        {
+            LogError( ( "Failed to initialize AESCMAC operation. "
+                        "mbedtls_cipher_setup failed: mbed TLS error = %s : %s.",
+                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+            prvCMACCleanUp( pxSession );
+            xResult = CKR_KEY_HANDLE_INVALID;
+        }
+    }
+
+    if( xResult == CKR_OK )
+    {
+        lMbedTLSResult = mbedtls_cipher_cmac_starts( &pxSession->xCMACSecretContext,
+                                                     pucKeyData, 8 * ulKeyDataLength );
+
+        if( lMbedTLSResult != 0 )
+        {
+            LogError( ( "Failed to initialize AESCMAC operation. "
+                        "mbedtls_md_setup failed: mbed TLS error = %s : %s.",
+                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+            prvCMACCleanUp( pxSession );
+            xResult = CKR_KEY_HANDLE_INVALID;
+        }
+    }
+
+    if( xResult == CKR_OK )
+    {
+        pxSession->xHMACKeyHandle = hKey;
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Helper function for initializing a sign operation for AES-CMAC.
+ * @param[in] pxSession         Pointer to a valid PKCS #11 session.
+ * @param[in] hKey              CMAC secret key handle.
+ * @param[in] pucKeyData        CMAC secret key data.
+ * @param[in] ulKeyDataLength   CMAC key Size.
+ */
+static CK_RV prvSignInitAESCMAC( P11Session_t * pxSession,
+                                 CK_OBJECT_HANDLE hKey,
+                                 CK_BYTE_PTR pucKeyData,
+                                 CK_ULONG ulKeyDataLength )
+{
+    CK_RV xResult = CKR_OK;
+
+    xResult = prvInitAESCMAC( pxSession,
+                              hKey,
+                              pucKeyData,
+                              ulKeyDataLength );
+
+    return xResult;
+}
+
+/**
  * @brief Helper function for cleaning up a sign operation for an EC or RSA key.
  * @param[in] pxSession   Pointer to a valid PKCS #11 session.
  */
@@ -4080,6 +4181,19 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
                     if( ( pxSession->xHMACKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xHMACKeyHandle != hKey ) )
                     {
                         xResult = prvSignInitSHA256HMAC( pxSession, hKey, pucKeyData, ulKeyDataLength );
+                    }
+                    else
+                    {
+                        /* The correct credentials are already initialized. */
+                    }
+
+                    break;
+
+                case CKM_AES_CMAC:
+
+                    if( ( pxSession->xHMACKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xHMACKeyHandle != hKey ) )
+                    {
+                        xResult = prvSignInitAESCMAC( pxSession, hKey, pucKeyData, ulKeyDataLength );
                     }
                     else
                     {
@@ -4347,16 +4461,6 @@ static CK_RV prvVerifyInitSHA256HMAC( P11Session_t * pxSession,
 }
 
 /**
- * @brief Helper function for cleaning up an CMAC verify operation.
- * @param[in] pxSession  Pointer to a valid PKCS #11 session.
- */
-static void prvVerifyInitCMACCleanUp( P11Session_t * pxSession )
-{
-    pxSession->xHMACKeyHandle = CK_INVALID_HANDLE;
-    mbedtls_cipher_free( &pxSession->xCMACSecretContext );
-}
-
-/**
  * @brief Helper function for initializing a verify operation for AES-CMAC.
  * @param[in] pxSession         Pointer to a valid PKCS #11 session.
  * @param[in] hKey              CMAC secret key handle.
@@ -4369,58 +4473,11 @@ static CK_RV prvVerifyInitAESCMAC( P11Session_t * pxSession,
                                    CK_ULONG ulKeyDataLength )
 {
     CK_RV xResult = CKR_OK;
-    int32_t lMbedTLSResult = -1;
-    const mbedtls_cipher_info_t * pxCipherInfo = NULL;
 
-    mbedtls_cipher_init( &pxSession->xCMACSecretContext );
-    pxCipherInfo = mbedtls_cipher_info_from_type( MBEDTLS_CIPHER_AES_128_ECB );
-
-    if( pxCipherInfo == NULL )
-    {
-        LogError( ( "Failed to initialize verify operation. "
-                    "mbedtls_ciphre_info_from_type failed. Consider "
-                    "double checking the mbedtls_md_type_t object "
-                    "that was used." ) );
-        xResult = CKR_FUNCTION_FAILED;
-        prvVerifyInitCMACCleanUp( pxSession );
-    }
-
-    if( xResult == CKR_OK )
-    {
-        lMbedTLSResult = mbedtls_cipher_setup( &pxSession->xCMACSecretContext,
-                                               pxCipherInfo );
-
-        if( lMbedTLSResult != 0 )
-        {
-            LogError( ( "Failed to initialize verify operation. "
-                        "mbedtls_cipher_setup failed: mbed TLS error = %s : %s.",
-                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-            prvVerifyInitCMACCleanUp( pxSession );
-            xResult = CKR_KEY_HANDLE_INVALID;
-        }
-    }
-
-    if( xResult == CKR_OK )
-    {
-        lMbedTLSResult = mbedtls_cipher_cmac_starts( &pxSession->xCMACSecretContext,
-                                                     pucKeyData, 8 * ulKeyDataLength );
-
-        if( lMbedTLSResult != 0 )
-        {
-            LogError( ( "Failed to initialize verify operation. "
-                        "mbedtls_md_setup failed: mbed TLS error = %s : %s.",
-                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-            prvVerifyInitCMACCleanUp( pxSession );
-            xResult = CKR_KEY_HANDLE_INVALID;
-        }
-    }
-
-    if( xResult == CKR_OK )
-    {
-        pxSession->xHMACKeyHandle = hKey;
-    }
+    xResult = prvInitAESCMAC( pxSession,
+                              hKey,
+                              pucKeyData,
+                              ulKeyDataLength );
 
     return xResult;
 }

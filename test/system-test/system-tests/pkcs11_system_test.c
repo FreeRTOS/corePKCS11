@@ -2205,4 +2205,8 @@ void test_AES_CMAC( void )
                                            knownSignature,
                                            sizeof( knownSignature ) );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "AES CMAC failed to verify the known signature." );
+
+    /* Test SignInit and Sign */
+    result = globalFunctionList->C_SignInit( globalSession, &mechanism, cMacKey );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to C_SignInit AES CMAC." );
 }
