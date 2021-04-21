@@ -45,7 +45,6 @@
 #include "mbedtls/sha256.h"
 #include "mbedtls/platform.h"
 #include "mbedtls/threading.h"
-#include "mbedtls/cipher.h"
 #include "mbedtls/cmac.h"
 
 /* Custom mbedtls utils include. */
@@ -3891,7 +3890,7 @@ static CK_RV prvSignInitSHA256HMAC( P11Session_t * pxSession,
  */
 static void prvCMACCleanUp( P11Session_t * pxSession )
 {
-    pxSession->xHMACKeyHandle = CK_INVALID_HANDLE;
+    pxSession->xCMACKeyHandle = CK_INVALID_HANDLE;
     mbedtls_cipher_free( &pxSession->xCMACSecretContext );
 }
 
@@ -3958,7 +3957,7 @@ static CK_RV prvInitAESCMAC( P11Session_t * pxSession,
 
     if( xResult == CKR_OK )
     {
-        pxSession->xHMACKeyHandle = hKey;
+        pxSession->xCMACKeyHandle = hKey;
     }
 
     return xResult;
@@ -4191,7 +4190,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
 
                 case CKM_AES_CMAC:
 
-                    if( ( pxSession->xHMACKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xHMACKeyHandle != hKey ) )
+                    if( ( pxSession->xCMACKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xCMACKeyHandle != hKey ) )
                     {
                         xResult = prvSignInitAESCMAC( pxSession, hKey, pucKeyData, ulKeyDataLength );
                     }
@@ -4363,7 +4362,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                             lMbedTLSResult = mbedtls_cipher_cmac_finish( &pxSessionObj->xCMACSecretContext, pxSignatureBuffer );
                         }
                         
-                        pxSessionObj->xHMACKeyHandle = CK_INVALID_HANDLE;
+                        pxSessionObj->xCMACKeyHandle = CK_INVALID_HANDLE;
 
                     }
                     else
@@ -4712,7 +4711,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
 
                 case CKM_AES_CMAC:
 
-                    if( ( pxSession->xHMACKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xCMACKeyHandle != hKey ) )
+                    if( ( pxSession->xCMACKeyHandle == CK_INVALID_HANDLE ) || ( pxSession->xCMACKeyHandle != hKey ) )
                     {
                         xResult = prvVerifyInitAESCMAC( pxSession, hKey, pucKeyData, ulKeyDataLength );
                     }
