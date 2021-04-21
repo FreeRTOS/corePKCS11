@@ -2052,6 +2052,83 @@ static CK_RV destroyProvidedObjects( CK_SESSION_HANDLE session,
 
     return result;
 }
+void test_SHA256_HMAC( void )
+{
+    CK_RV result;
+    CK_FUNCTION_LIST_PTR functionList;
+
+    CK_BYTE label[] = pkcs11testLABEL_HMAC_KEY;
+    CK_KEY_TYPE hmacKeyType = CKK_SHA256_HMAC;
+    CK_OBJECT_CLASS hmacKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL trueObject = CK_TRUE;
+
+    CK_OBJECT_HANDLE hMacKey;
+    /* Min Key Size is 32 */
+    CK_BYTE keyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
+    CK_BYTE message[] = "Hello world";
+    CK_BYTE signature[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
+    size_t signatureLength = sizeof( signature );
+
+    CK_MECHANISM mechanism =
+    {
+        CKM_SHA256_HMAC, NULL_PTR, 0
+    };
+
+    /* Generated with: */
+    /* $ echo -n "Hello world" | openssl dgst -sha256 -hmac abcdabcdabcdabcdabcdabcdabcdabcd -binary | hexdump */
+    CK_BYTE knownSignature[] =
+    {
+        0x81, 0xc7, 0xe0, 0x72, 0x57, 0x45, 0xe1, 0x7d,
+        0x2e, 0x13, 0xd1, 0x27, 0x30, 0xa8, 0x60, 0x78,
+        0xb5, 0x85, 0x3a, 0x93, 0x2b, 0x6f, 0xda, 0x7f,
+        0x8b, 0x7c, 0x4d, 0xd1, 0x39, 0xf6, 0x34, 0x4e
+    };
+
+    result = C_GetFunctionList( &functionList );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to get PKCS #11 function list." );
+
+    CK_ATTRIBUTE sha256_hmac_template[] =
+    {
+        { CKA_CLASS,    &hmacKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &hmacKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    label,         sizeof( label ) - 1       },
+        { CKA_TOKEN,    &trueObject,   sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &trueObject,   sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &trueObject,   sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    keyValue,      sizeof( keyValue ) - 1    }
+    };
+
+    result = functionList->C_CreateObject( globalSession,
+                                           ( CK_ATTRIBUTE_PTR ) &sha256_hmac_template,
+                                           sizeof( sha256_hmac_template ) / sizeof( CK_ATTRIBUTE ),
+                                           &hMacKey );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to create SHA256 HMAC object." );
+    TEST_ASSERT_NOT_EQUAL_MESSAGE( CK_INVALID_HANDLE, hMacKey, "SHA256 HMAC key is invalid." );
+
+    result = globalFunctionList->C_VerifyInit( globalSession, &mechanism, hMacKey );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to C_VerifyInit SHA256 HMAC." );
+
+    result = globalFunctionList->C_Verify( globalSession,
+                                           message,
+                                           sizeof( message ) - 1,
+                                           knownSignature,
+                                           sizeof( knownSignature ) );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "SHA256 HMAC failed to verify the known signature." );
+
+    result = globalFunctionList->C_SignInit( globalSession, &mechanism, hMacKey );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to C_SignInit SHA256 HMAC." );
+
+    result = globalFunctionList->C_Sign( globalSession,
+                                         message,
+                                         sizeof( message ) - 1,
+                                         signature,
+                                         &signatureLength );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "SHA256 HMAC failed." );
+    TEST_ASSERT_EQUAL_MESSAGE( pkcs11SHA256_DIGEST_LENGTH, signatureLength, "SHA 256 HMAC returned an unexpected size." );
+    TEST_ASSERT_EQUAL_MESSAGE( sizeof( knownSignature ), signatureLength, "SHA 256 HMAC returned a size different to the know signature." );
+    TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE( knownSignature, signature, sizeof( knownSignature ), "The PKCS #11 generated signature was different to the known signature." );
+}
+/*-----------------------------------------------------------*/
 
 void test_AES_CMAC( void )
 {
