@@ -231,7 +231,7 @@
  * @ingroup pkcs11_macros
  * @brief Private define for minimum AES-CMAC key size, in bytes.
  */
-#define PKCS11_AES_CMAC_MIN_SIZE        ( 16UL )
+#define PKCS11_AES_CMAC_MIN_SIZE           ( 16UL )
 
 /**
  * @ingroup pkcs11_macros
@@ -2537,6 +2537,7 @@ static CK_RV prvCMACKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             break;
 
         case ( CKA_VALUE ):
+
             if( ( pxAttribute->ulValueLen >= PKCS11_AES_CMAC_MIN_SIZE ) &&
                 ( pxAttribute->pValue != NULL ) )
             {
@@ -2733,8 +2734,8 @@ static CK_RV prvCreateSecretKey( CK_ATTRIBUTE * pxTemplate,
     }
     else if( xKeyType == CKK_AES )
     {
-        xResult = prvCreateAESCMAC( pxTemplate, 
-                                    ulCount, 
+        xResult = prvCreateAESCMAC( pxTemplate,
+                                    ulCount,
                                     pxObject );
     }
     else
