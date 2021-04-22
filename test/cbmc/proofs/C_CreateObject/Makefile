@@ -51,6 +51,7 @@ UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCreateECKey.0:$(TEMPL
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvGetLabel.0:$(TEMPLATE_SIZE)
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCreateRsaKey.0:$(TEMPLATE_SIZE)
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCreateSHA256HMAC.0:$(TEMPLATE_SIZE)
+UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvCreateAESCMAC.0:$(TEMPLATE_SIZE)
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvAddObjectToList.0:$(MAX_OBJECT_NUM)
 UNWINDSET += harness.0:$(TEMPLATE_SIZE)
 UNWINDSET += memcmp.0:$(MAX_LABEL_SIZE)

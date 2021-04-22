@@ -2052,7 +2052,6 @@ static CK_RV destroyProvidedObjects( CK_SESSION_HANDLE session,
 
     return result;
 }
-
 void test_SHA256_HMAC( void )
 {
     CK_RV result;
@@ -2128,5 +2127,51 @@ void test_SHA256_HMAC( void )
     TEST_ASSERT_EQUAL_MESSAGE( pkcs11SHA256_DIGEST_LENGTH, signatureLength, "SHA 256 HMAC returned an unexpected size." );
     TEST_ASSERT_EQUAL_MESSAGE( sizeof( knownSignature ), signatureLength, "SHA 256 HMAC returned a size different to the know signature." );
     TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE( knownSignature, signature, sizeof( knownSignature ), "The PKCS #11 generated signature was different to the known signature." );
+}
+/*-----------------------------------------------------------*/
+
+void test_AES_CMAC( void )
+{
+    CK_RV result;
+    CK_FUNCTION_LIST_PTR functionList;
+
+    CK_BYTE label[] = pkcs11testLABEL_CMAC_KEY;
+    CK_KEY_TYPE aesKeyType = CKK_AES;
+    CK_OBJECT_CLASS aesKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL trueObject = CK_TRUE;
+
+    CK_OBJECT_HANDLE hAesKey;
+    /* Min Key Size is 32 bytes. */
+    CK_BYTE keyValue[] = "11223344556677889900112233445566";
+    CK_BYTE message[] = "Hello world";
+
+    /* See https://tools.ietf.org/html/rfc4493. Signature is always 16 bytes. */
+    CK_BYTE signature[ 16 ] = { 0 };
+    size_t signatureLength = sizeof( signature );
+
+    CK_MECHANISM mechanism =
+    {
+        CKM_AES_CMAC, NULL_PTR, 0
+    };
+
+    result = C_GetFunctionList( &functionList );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to get PKCS #11 function list." );
+
+    CK_ATTRIBUTE aes_cmac_template[] =
+    {
+        { CKA_CLASS,    &aesKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &aesKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    label,        sizeof( label ) - 1       },
+        { CKA_TOKEN,    &trueObject,  sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &trueObject,  sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    keyValue,     sizeof( keyValue ) - 1    }
+    };
+
+    result = functionList->C_CreateObject( globalSession,
+                                           ( CK_ATTRIBUTE_PTR ) &aes_cmac_template,
+                                           sizeof( aes_cmac_template ) / sizeof( CK_ATTRIBUTE ),
+                                           &hAesKey );
+    TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to create AES CMAC object." );
+    TEST_ASSERT_NOT_EQUAL_MESSAGE( CK_INVALID_HANDLE, hAesKey, "AES CMAC key is invalid." );
 }
 /*-----------------------------------------------------------*/

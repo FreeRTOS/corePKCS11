@@ -140,6 +140,11 @@
 #define pkcs11configLABEL_HMAC_KEY                         "HMAC Key"
 
 /**
+ * @brief The PKCS #11 label for the object to be used for CMAC operations.
+ */
+#define pkcs11configLABEL_CMAC_KEY                         "CMAC Key"
+
+/**
  * @brief The PKCS #11 label for the object to be used for code verification.
  *
  * Used by over-the-air update code to verify an incoming signed image.

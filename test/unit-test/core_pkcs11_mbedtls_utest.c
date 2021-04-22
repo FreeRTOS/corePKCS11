@@ -2630,6 +2630,372 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyInvalidKeyType( void )
     }
 }
 
+/*!
+ * @brief C_CreateObject Creating a AES-CMAC secret key happy path.
+ *
+ */
+void test_pkcs11_C_CreateObjectAESCMACKey( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_KEY_TYPE xKeyType = CKK_AES;
+    CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BYTE pcLabel[] = pkcs11configLABEL_CMAC_KEY;
+
+    CK_BYTE pxKeyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
+
+    CK_ATTRIBUTE xAESCMACTemplate[] =
+    {
+        { CKA_CLASS,    &xKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &xKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    pcLabel,    sizeof( pcLabel ) - 1     },
+        { CKA_TOKEN,    &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
+    };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
+        mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xAESCMACTemplate,
+                                  sizeof( xAESCMACTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_CreateObject Creating a AES-CMAC invalid token values.
+ *
+ */
+void test_pkcs11_C_CreateObjectAESCMACKeyBadAtts( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_KEY_TYPE xKeyType = CKK_AES;
+    CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL xFalse = CK_FALSE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BYTE pcLabel[] = pkcs11configLABEL_CMAC_KEY;
+
+    CK_BYTE pxKeyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
+
+    CK_ATTRIBUTE xAESCMACTemplate[] =
+    {
+        { CKA_CLASS,    &xKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &xKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    pcLabel,    sizeof( pcLabel ) - 1     },
+        { CKA_TOKEN,    &xFalse,    sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &xFalse,    sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &xFalse,    sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
+    };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xAESCMACTemplate,
+                                  sizeof( xAESCMACTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_CreateObject Creating a AES-CMAC unknown attribute.
+ *
+ */
+void test_pkcs11_C_CreateObjectAESCMACKeyUnknownAtt( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_KEY_TYPE xKeyType = CKK_AES;
+    CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BYTE pcLabel[] = pkcs11configLABEL_CMAC_KEY;
+
+    CK_BYTE pxKeyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
+
+    CK_ATTRIBUTE xAESCMACTemplate[] =
+    {
+        { CKA_CLASS,    &xKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &xKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    pcLabel,    sizeof( pcLabel ) - 1     },
+        { CKA_SUBJECT,  &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
+    };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xAESCMACTemplate,
+                                  sizeof( xAESCMACTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_TYPE_INVALID, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_CreateObject Creating a AES-CMAC missing label.
+ *
+ */
+void test_pkcs11_C_CreateObjectAESCMACKeyMissingLabel( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_KEY_TYPE xKeyType = CKK_AES;
+    CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BYTE pcLabel[] = pkcs11configLABEL_CMAC_KEY;
+
+    CK_BYTE pxKeyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
+
+    CK_ATTRIBUTE xAESCMACTemplate[] =
+    {
+        { CKA_CLASS,    &xKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &xKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_TOKEN,    &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
+    };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xAESCMACTemplate,
+                                  sizeof( xAESCMACTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_CreateObject Creating a AES-CMAC NULL secret key.
+ *
+ */
+void test_pkcs11_C_CreateObjectAESCMACKeyNullSecretKey( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_KEY_TYPE xKeyType = CKK_AES;
+    CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BYTE pcLabel[] = pkcs11configLABEL_CMAC_KEY;
+
+    CK_ATTRIBUTE xAESCMACTemplate[] =
+    {
+        { CKA_CLASS,    &xKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &xKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    pcLabel,    sizeof( pcLabel ) - 1     },
+        { CKA_TOKEN,    &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    NULL,       0                         }
+    };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 0 );
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xAESCMACTemplate,
+                                  sizeof( xAESCMACTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_CreateObject Creating a AES-CMAC short secret key.
+ *
+ */
+void test_pkcs11_C_CreateObjectAESCMACKeyShortSecretKey( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_KEY_TYPE xKeyType = CKK_AES;
+    CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BYTE pcLabel[] = pkcs11configLABEL_CMAC_KEY;
+
+    CK_BYTE pxKeyValue[] = "abcdabcdabcdabcd";
+
+    CK_ATTRIBUTE xAESCMACTemplate[] =
+    {
+        { CKA_CLASS,    &xKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &xKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    pcLabel,    sizeof( pcLabel ) - 1     },
+        { CKA_TOKEN,    &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
+    };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 0 );
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xAESCMACTemplate,
+                                  sizeof( xAESCMACTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_CreateObject Creating a AES-ChAC secret key fails to write to PKCS #11 PAL.
+ *
+ */
+void test_pkcs11_C_CreateObjectAESCMACKeyPalFailure( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_KEY_TYPE xKeyType = CKK_AES;
+    CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BYTE pcLabel[] = pkcs11configLABEL_CMAC_KEY;
+
+    CK_BYTE pxKeyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
+
+    CK_ATTRIBUTE xAESCMACTemplate[] =
+    {
+        { CKA_CLASS,    &xKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &xKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    pcLabel,    sizeof( pcLabel ) - 1     },
+        { CKA_TOKEN,    &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
+    };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 0 );
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xAESCMACTemplate,
+                                  sizeof( xAESCMACTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_DEVICE_MEMORY, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_CreateObject Creating a AES-CMAC invalid CMAC key type.
+ *
+ */
+void test_pkcs11_C_CreateObjectAESCMACKeyInvalidKeyType( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_KEY_TYPE xKeyType = CKK_MD5_HMAC;
+    CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_BYTE pcLabel[] = pkcs11configLABEL_CMAC_KEY;
+
+    CK_BYTE pxKeyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
+
+    CK_ATTRIBUTE xAESCMACTemplate[] =
+    {
+        { CKA_CLASS,    &xKeyClass, sizeof( CK_OBJECT_CLASS ) },
+        { CKA_KEY_TYPE, &xKeyType,  sizeof( CK_KEY_TYPE )     },
+        { CKA_LABEL,    pcLabel,    sizeof( pcLabel ) - 1     },
+        { CKA_TOKEN,    &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_SIGN,     &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VERIFY,   &xTrue,     sizeof( CK_BBOOL )        },
+        { CKA_VALUE,    pxKeyValue, sizeof( pxKeyValue ) - 1  }
+    };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
+        mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xAESCMACTemplate,
+                                  sizeof( xAESCMACTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_MECHANISM_INVALID, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
 /* ======================  TESTING C_GetAttributeValue  ============================ */
 
 /*!
