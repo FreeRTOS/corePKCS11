@@ -2915,7 +2915,7 @@ void test_pkcs11_C_CreateObjectAESCMACKeyShortSecretKey( void )
     CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
     CK_BYTE pcLabel[] = pkcs11configLABEL_CMAC_KEY;
 
-    CK_BYTE pxKeyValue[] = "abcdabcdabcdabcd";
+    CK_BYTE pxKeyValue[] = "abcdabcdabcdab";
 
     CK_ATTRIBUTE xAESCMACTemplate[] =
     {
