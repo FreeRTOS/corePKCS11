@@ -2376,7 +2376,7 @@ static CK_RV prvCreateRsaKey( CK_ATTRIBUTE * pxTemplate,
 }
 
 /**
- * @brief Parses attribute values for a RSA Key.
+ * @brief Parses attribute values for a HMAC Key.
  */
 static CK_RV prvHMACKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                  CK_BYTE_PTR * ppxHmacKey,
@@ -2499,7 +2499,7 @@ static CK_RV prvCreateSHA256HMAC( CK_ATTRIBUTE * pxTemplate,
 }
 
 /**
- * @brief Parses attribute values for a RSA Key.
+ * @brief Parses attribute values for a CMAC Key.
  */
 static CK_RV prvCMACKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                  CK_BYTE_PTR * ppxCmacKey,
@@ -4370,6 +4370,7 @@ static CK_RV prvInitAESCMAC( P11Session_t * pxSession,
     CK_RV xResult = CKR_OK;
     int32_t lMbedTLSResult = -1;
     const mbedtls_cipher_info_t * pxCipherInfo = NULL;
+    size_t ulKeyDataBitLength = 8 * ulKeyDataLength;
 
     mbedtls_cipher_init( &pxSession->xCMACSecretContext );
     pxCipherInfo = mbedtls_cipher_info_from_type( MBEDTLS_CIPHER_AES_128_ECB );
@@ -4403,7 +4404,7 @@ static CK_RV prvInitAESCMAC( P11Session_t * pxSession,
     if( xResult == CKR_OK )
     {
         lMbedTLSResult = mbedtls_cipher_cmac_starts( &pxSession->xCMACSecretContext,
-                                                     pucKeyData, 8 * ulKeyDataLength );
+                                                     pucKeyData, ulKeyDataBitLength );
 
         if( lMbedTLSResult != 0 )
         {
@@ -4962,6 +4963,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                         }
                     }
                 }
+
+                pxSessionObj->xCMACKeyHandle = CK_INVALID_HANDLE;
             }
             else
             {
