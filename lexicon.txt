@@ -311,6 +311,8 @@ www
 xapphandle
 xbyte
 xcertificatetype
+xcmackeyhandle
+xcmacsecretcontext
 xclass
 xcmackeyhandle
 xcmacsecretcontext
