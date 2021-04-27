@@ -3885,7 +3885,7 @@ static CK_RV prvSignInitSHA256HMAC( P11Session_t * pxSession,
 }
 
 /**
- * @brief Helper function for cleaning up an CMAC verify operation.
+ * @brief Helper function for cleaning up an CMAC operation.
  * @param[in] pxSession  Pointer to a valid PKCS #11 session.
  */
 static void prvCMACCleanUp( P11Session_t * pxSession )
@@ -3909,14 +3909,15 @@ static CK_RV prvInitAESCMAC( P11Session_t * pxSession,
     CK_RV xResult = CKR_OK;
     int32_t lMbedTLSResult = -1;
     const mbedtls_cipher_info_t * pxCipherInfo = NULL;
+    size_t ulKeyDataBitLength = 8 * ulKeyDataLength;
 
     mbedtls_cipher_init( &pxSession->xCMACSecretContext );
     pxCipherInfo = mbedtls_cipher_info_from_type( MBEDTLS_CIPHER_AES_128_ECB );
 
     if( pxCipherInfo == NULL )
     {
-        LogError( ( "Failed to initialize AESCMAC operation. "
-                    "mbedtls_ciphre_info_from_type failed. Consider "
+        LogError( ( "Failed to initialize AES-CMAC operation. "
+                    "mbedtls_cipher_info_from_type failed. Consider "
                     "double checking the mbedtls_md_type_t object "
                     "that was used." ) );
         xResult = CKR_FUNCTION_FAILED;
@@ -3930,7 +3931,7 @@ static CK_RV prvInitAESCMAC( P11Session_t * pxSession,
 
         if( lMbedTLSResult != 0 )
         {
-            LogError( ( "Failed to initialize AESCMAC operation. "
+            LogError( ( "Failed to initialize AES-CMAC operation. "
                         "mbedtls_cipher_setup failed: mbed TLS error = %s : %s.",
                         mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                         mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
@@ -3942,11 +3943,11 @@ static CK_RV prvInitAESCMAC( P11Session_t * pxSession,
     if( xResult == CKR_OK )
     {
         lMbedTLSResult = mbedtls_cipher_cmac_starts( &pxSession->xCMACSecretContext,
-                                                     pucKeyData, 8 * ulKeyDataLength );
+                                                     pucKeyData, ulKeyDataBitLength );
 
         if( lMbedTLSResult != 0 )
         {
-            LogError( ( "Failed to initialize AESCMAC operation. "
+            LogError( ( "Failed to initialize AES-CMAC operation. "
                         "mbedtls_md_setup failed: mbed TLS error = %s : %s.",
                         mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                         mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
