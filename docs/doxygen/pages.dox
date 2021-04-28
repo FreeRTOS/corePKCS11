@@ -1,5 +1,5 @@
 /**
-@mainpage
+@mainpage Overview
 @anchor core_pkcs11
 @brief PKCS #11 Crypto Abstraction Library.
 
@@ -12,9 +12,7 @@ This PKCS #11 library implements a subset of the PKCS #11 API required to establ
 - Signing a message.
 - Managing certificates and keys.
 - Generating random numbers.
-*/
 
-/**
 @section pkcs11_memory_requirements Memory Requirements
 @brief Memory requirements of the PKCS #11 library.
 
