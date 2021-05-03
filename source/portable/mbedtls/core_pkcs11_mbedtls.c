@@ -3909,7 +3909,7 @@ static CK_RV prvInitAESCMAC( P11Session_t * pxSession,
     CK_RV xResult = CKR_OK;
     int32_t lMbedTLSResult = -1;
     const mbedtls_cipher_info_t * pxCipherInfo = NULL;
-    size_t ulKeyDataBitLength = 8 * ulKeyDataLength;
+    size_t ulKeyDataBitLength = 8UL * ulKeyDataLength;
 
     mbedtls_cipher_init( &pxSession->xCMACSecretContext );
     pxCipherInfo = mbedtls_cipher_info_from_type( MBEDTLS_CIPHER_AES_128_ECB );
@@ -4313,7 +4313,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
         {
             xSignatureLength = pkcs11AES_CMAC_SIGNATURE_LENGTH;
             xExpectedInputLength = pkcs11AES_CMAC_SIGNATURE_LENGTH;
-            xHashType = MBEDTLS_CIPHER_AES_128_ECB;
         }
         else
         {
@@ -4840,10 +4839,10 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
         }
         else if( pxSessionObj->xOperationVerifyMechanism == CKM_AES_CMAC )
         {
-            if( ulSignatureLen != MBEDTLS_AES_BLOCK_SIZE )
+            if( ulSignatureLen != PKCS11_AES_CMAC_MIN_SIZE )
             {
                 LogError( ( "Failed verify operation. Data Length was too "
-                            "short for MBEDTLS_AES_BLOCK_SIZE." ) );
+                            "short for PKCS11_AES_CMAC_MIN_SIZE." ) );
                 xResult = CKR_SIGNATURE_LEN_RANGE;
             }
         }
