@@ -70,7 +70,7 @@ jobs:
           find source/ -iname '*.c' -not -path 'source/portable/windows/*' -not -path 'source/dependency*' |\
           xargs complexity --scores --threshold=0 --horrid-threshold=8
   doxygen:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Check doxygen build
@@ -118,7 +118,7 @@ jobs:
           path: ./
           exclude-dirs: .git
   link-verifier:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python for link verifier action
