@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  systemtests:
+  system-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
@@ -26,7 +26,7 @@ jobs:
         run: |
           cd build/
           ctest --output-on-failure
-  unittest:
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
@@ -53,12 +53,12 @@ jobs:
           lcov --rc lcov_branch_coverage=1 --remove build/coverage.info '*CMakeCCompilerId*' --output-file build/coverage.info
           lcov --rc lcov_branch_coverage=1 --remove build/coverage.info '*mocks*' --output-file build/coverage.info
           lcov --list build/coverage.info
-      - name: lcov-cop
-        uses: ChicagoFlutter/lcov-cop@v1.0.2
+      - name: Check Coverage
+        uses: FreeRTOS/CI-CD-Github-Actions/coverage-cop@main
         with:
-          path: "build/coverage.info"
-          min_coverage: 99
-          exclude: "**/*test*"
+          path: ./build/coverage.info
+          line-coverage-min: 99
+          branch-coverage-min: 90
   complexity:
     runs-on: ubuntu-latest
     steps:
@@ -70,17 +70,13 @@ jobs:
           find source/ -iname '*.c' -not -path 'source/portable/windows/*' -not -path 'source/dependency*' |\
           xargs complexity --scores --threshold=0 --horrid-threshold=8
   doxygen:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Doxygen
-        run: |
-          wget -qO- "https://sourceforge.net/projects/doxygen/files/rel-1.8.20/doxygen-1.8.20.linux.bin.tar.gz/download" | sudo tar --strip-components=1 -xz -C /usr/local
-          sudo apt-get install -y libclang-9-dev graphviz
-      - name: Run Doxygen And Verify Stdout Is Empty
-        run: |
-          doxygen docs/doxygen/config.doxyfile 2>&1 | tee doxyoutput.txt
-          if [[ "$(wc -c < doxyoutput.txt | bc)" = "0" ]]; then exit 0; else exit 1; fi
+      - name: Check doxygen build
+        uses: FreeRTOS/CI-CD-Github-Actions/doxygen@main
+        with:
+          path: ./
   spell-check:
     runs-on: ubuntu-latest
     steps:
@@ -116,31 +112,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Uncrustify
-        run: sudo apt-get install uncrustify
-      - name: Run Uncrustify
-        run: find . -iname "*.[hc]" -exec uncrustify --check -c tools/uncrustify.cfg {} +
-      - name: Check For Trailing Whitespace
-        run: |
-          set +e
-          grep --exclude="README.md" -rnI -e "[[:blank:]]$" .
-          if [ "$?" = "0" ]; then
-            echo "Files have trailing whitespace."
-            exit 1
-          else
-            exit 0
-          fi
-            url-check:
-  url-check:
+      - name: Check formatting
+        uses: FreeRTOS/CI-CD-Github-Actions/formatting@main
+        with:
+          path: ./
+          exclude-dirs: .git
+  link-verifier:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone This Repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Setup Python for link verifier action
+        uses: actions/setup-python@v2
         with:
-            path: ./kernel
-      - name: URL Checker
-        run: |
-            bash kernel/.github/actions/url_verifier.sh kernel
+          python-version: '3.8'
+      - name: Check Links
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: FreeRTOS/CI-CD-GitHub-Actions/link-verifier@main
+        with:
+          path: ./
+          exclude-dirs: cbmc
+          include-file-types: .c,.h,.dox
   git-secrets:
     runs-on: ubuntu-latest
     steps:
