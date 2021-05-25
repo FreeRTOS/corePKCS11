@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  systemtests:
+  system-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
@@ -26,7 +26,7 @@ jobs:
         run: |
           cd build/
           ctest --output-on-failure
-  unittest:
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
@@ -53,12 +53,10 @@ jobs:
           lcov --rc lcov_branch_coverage=1 --remove build/coverage.info '*CMakeCCompilerId*' --output-file build/coverage.info
           lcov --rc lcov_branch_coverage=1 --remove build/coverage.info '*mocks*' --output-file build/coverage.info
           lcov --list build/coverage.info
-      - name: lcov-cop
-        uses: ChicagoFlutter/lcov-cop@v1.0.2
+      - name: Check Coverage
+        uses: FreeRTOS/CI-CD-Github-Actions/coverage-cop@main
         with:
-          path: "build/coverage.info"
-          min_coverage: 99
-          exclude: "**/*test*"
+          path: ./build/coverage.info
   complexity:
     runs-on: ubuntu-latest
     steps:
@@ -116,31 +114,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Uncrustify
-        run: sudo apt-get install uncrustify
-      - name: Run Uncrustify
-        run: find . -iname "*.[hc]" -exec uncrustify --check -c tools/uncrustify.cfg {} +
-      - name: Check For Trailing Whitespace
-        run: |
-          set +e
-          grep --exclude="README.md" -rnI -e "[[:blank:]]$" .
-          if [ "$?" = "0" ]; then
-            echo "Files have trailing whitespace."
-            exit 1
-          else
-            exit 0
-          fi
-            url-check:
-  url-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone This Repo
-        uses: actions/checkout@v2
+      - name: Check formatting
+        uses: FreeRTOS/CI-CD-Github-Actions/formatting@main
         with:
-            path: ./kernel
-      - name: URL Checker
-        run: |
-            bash kernel/.github/actions/url_verifier.sh kernel
+          path: ./
+          exclude-dirs: .git
+  link-verifier:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python for link verifier action
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Check Links
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: FreeRTOS/CI-CD-GitHub-Actions/link-verifier@main
+        with:
+          path: ./
+          exclude-dirs: cbmc
+          include-file-types: .c,.h,.dox
   git-secrets:
     runs-on: ubuntu-latest
     steps:
