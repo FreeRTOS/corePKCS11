@@ -57,6 +57,8 @@ jobs:
         uses: FreeRTOS/CI-CD-Github-Actions/coverage-cop@main
         with:
           path: ./build/coverage.info
+          line-coverage-min: 99
+          branch-coverage-min: 90
   complexity:
     runs-on: ubuntu-latest
     steps:
@@ -71,14 +73,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - name: Install Doxygen
-        run: |
-          wget -qO- "https://sourceforge.net/projects/doxygen/files/rel-1.8.20/doxygen-1.8.20.linux.bin.tar.gz/download" | sudo tar --strip-components=1 -xz -C /usr/local
-          sudo apt-get install -y libclang-9-dev graphviz
-      - name: Run Doxygen And Verify Stdout Is Empty
-        run: |
-          doxygen docs/doxygen/config.doxyfile 2>&1 | tee doxyoutput.txt
-          if [[ "$(wc -c < doxyoutput.txt | bc)" = "0" ]]; then exit 0; else exit 1; fi
+      - name: Check doxygen build
+        uses: FreeRTOS/CI-CD-Github-Actions/doxygen@main
+        with:
+          path: ./
   spell-check:
     runs-on: ubuntu-latest
     steps:
