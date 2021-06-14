@@ -143,7 +143,7 @@ void prvLabelToFilenameHandle( uint8_t * pcLabel,
             *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
             *pHandle = eAwsCodeSigningKey;
         }
-        else if( 0 == strncmp( pkcs11configLABEL_CMAC_KEY,
+        else if( 0 == memcmp( pkcs11configLABEL_CMAC_KEY,
                                pcLabel,
                                sizeof( pkcs11configLABEL_CMAC_KEY ) ) )
         {
