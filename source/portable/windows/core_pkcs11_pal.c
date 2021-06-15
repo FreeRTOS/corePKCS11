@@ -52,6 +52,7 @@
 #define pkcs11palFILE_NAME_PUBLIC_KEY            "FreeRTOS_P11_PubKey.dat"            /**< The file name of the Public Key object. */
 #define pkcs11palFILE_NAME_KEY                   "FreeRTOS_P11_Key.dat"               /**< The file name of the Private Key object. */
 #define pkcs11palFILE_CODE_SIGN_PUBLIC_KEY       "FreeRTOS_P11_CodeSignKey.dat"       /**< The file name of the Code Sign Key object. */
+#define pkcs11palFILE_CMAC_SECRET_KEY            "FreeRTOS_P11_CMACKey.dat"           /**< The file name of the CMAC Secret Key object. */
 
 /**
  * @ingroup pkcs11_macros
@@ -71,7 +72,8 @@ enum eObjectHandles
     eAwsDevicePrivateKey = 1, /**< Private Key. */
     eAwsDevicePublicKey,      /**< Public Key. */
     eAwsDeviceCertificate,    /**< Certificate. */
-    eAwsCodeSigningKey        /**< Code Signing Key. */
+    eAwsCodeSigningKey,       /**< Code Signing Key. */
+    eAwsCMACSecretKey         /**< CMAC Secret Key. */
 };
 
 /*-----------------------------------------------------------*/
@@ -114,32 +116,39 @@ void prvLabelToFilenameHandle( uint8_t * pcLabel,
     {
         /* Translate from the PKCS#11 label to local storage file name. */
         if( 0 == memcmp( pcLabel,
-                         &pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
+                         pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
                          sizeof( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
         {
             *pcFileName = pkcs11palFILE_NAME_CLIENT_CERTIFICATE;
             *pHandle = eAwsDeviceCertificate;
         }
         else if( 0 == memcmp( pcLabel,
-                              &pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
+                              pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
                               sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) ) )
         {
             *pcFileName = pkcs11palFILE_NAME_KEY;
             *pHandle = eAwsDevicePrivateKey;
         }
         else if( 0 == memcmp( pcLabel,
-                              &pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
+                              pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
                               sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
         {
             *pcFileName = pkcs11palFILE_NAME_PUBLIC_KEY;
             *pHandle = eAwsDevicePublicKey;
         }
         else if( 0 == memcmp( pcLabel,
-                              &pkcs11configLABEL_CODE_VERIFICATION_KEY,
+                              pkcs11configLABEL_CODE_VERIFICATION_KEY,
                               sizeof( pkcs11configLABEL_CODE_VERIFICATION_KEY ) ) )
         {
             *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
             *pHandle = eAwsCodeSigningKey;
+        }
+        else if( 0 == memcmp( pcLabel,
+                              pkcs11configLABEL_CMAC_KEY,
+                              sizeof( pkcs11configLABEL_CMAC_KEY ) ) )
+        {
+            *pcFileName = pkcs11palFILE_CMAC_SECRET_KEY;
+            *pHandle = ( CK_OBJECT_HANDLE ) eAwsCMACSecretKey;
         }
         else
         {
@@ -189,6 +198,12 @@ static CK_RV prvHandleToFilename( CK_OBJECT_HANDLE xHandle,
                 *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
+                break;
+
+            case eAwsCMACSecretKey:
+                *pcFileName = pkcs11palFILE_CMAC_SECRET_KEY;
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
                 break;
 
             default:
