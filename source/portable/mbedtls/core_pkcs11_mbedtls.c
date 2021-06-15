@@ -5473,7 +5473,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
     {
         lMbedTLSResult = mbedtls_pk_write_pubkey_der( &xCtx, pucDerFile, pkcs11KEY_GEN_MAX_DER_SIZE );
 
-        if( lMbedTLSResult > 0 )
+        if( ( lMbedTLSResult > 0 ) &&
+            ( lMbedTLSResult <= pkcs11KEY_GEN_MAX_DER_SIZE ) )
         {
             xPalPublic = PKCS11_PAL_SaveObject( pxPublicLabel, pucDerFile + pkcs11KEY_GEN_MAX_DER_SIZE - lMbedTLSResult, ( uint32_t ) lMbedTLSResult );
             LogDebug( ( "PKCS11_PAL_SaveObject returned a %lu PAL handle value "
@@ -5493,7 +5494,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
     {
         lMbedTLSResult = mbedtls_pk_write_key_der( &xCtx, pucDerFile, pkcs11KEY_GEN_MAX_DER_SIZE );
 
-        if( lMbedTLSResult > 0 )
+        if( ( lMbedTLSResult > 0 ) &&
+            ( lMbedTLSResult <= pkcs11KEY_GEN_MAX_DER_SIZE ) )
         {
             xPalPrivate = PKCS11_PAL_SaveObject( pxPrivateLabel, pucDerFile + pkcs11KEY_GEN_MAX_DER_SIZE - lMbedTLSResult, ( uint32_t ) lMbedTLSResult );
             LogDebug( ( "PKCS11_PAL_SaveObject returned a %lu PAL handle value "
