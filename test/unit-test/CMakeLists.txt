@@ -151,7 +151,6 @@ list(APPEND mock_list
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/ecp.h"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/pk_internal.h"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/ecdsa.h"
-            "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/error.h"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/pk.h"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/x509_crt.h"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls/md.h"

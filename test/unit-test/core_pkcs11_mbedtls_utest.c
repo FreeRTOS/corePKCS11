@@ -40,7 +40,6 @@
 #include "mock_rsa.h"
 #include "mock_bignum.h"
 #include "mock_core_pki_utils.h"
-#include "mock_error.h"
 #include "mock_pk_internal.h"
 #include "mock_md.h"
 #include "mock_cmac.h"
