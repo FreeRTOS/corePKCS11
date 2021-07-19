@@ -23,7 +23,7 @@ list(APPEND real_source_files
             ${test_config_sources}
             "${corePKCS11_location}/source/portable/posix/core_pkcs11_pal.c"
             "${CORE_PKCS11_3RDPARTY_LOCATION}/mbedtls_utils/mbedtls_utils.c"
-            "${CORE_PKCS11_3RDPARTY_LOCATION}/mbedtls_utils/mbedtls_error.c"
+            "${CORE_PKCS11_3RDPARTY_LOCATION}/mbedtls/library/error.c"
             )
 
 # list the directories the module under test includes
@@ -95,7 +95,7 @@ set_source_files_properties(
 )
 
 set_source_files_properties(
-    "${CORE_PKCS11_3RDPARTY_LOCATION}/mbedtls_utils/mbedtls_error.c"
+    "${CORE_PKCS11_3RDPARTY_LOCATION}/mbedtls/library/error.c"
     PROPERTIES COMPILE_FLAGS
     "-Wno-pedantic -Wno-error"
 )

@@ -2349,7 +2349,7 @@
  *
  * This module enables mbedtls_strerror().
  */
-/*#define MBEDTLS_ERROR_C */
+#define MBEDTLS_ERROR_C
 
 /**
  * \def MBEDTLS_GCM_C
