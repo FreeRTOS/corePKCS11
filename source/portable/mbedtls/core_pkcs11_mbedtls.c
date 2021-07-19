@@ -46,9 +46,7 @@
 #include "mbedtls/cmac.h"
 #include "mbedtls/platform.h"
 #include "mbedtls/threading.h"
-
-/* Custom mbedtls utils include. */
-#include "mbedtls_error.h"
+#include "mbedtls/error.h"
 
 /* C runtime includes. */
 #include <string.h>
