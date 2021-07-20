@@ -46,9 +46,7 @@
 #include "mbedtls/cmac.h"
 #include "mbedtls/platform.h"
 #include "mbedtls/threading.h"
-
-/* Custom mbedtls utils include. */
-#include "mbedtls_error.h"
+#include "mbedtls/error.h"
 
 /* C runtime includes. */
 #include <string.h>
@@ -83,17 +81,17 @@
  * @brief Utility for converting the high-level code in an mbedTLS error to string,
  * if the code-contains a high-level code; otherwise, using a default string.
  */
-    #define mbedtlsHighLevelCodeOrDefault( mbedTlsCode )    \
-    ( mbedtls_strerror_highlevel( mbedTlsCode ) != NULL ) ? \
-    mbedtls_strerror_highlevel( mbedTlsCode ) : pNoHighLevelMbedTlsCodeStr
+    #define mbedtlsHighLevelCodeOrDefault( mbedTlsCode )   \
+    ( mbedtls_high_level_strerr( mbedTlsCode ) != NULL ) ? \
+    mbedtls_high_level_strerr( mbedTlsCode ) : pNoHighLevelMbedTlsCodeStr
 
 /**
  * @brief Utility for converting the level-level code in an mbedTLS error to string,
  * if the code-contains a level-level code; otherwise, using a default string.
  */
-    #define mbedtlsLowLevelCodeOrDefault( mbedTlsCode )    \
-    ( mbedtls_strerror_lowlevel( mbedTlsCode ) != NULL ) ? \
-    mbedtls_strerror_lowlevel( mbedTlsCode ) : pNoLowLevelMbedTlsCodeStr
+    #define mbedtlsLowLevelCodeOrDefault( mbedTlsCode )   \
+    ( mbedtls_low_level_strerr( mbedTlsCode ) != NULL ) ? \
+    mbedtls_low_level_strerr( mbedTlsCode ) : pNoLowLevelMbedTlsCodeStr
 
 #endif /* ifndef DISABLE_LOGGING */
 
