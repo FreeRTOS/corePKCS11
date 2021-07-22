@@ -1,5 +1,5 @@
 /*
- * corePKCS11 V3.0.1
+ * corePKCS11 v3.0.2
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -30,6 +30,12 @@
  * @file core_pkcs11_pal.h
  * @brief Port Specific File Access functions for PKCS #11
  */
+
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    extern "C" {
+#endif
+/* *INDENT-ON* */
 
 /*-----------------------------------------------------------*/
 /*------------ Port Specific File Access API ----------------*/
@@ -139,5 +145,11 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
                                        CK_ULONG ulDataSize );
 /* @[declare_pkcs11_pal_getobjectvaluecleanup] */
+
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    }
+#endif
+/* *INDENT-ON* */
 
 #endif /* CORE_PKCS11_PAL include guard. */

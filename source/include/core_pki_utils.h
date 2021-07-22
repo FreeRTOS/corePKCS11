@@ -1,5 +1,5 @@
 /*
- * corePKCS11 V3.0.1
+ * corePKCS11 v3.0.2
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -28,6 +28,12 @@
 
 #include <stdint.h>
 #include <stddef.h>
+
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    extern "C" {
+#endif
+/* *INDENT-ON* */
 
 /**
  * @file core_pki_utils.h
@@ -85,4 +91,11 @@ int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
 int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
                                               size_t * pxSigLen );
 /* @[declare_pkcs11_utils_pkipkcs11signaturetombedtlssignature] */
+
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    }
+#endif
+/* *INDENT-ON* */
+
 #endif /* ifndef _CORE_PKI_UTILS_H_ */
