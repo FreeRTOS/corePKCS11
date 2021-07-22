@@ -16,7 +16,7 @@ This PKCS #11 library implements a subset of the PKCS #11 API required to establ
 @section pkcs11_memory_requirements Memory Requirements
 @brief Memory requirements of the PKCS #11 library.
 
-@include{doc} size_table.html
+@include{doc} size_table.md
 */
 
 /**

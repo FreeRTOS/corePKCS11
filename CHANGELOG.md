@@ -1,6 +1,7 @@
 # Change Log for corePKCS11 Library
 
 ## v3.0.2 (July 2021)
+* [#118](https://github.com/FreeRTOS/corePKCS11/pull/118) Update version numbers and add C++ header guards
 * [#116](https://github.com/FreeRTOS/corePKCS11/pull/116) Remove redundant mbedtls error sources
 * [#115](https://github.com/FreeRTOS/corePKCS11/pull/115) Update broken links to MISRA in documentation
 * [#113](https://github.com/FreeRTOS/corePKCS11/pull/113) Fix description of CBMC in README
