@@ -57,10 +57,11 @@ create_real_library(${real_name}
                     # Empty mock name as create_real_library needs the 4th argument.
                     ""
         )
+
 target_compile_definitions(
     ${real_name}
     PUBLIC
-        -DMBEDTLS_CONFIG_FILE="mbedtls_config.h"
+    MBEDTLS_CONFIG_FILE="mbedtls_config.h"
 )
 
 list(APPEND stest_link_list
@@ -113,7 +114,13 @@ set_source_files_properties(
 )
 
 set_source_files_properties(
+    ${MBEDTLS_FILES}
+    PROPERTY C_STANDARD
+    gnu90
+)
+
+set_source_files_properties(
     ${MBEDTLS_FILES_INCLUDES}
-    PROPERTIES COMPILE_FLAGS
-    "-Wno-pedantic"
+    PROPERTY C_STANDARD
+    gnu90
 )
