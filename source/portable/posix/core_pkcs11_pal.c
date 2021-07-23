@@ -115,42 +115,42 @@ static void prvLabelToFilenameHandle( const char * pcLabel,
 {
     if( ( pcLabel != NULL ) && ( pHandle != NULL ) && ( pcFileName != NULL ) )
     {
-        if( 0 == strncmp( &pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
+        if( 0 == strncmp( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
                           pcLabel,
                           sizeof( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
         {
             *pcFileName = pkcs11palFILE_NAME_CLIENT_CERTIFICATE;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsDeviceCertificate;
         }
-        else if( 0 == strncmp( &pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
+        else if( 0 == strncmp( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
                                pcLabel,
                                sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) ) )
         {
             *pcFileName = pkcs11palFILE_NAME_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsDevicePrivateKey;
         }
-        else if( 0 == strncmp( &pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
+        else if( 0 == strncmp( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
                                pcLabel,
                                sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
         {
             *pcFileName = pkcs11palFILE_NAME_PUBLIC_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsDevicePublicKey;
         }
-        else if( 0 == strncmp( &pkcs11configLABEL_CODE_VERIFICATION_KEY,
+        else if( 0 == strncmp( pkcs11configLABEL_CODE_VERIFICATION_KEY,
                                pcLabel,
                                sizeof( pkcs11configLABEL_CODE_VERIFICATION_KEY ) ) )
         {
             *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsCodeSigningKey;
         }
-        else if( 0 == strncmp( &pkcs11configLABEL_HMAC_KEY,
+        else if( 0 == strncmp( pkcs11configLABEL_HMAC_KEY,
                                pcLabel,
                                sizeof( pkcs11configLABEL_HMAC_KEY ) ) )
         {
             *pcFileName = pkcs11palFILE_HMAC_SECRET_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsHMACSecretKey;
         }
-        else if( 0 == strncmp( &pkcs11configLABEL_CMAC_KEY,
+        else if( 0 == strncmp( pkcs11configLABEL_CMAC_KEY,
                                pcLabel,
                                sizeof( pkcs11configLABEL_CMAC_KEY ) ) )
         {
