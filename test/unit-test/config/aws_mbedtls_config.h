@@ -2935,6 +2935,24 @@
  */
 #define MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_KEY_EXCHANGE
 
+/**
+ * \def MBEDTLS_USE_PSA_CRYPTO
+ *
+ * Make the X.509 and TLS library use PSA for cryptographic operations, see
+ * #MBEDTLS_PSA_CRYPTO_C.
+ *
+ * Note: this option is still in progress, the full X.509 and TLS modules are
+ * not covered yet, but parts that are not ported to PSA yet will still work
+ * as usual, so enabling this option should not break backwards compatibility.
+ *
+ * \warning  Support for PSA is still an experimental feature.
+ *           Any public API that depends on this option may change
+ *           at any time until this warning is removed.
+ *
+ * Requires: MBEDTLS_PSA_CRYPTO_C.
+ */
+#define MBEDTLS_USE_PSA_CRYPTO
+
 /* \} name SECTION: Customisation configuration options */
 
 /* Target and application specific configurations */
