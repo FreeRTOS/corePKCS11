@@ -1,14 +1,9 @@
 cmake_minimum_required ( VERSION 3.13.0 )
 project ( "corePKCS11 unit test"
-          VERSION 3.0.1
           LANGUAGES C )
 
 # Allow the project to be organized into folders.
 set_property( GLOBAL PROPERTY USE_FOLDERS ON )
-
-# Use C90.
-set( CMAKE_C_STANDARD 90 )
-set( CMAKE_C_STANDARD_REQUIRED ON )
 
 # Do not allow in-source build.
 if( ${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR} )
@@ -39,7 +34,7 @@ add_library( coverity_analysis
              ${PKCS_SOURCES} )
 
 # Build corePKCS11 library target without custom config dependency.
-target_compile_definitions( coverity_analysis PUBLIC -DMBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" )
+target_compile_definitions( coverity_analysis PUBLIC -DMBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" -std=c90 )
 
 # corePKCS11 public include path.
 target_include_directories( coverity_analysis PUBLIC ${PKCS_INCLUDE_PUBLIC_DIRS} ${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include ${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls_utils ${MODULE_ROOT_DIR}/test/unit-test/config )
