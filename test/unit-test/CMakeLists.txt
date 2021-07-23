@@ -162,6 +162,7 @@ list(APPEND mock_list
 
 # list the directories your mocks need
 list(APPEND mock_include_list
+            "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls_utils"
             "${MODULE_ROOT_DIR}/test/unit-test/config"
@@ -195,6 +196,7 @@ list(APPEND real_include_directories
 # list the directories your test needs to include
 list(APPEND test_include_directories
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/pkcs11"
+            "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls_utils"
             "${MODULE_ROOT_DIR}/test/unit-test/config"
