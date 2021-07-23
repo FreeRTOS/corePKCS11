@@ -33,6 +33,7 @@ list(APPEND mock_list
 list(APPEND mock_include_list
         config
         "${PKCS_INCLUDE_PUBLIC_DIRS}"
+        "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include"
         "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls"
         "${MODULE_ROOT_DIR}/test/unit-test/config"
     )
