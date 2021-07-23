@@ -1,6 +1,7 @@
 # Change Log for corePKCS11 Library
 
-## v3.0.2 (July 2021)
+## v3.1.0 (July 2021)
+- [#119](https://github.com/FreeRTOS/corePKCS11/pull/119) Update mbedTLS submodule to [v2.26.0](https://github.com/ARMmbed/mbedtls/tree/v2.26.0).
 * [#118](https://github.com/FreeRTOS/corePKCS11/pull/118) Update version numbers and add C++ header guards
 * [#116](https://github.com/FreeRTOS/corePKCS11/pull/116) Remove redundant mbedtls error sources
 * [#115](https://github.com/FreeRTOS/corePKCS11/pull/115) Update broken links to MISRA in documentation
