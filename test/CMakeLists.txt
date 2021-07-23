@@ -34,7 +34,10 @@ add_library( coverity_analysis
              ${PKCS_SOURCES} )
 
 # Build corePKCS11 library target without custom config dependency.
-target_compile_definitions( coverity_analysis PUBLIC -DMBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" -std=c90 )
+target_compile_definitions( coverity_analysis PUBLIC -DMBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" )
+
+# Build corePKCS11 library with C90 requirement.
+target_compile_options( coverity_analysis PUBLIC -std=c90 )
 
 # corePKCS11 public include path.
 target_include_directories( coverity_analysis PUBLIC ${PKCS_INCLUDE_PUBLIC_DIRS} ${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include ${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls_utils ${MODULE_ROOT_DIR}/test/unit-test/config )
