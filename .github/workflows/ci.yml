@@ -20,7 +20,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Debug \
           -DBUILD_CLONE_SUBMODULES=ON \
           -DSYSTEM_TESTS=1 \
-          -DCMAKE_C_FLAGS='-Wall -Wextra -DNDEBUG'
+          -DCMAKE_C_FLAGS='-Wall -Wextra -DNDEBUG -DLIBRARY_LOG_LEVEL=LOG_DEBUG'
           make -C build/ all
       - name: System Tests
         run: |

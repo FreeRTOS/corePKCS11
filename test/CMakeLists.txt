@@ -1,14 +1,9 @@
 cmake_minimum_required ( VERSION 3.13.0 )
 project ( "corePKCS11 unit test"
-          VERSION 3.0.1
           LANGUAGES C )
 
 # Allow the project to be organized into folders.
 set_property( GLOBAL PROPERTY USE_FOLDERS ON )
-
-# Use C90.
-set( CMAKE_C_STANDARD 90 )
-set( CMAKE_C_STANDARD_REQUIRED ON )
 
 # Do not allow in-source build.
 if( ${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR} )
@@ -41,6 +36,9 @@ add_library( coverity_analysis
 # Build corePKCS11 library target without custom config dependency.
 target_compile_definitions( coverity_analysis PUBLIC -DMBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" )
 
+# Build corePKCS11 library with gnuC90 standard due to mbedtls compatbility issues.
+target_compile_options( coverity_analysis PUBLIC -std=gnu90 )
+
 # corePKCS11 public include path.
 target_include_directories( coverity_analysis PUBLIC ${PKCS_INCLUDE_PUBLIC_DIRS} ${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include ${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls_utils ${MODULE_ROOT_DIR}/test/unit-test/config )
 
@@ -68,11 +66,6 @@ endif()
 # Use CTest utility for managing test runs. This has to be added BEFORE
 # defining test targets with add_test()
 enable_testing()
-
-# We do this to swap out the default mbed TLS config for one geared towards the
-# unit tests.
-add_compile_definitions( MBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" )
-
 
 # Add build targets for CMock and Unit, required for unit testing.
 add_cmock_targets()

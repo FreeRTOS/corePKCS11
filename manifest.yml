@@ -1,10 +1,10 @@
 name : "corePKCS11"
-version: "v3.0.2"
+version: "v3.1.0"
 description: |
   "Software implementation of the PKCS #11 standard.\n"
 dependencies:
   - name : "mbedtls"
-    version: "v2.16.8"
+    version: "v2.26.0"
     repository:
       type: "git"
       url: "https://github.com/ARMmbed/mbedtls/"

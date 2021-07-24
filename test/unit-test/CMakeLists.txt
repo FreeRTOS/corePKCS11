@@ -2,6 +2,8 @@ project( "pkcs11_wrapper" )
 #Include filepaths for source and include.
 include( ${MODULE_ROOT_DIR}/pkcsFilePaths.cmake )
 
+add_compile_definitions( MBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" )
+
 # =============================  PKCS #11 wrapper unit tests  ===========================
 set(project_name "core_pkcs11")
 set(utest_name "${project_name}_utest")
@@ -33,6 +35,7 @@ list(APPEND mock_list
 list(APPEND mock_include_list
         config
         "${PKCS_INCLUDE_PUBLIC_DIRS}"
+        "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include"
         "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls"
         "${MODULE_ROOT_DIR}/test/unit-test/config"
     )
@@ -161,6 +164,7 @@ list(APPEND mock_list
 
 # list the directories your mocks need
 list(APPEND mock_include_list
+            "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls_utils"
             "${MODULE_ROOT_DIR}/test/unit-test/config"
@@ -194,6 +198,7 @@ list(APPEND real_include_directories
 # list the directories your test needs to include
 list(APPEND test_include_directories
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/pkcs11"
+            "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include/mbedtls"
             "${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls_utils"
             "${MODULE_ROOT_DIR}/test/unit-test/config"
