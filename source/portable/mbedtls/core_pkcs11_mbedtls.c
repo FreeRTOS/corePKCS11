@@ -32,6 +32,7 @@
 
 /* PKCS #11 includes. */
 #include "core_pkcs11_config.h"
+#include "core_pkcs11_config_defaults.h"
 #include "core_pkcs11.h"
 #include "core_pkcs11_pal.h"
 #include "core_pki_utils.h"

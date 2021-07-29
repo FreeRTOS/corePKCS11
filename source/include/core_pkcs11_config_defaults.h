@@ -24,13 +24,13 @@
  */
 
 /**
- * @file core_pkcs11_config_info.h
- * @brief File for documentation on corePKCS11 configurations.
+ * @file core_pkcs11_config_defaults.h
+ * @brief List of configuration macros for the corePKCS11 library along with
+ * their default values.
  */
 
-
-#ifndef CORE_PKCS11_CONFIG_INFO_H_
-#define CORE_PKCS11_CONFIG_INFO_H_
+#ifndef CORE_PKCS11_CONFIG_DEFAULTS_H_
+#define CORE_PKCS11_CONFIG_DEFAULTS_H_
 
 /**
  * @brief Malloc API used by iot_pkcs11.h
@@ -38,7 +38,7 @@
  * <br><b>Possible values:</b> Any platform-specific function for allocating memory.<br>
  * <b>Default value:</b> The standard C `"malloc"` function
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configPKCS11_MALLOC
     #define pkcs11configPKCS11_MALLOC    malloc
 #endif
 
@@ -48,7 +48,7 @@
  * <br><b>Possible values:</b> Any platform-specific function for freeing memory.<br>
  * <b>Default value:</b> The standard C `"free"` function
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configPKCS11_FREE
     #define pkcs11configPKCS11_FREE    free
 #endif
 
@@ -67,7 +67,7 @@
  * <b>Possible values:</b> Any four digit code<br>
  * <b>Default value:</b> `"0000"`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configPKCS11_DEFAULT_USER_PIN
     #define pkcs11configPKCS11_DEFAULT_USER_PIN    "0000"
 #endif
 
@@ -78,7 +78,7 @@
  * <br><b>Possible values:</b> Any positive integer.<br>
  * <b>Default value:</b> `32`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configMAX_LABEL_LENGTH
     #define pkcs11configMAX_LABEL_LENGTH    32
 #endif
 
@@ -89,7 +89,7 @@
  * <br><b>Possible values:</b> Any positive integer.<br>
  * <b>Default value:</b> `6`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configMAX_NUM_OBJECTS
     #define pkcs11configMAX_NUM_OBJECTS    6
 #endif
 
@@ -103,7 +103,7 @@
  * <b>Possible values:</b> Any positive integer.<br>
  * <b>Default value:</b> 10
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configMAX_SESSIONS
     #define pkcs11configMAX_SESSIONS    10
 #endif
 
@@ -117,7 +117,7 @@
  * <b>Possible values:</b> `0` or `1`<br>
  * <b>Default value:</b> `0`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configPAL_DESTROY_SUPPORTED
     #define pkcs11configPAL_DESTROY_SUPPORTED    0
 #endif
 
@@ -130,7 +130,7 @@
  * <b>Possible values:</b> `0` or `1`<br>
  * <b>Default value:</b> `0`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configOTA_SUPPORTED
     #define pkcs11configOTA_SUPPORTED    0
 #endif
 
@@ -144,7 +144,7 @@
  * <b>Possible values:</b> `0` or `1`<br>
  * <b>Default value:</b> `0`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configJITP_CODEVERIFY_ROOT_CERT_SUPPORTED
     #define pkcs11configJITP_CODEVERIFY_ROOT_CERT_SUPPORTED    0
 #endif
 
@@ -157,7 +157,7 @@
  * <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
  * <b>Default value:</b> `Device Priv TLS Key`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS
     #define pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS    "Device Priv TLS Key"
 #endif
 
@@ -169,7 +169,7 @@
  * <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
  * <b>Default value:</b> `Device Pub TLS Key`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS
     #define pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS    "Device Pub TLS Key"
 #endif
 
@@ -181,7 +181,7 @@
  * <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
  * <b>Default value:</b> `Device Cert`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS
     #define pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS    "Device Cert"
 #endif
 
@@ -193,7 +193,7 @@
  * <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
  * <b>Default value:</b> `Root Cert`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configLABEL_ROOT_CERTIFICATE
     #define pkcs11configLABEL_ROOT_CERTIFICATE    "Root Cert"
 #endif
 
@@ -203,7 +203,7 @@
  * <br><b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
  * <b>Default value:</b> `HMAC Key`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configLABEL_HMAC_KEY
     #define pkcs11configLABEL_HMAC_KEY    "HMAC Key"
 #endif
 
@@ -213,7 +213,7 @@
  * <br><b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
  * <b>Default value:</b> `CMAC Key`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configLABEL_CMAC_KEY
     #define pkcs11configLABEL_CMAC_KEY    "CMAC Key"
 #endif
 
@@ -225,7 +225,7 @@
  * <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
  * <b>Default value:</b> `Code Verify Key`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configLABEL_CODE_VERIFICATION_KEY
     #define pkcs11configLABEL_CODE_VERIFICATION_KEY    "Code Verify Key"
 #endif
 
@@ -239,7 +239,7 @@
  * <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
  * <b>Default value:</b> `Code Verify Key`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configLABEL_JITP_CERTIFICATE
     #define pkcs11configLABEL_JITP_CERTIFICATE    "JITP Cert"
 #endif
 
@@ -251,7 +251,7 @@
  * <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
  * <b>Default value:</b> `Code Verify Key`
  */
-#ifdef DOXYGEN
+#ifndef pkcs11configLABEL_CODE_VERIFICATION_KEY
     #define pkcs11configLABEL_CODE_VERIFICATION_KEY    "Code Verify Key"
 #endif
 
@@ -271,7 +271,7 @@
  * <b>Default value</b>: Error logging is turned off, and no code is generated for calls
  * to the macro in the corePKCS11 library on compilation.
  */
-#ifdef DOXYGEN
+#ifndef LogError
     #define LogError( message )
 #endif
 
@@ -291,7 +291,7 @@
  * <b>Default value</b>: Warning logs are turned off, and no code is generated for calls
  * to the macro in the corePKCS11 library on compilation.
  */
-#ifdef DOXYGEN
+#ifndef LogWarn
     #define LogWarn( message )
 #endif
 
@@ -311,7 +311,7 @@
  * <b>Default value</b>: Info logging is turned off, and no code is generated for calls
  * to the macro in the corePKCS11 library on compilation.
  */
-#ifdef DOXYGEN
+#ifndef LogInfo
     #define LogInfo( message )
 #endif
 
@@ -331,8 +331,19 @@
  * <b>Default value</b>: Debug logging is turned off, and no code is generated for calls
  * to the macro in the corePKCS11 library on compilation.
  */
-#ifdef DOXYGEN
+#ifndef LogDebug
     #define LogDebug( message )
 #endif
+
+/**
+ * @brief Definitions mapping deprecated configuration macro names to their current equivalent
+ * configurations for backwards compatibility of API.
+ */
+#ifndef DOXYGEN
+    #define PKCS11_MALLOC                    pkcs11configPKCS11_MALLOC
+    #define PKCS11_FREE                      pkcs11configPKCS11_FREE
+    #define configPKCS11_DEFAULT_USER_PIN    pkcs11configPKCS11_MALLOC
+#endif
+
 
 #endif /* _AWS_PKCS11_CONFIG_H_ include guard. */
