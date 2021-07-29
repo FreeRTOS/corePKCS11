@@ -6,6 +6,7 @@ alt
 ans
 api
 app
+armmbed
 asn
 aws
 bbool
@@ -128,10 +129,17 @@ initpin
 inittoken
 int
 iot
+iso
+jitp
+jitr
 keil
 keypair
 len
 linux
+logdebug
+logerror
+loginfo
+logwarn
 lookedup
 mainpage
 malloc
@@ -156,6 +164,7 @@ onboard
 opensession
 org
 os
+ota
 palfile
 papplication
 param
@@ -182,6 +191,7 @@ pkimbedtlssignaturetopkcs
 pkipkcs
 pmechanism
 png
+posix
 ppart
 ppclabel
 ppfunctionlist
@@ -243,6 +253,7 @@ rowspan
 rsa
 sa
 saveobject
+sdk
 searchable
 seedrandom
 semaphorehandle
@@ -311,10 +322,10 @@ www
 xapphandle
 xbyte
 xcertificatetype
-xcmackeyhandle
-xcmacsecretcontext
 xclass
 xcmackeyhandle
+xcmackeyhandle
+xcmacsecretcontext
 xcmacsecretcontext
 xfindobjectlabellen
 xfindobjectwithlabelandclass

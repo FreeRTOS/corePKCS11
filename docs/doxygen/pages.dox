@@ -22,7 +22,7 @@ This corePKCS11 library implements a subset of the PKCS #11 API required to esta
 /**
 @page pkcs11_design Design
 @section PKCS11_Wrapper Dependencies of corePKCS11 Wrapper for PKCS #11 standard
-Currently, the corePKCS11 library provides a wrapper header around the PKCS #11 standard. It has depdnencies on:
+Currently, the corePKCS11 library provides a wrapper header around the PKCS #11 standard. It has dependencies on:
 - The C standard library `stdint`
 - PKCS #11 standard.
 
@@ -89,7 +89,7 @@ The PKI utils module is a forked version of the PKI utilities provided by Mbed T
 - DER to format required for PKCS #11
 - PKCS #11 to ASN.1 format
 
-Currently, the module has a depedency only on the C standard library.
+Currently, the module has a dependency only on the C standard library.
 
 @dot "PKCS #11 Utilities Dependencies"
 digraph pkcs11_utils_dependencies
@@ -337,7 +337,6 @@ digraph pkcs11_utils_dependencies
 @copydoc C_GenerateRandom
 
 */
-
 
 /**
 @page pkcs11_core_wrapper_function PKCS #11 Wrapper Functions
