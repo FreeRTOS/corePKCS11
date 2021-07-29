@@ -59,7 +59,7 @@
 /**
  * @brief Free API used by core_pkcs11.h
  */
-#define PKCS11_FREE                  free
+#define pkcs11configPKCS11_FREE      free
 
 
 /**

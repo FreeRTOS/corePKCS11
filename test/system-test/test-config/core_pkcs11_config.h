@@ -68,7 +68,7 @@
 /**
  * @brief Free API used by iot_pkcs11.h
  */
-#define PKCS11_FREE                            free
+#define pkcs11configPKCS11_FREE                free
 
 /**
  * @brief PKCS #11 default user PIN.

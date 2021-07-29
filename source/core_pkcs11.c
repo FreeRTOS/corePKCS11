@@ -133,7 +133,7 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
 
     if( ( xResult != CKR_OK ) && ( pxSlotId != NULL ) )
     {
-        PKCS11_FREE( pxSlotId );
+        pkcs11configPKCS11_FREE( pxSlotId );
         *ppxSlotId = NULL;
     }
 
@@ -239,12 +239,12 @@ CK_RV xInitializePkcs11Token( void )
 
     if( pxTokenInfo != NULL )
     {
-        PKCS11_FREE( pxTokenInfo );
+        pkcs11configPKCS11_FREE( pxTokenInfo );
     }
 
     if( pxSlotId != NULL )
     {
-        PKCS11_FREE( pxSlotId );
+        pkcs11configPKCS11_FREE( pxSlotId );
     }
 
     return xResult;
@@ -293,7 +293,7 @@ CK_RV xInitializePkcs11Session( CK_SESSION_HANDLE * pxSession )
         xResult = prvOpenSession( pxSession, pxSlotId[ 0 ] );
 
         /* Free the memory allocated by xGetSlotList. */
-        PKCS11_FREE( pxSlotId );
+        pkcs11configPKCS11_FREE( pxSlotId );
     }
 
     if( ( xResult == CKR_OK ) && ( pxFunctionList != NULL ) && ( pxFunctionList->C_Login != NULL ) )

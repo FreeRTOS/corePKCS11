@@ -376,7 +376,7 @@ void test_GetSlotList( void )
 
     if( slotIdPtr != NULL )
     {
-        PKCS11_FREE( slotIdPtr );
+        pkcs11configPKCS11_FREE( slotIdPtr );
     }
 
     result = globalFunctionList->C_Finalize( NULL );
@@ -399,7 +399,7 @@ void test_OpenSession_CloseSession( void )
         TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to get slot list" );
 
         slotId = slotIdPtr[ pkcs11testSLOT_NUMBER ];
-        PKCS11_FREE( slotIdPtr ); /* xGetSlotList allocates memory. */
+        pkcs11configPKCS11_FREE( slotIdPtr ); /* xGetSlotList allocates memory. */
         TEST_ASSERT_GREATER_THAN( 0, slotCount );
 
         result = globalFunctionList->C_OpenSession( slotId,
@@ -1084,7 +1084,7 @@ void test_Sign_EC( void )
         mbedtls_mpi_free( &S );
     }
 
-    PKCS11_FREE( publicKeyPtr );
+    pkcs11configPKCS11_FREE( publicKeyPtr );
     mbedtls_pk_free( &ecdsaContext );
 }
 
@@ -1534,7 +1534,7 @@ static CK_RV provisionPrivateECKey( CK_SESSION_HANDLE session,
 
     if( DPtr != NULL )
     {
-        PKCS11_FREE( DPtr );
+        pkcs11configPKCS11_FREE( DPtr );
     }
 
     return result;
@@ -1633,7 +1633,7 @@ static CK_RV provisionPrivateRSAKey( CK_SESSION_HANDLE session,
 
     if( NULL != rsaParams )
     {
-        PKCS11_FREE( rsaParams );
+        pkcs11configPKCS11_FREE( rsaParams );
     }
 
     return result;
@@ -1990,7 +1990,7 @@ static CK_RV provisionCertificate( CK_SESSION_HANDLE session,
 
     if( derObject != NULL )
     {
-        PKCS11_FREE( derObject );
+        pkcs11configPKCS11_FREE( derObject );
     }
 
     return result;
