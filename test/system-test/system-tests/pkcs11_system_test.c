@@ -31,7 +31,7 @@
 #include "core_pki_utils.h"
 #include "core_pkcs11_config.h"
 #include "core_pkcs11.h"
-#include "core_test_pkcs11_config.h"
+#include "system_test_pkcs11_config.h"
 
 /* Logging includes. */
 #include "logging_levels.h"
@@ -350,7 +350,7 @@ void test_GetSlotList( void )
         TEST_ASSERT_GREATER_THAN_MESSAGE( 0, slotCount, "Slot count incorrectly updated" );
 
         /* Allocate memory to receive the list of slots, plus one extra. */
-        slotIdPtr = PKCS11_MALLOC( sizeof( CK_SLOT_ID ) * ( slotCount + 1 ) );
+        slotIdPtr = pkcs11configPKCS11_MALLOC( sizeof( CK_SLOT_ID ) * ( slotCount + 1 ) );
         TEST_ASSERT_NOT_EQUAL_MESSAGE( NULL, slotIdPtr, "Failed malloc memory for slot list" );
 
         /* Call C_GetSlotList again to receive all slots with tokens present. */
@@ -1025,7 +1025,7 @@ void test_Sign_EC( void )
     /* Reconstruct public key from EC Params. */
     mbedtls_ecp_keypair * keyPair;
 
-    keyPair = PKCS11_MALLOC( sizeof( mbedtls_ecp_keypair ) );
+    keyPair = pkcs11configPKCS11_MALLOC( sizeof( mbedtls_ecp_keypair ) );
     TEST_ASSERT_NOT_EQUAL_MESSAGE( NULL, keyPair, "Failed to allocate memory for the mbed TLS context." );
 
     /* Initialize the info. */
@@ -1046,7 +1046,7 @@ void test_Sign_EC( void )
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to query for public key length" );
     TEST_ASSERT_NOT_EQUAL_MESSAGE( 0, pubKeyQuery.ulValueLen, "The size of the public key was an unexpected value." );
 
-    publicKeyPtr = PKCS11_MALLOC( pubKeyQuery.ulValueLen );
+    publicKeyPtr = pkcs11configPKCS11_MALLOC( pubKeyQuery.ulValueLen );
     TEST_ASSERT_NOT_EQUAL_MESSAGE( NULL, publicKeyPtr, "Failed to allocate space for public key." );
 
     pubKeyQuery.pValue = publicKeyPtr;
@@ -1474,7 +1474,7 @@ static CK_RV provisionPrivateECKey( CK_SESSION_HANDLE session,
 
     result = C_GetFunctionList( &functionList );
 
-    DPtr = PKCS11_MALLOC( EC_D_LENGTH );
+    DPtr = pkcs11configPKCS11_MALLOC( EC_D_LENGTH );
 
     if( ( DPtr == NULL ) )
     {
@@ -1559,7 +1559,7 @@ static CK_RV provisionPrivateRSAKey( CK_SESSION_HANDLE session,
 
     result = C_GetFunctionList( &functionList );
 
-    rsaParams = PKCS11_MALLOC( sizeof( RsaParams_t ) );
+    rsaParams = pkcs11configPKCS11_MALLOC( sizeof( RsaParams_t ) );
 
     if( rsaParams == NULL )
     {
@@ -1940,7 +1940,7 @@ static CK_RV provisionCertificate( CK_SESSION_HANDLE session,
         /* Convert the certificate to DER format if it was in PEM. The DER key
          * should be about 3/4 the size of the PEM key, so mallocing the PEM key
          * size is sufficient. */
-        derObject = PKCS11_MALLOC( certificateTemplate.xValue.ulValueLen );
+        derObject = pkcs11configPKCS11_MALLOC( certificateTemplate.xValue.ulValueLen );
         derLen = certificateTemplate.xValue.ulValueLen;
 
         if( derObject != NULL )

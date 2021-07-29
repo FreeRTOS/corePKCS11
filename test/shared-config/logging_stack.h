@@ -35,8 +35,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-
-
 /* Metadata information to prepend to every log message. */
 #define LOG_METADATA_FORMAT    "[%s:%d] "
 #define LOG_METADATA_ARGS      __FILE__, __LINE__
