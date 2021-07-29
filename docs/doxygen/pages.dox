@@ -8,7 +8,7 @@
 <span style="float:right;margin-right:4em"> &mdash; <i>Official documentation of PKCS #11 from [oasis](http://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html)</i></span><br>
 
 This corePKCS11 library implements a subset of the PKCS #11 API required to establish a secure connection to AWS IoT:
-- Verifying signature on the contents of a message.
+- Verifying the signature of the contents of a message.
 - Signing a message.
 - Managing certificates and keys.
 - Generating random numbers.
@@ -21,7 +21,7 @@ This corePKCS11 library implements a subset of the PKCS #11 API required to esta
 
 /**
 @page pkcs11_design Design
-@section PKCS11_Wrapper Dependencies of corePKCS11 Wrapper for PKCS #11 standard
+@section PKCS11_Wrapper Dependencies of the corePKCS11 Wrapper for the PKCS #11 standard
 Currently, the corePKCS11 library provides a wrapper header around the [PKCS #11 standard](http://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html). It has dependencies on:
 - `stdint` from the C standard library
 - PKCS #11 standard.
@@ -83,11 +83,12 @@ digraph pkcs11_software_implementation_dependencies
 }
 @enddot
 
-@section PKCS11_utilities corePKCS1111 Utilities Dependencies
+@section PKCS11_utilities corePKCS11 Utilities Dependencies
 
-The PKI utils module is a forked version of the PKI utilities provided by Mbed TLS. They provide helper utilities to convert format of ECDSA P-256 signatures.
-- DER to format required for PKCS #11
-- PKCS #11 to ASN.1 format
+The PKI utils module is a forked version of the PKI utilities provided by Mbed TLS. They provide helper utilities to convert the format of ECDSA P-256 signatures.
+The conversions provided are:
+- DER format to PKCS #11 format
+- PKCS #11 format to ASN.1 format
 
 Currently, the module has a dependency only on the C standard library.
 
