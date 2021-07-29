@@ -22,8 +22,8 @@ This corePKCS11 library implements a subset of the PKCS #11 API required to esta
 /**
 @page pkcs11_design Design
 @section PKCS11_Wrapper Dependencies of corePKCS11 Wrapper for PKCS #11 standard
-Currently, the corePKCS11 library provides a wrapper header around the PKCS #11 standard. It has dependencies on:
-- The C standard library `stdint`
+Currently, the corePKCS11 library provides a wrapper header around the [PKCS #11 standard](http://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html). It has dependencies on:
+- `stdint` from the C standard library
 - PKCS #11 standard.
 
 Note: "core_pkcs11.h" should always be included first as it defines the macros that are needed by the standard PKCS #11 header files.
