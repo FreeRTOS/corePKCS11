@@ -138,12 +138,20 @@
 #define pkcs11configLABEL_CODE_VERIFICATION_KEY            "Code Verify Key"
 
 /**
- * @brief The PKCS #11 label for the claim certificate for Fleet Provisioning.
+ * @brief The PKCS #11 label for a claim certificate useful for provisioning with
+ * Fleet Provisioning feature of AWS IoT Core through the "Provisioning by Claim" workflow.
+ *
+ * For more information on Fleet Provisioning, refer to this
+ * [AWS document](https://docs.aws.amazon.com/iot/latest/developerguide/provision-wo-cert.html)
  */
 #define pkcs11configLABEL_CLAIM_CERTIFICATE                "Claim Cert"
 
 /**
- * @brief The PKCS #11 label for the claim private key for Fleet Provisioning.
+ * @brief The PKCS #11 label for a claim private key useful for provisioning with
+ * Fleet Provisioning feature of AWS IoT Core through the "Provisioning by Claim" workflow.
+ *
+ * For more information on Fleet Provisioning, refer to this
+ * [AWS document](https://docs.aws.amazon.com/iot/latest/developerguide/provision-wo-cert.html)
  */
 #define pkcs11configLABEL_CLAIM_PRIVATE_KEY                "Claim Key"
 
