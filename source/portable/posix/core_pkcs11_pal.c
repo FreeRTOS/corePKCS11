@@ -52,6 +52,8 @@
 #define pkcs11palFILE_CODE_SIGN_PUBLIC_KEY       "FreeRTOS_P11_CodeSignKey.dat"       /**< The file name of the Code Sign Key object. */
 #define pkcs11palFILE_HMAC_SECRET_KEY            "FreeRTOS_P11_HMACKey.dat"           /**< The file name of the HMAC Secret Key object. */
 #define pkcs11palFILE_CMAC_SECRET_KEY            "FreeRTOS_P11_CMACKey.dat"           /**< The file name of the CMAC Secret Key object. */
+#define pkcs11palFILE_NAME_CLAIM_CERTIFICATE     "FreeRTOS_P11_Claim_Certificate.dat" /**< The file name of the Provisioning Claim Certificate object. */
+#define pkcs11palFILE_NAME_CLAIM_KEY             "FreeRTOS_P11_Claim_Key.dat"         /**< The file name of the Provisioning Claim Key object. */
 
 
 /**
@@ -67,7 +69,9 @@ enum eObjectHandles
     eAwsDeviceCertificate,    /**< Certificate. */
     eAwsCodeSigningKey,       /**< Code Signing Key. */
     eAwsHMACSecretKey,        /**< HMAC Secret Key. */
-    eAwsCMACSecretKey         /**< CMAC Secret Key. */
+    eAwsCMACSecretKey,        /**< CMAC Secret Key. */
+    eAwsClaimPrivateKey,      /**< Provisioning Claim Private Key. */
+    eAwsClaimCertificate      /**< Provisioning Claim Certificate. */
 };
 
 /*-----------------------------------------------------------*/
@@ -157,6 +161,20 @@ static void prvLabelToFilenameHandle( const char * pcLabel,
             *pcFileName = pkcs11palFILE_CMAC_SECRET_KEY;
             *pHandle = ( CK_OBJECT_HANDLE ) eAwsCMACSecretKey;
         }
+        else if( 0 == strncmp( pkcs11configLABEL_CLAIM_CERTIFICATE,
+                               pcLabel,
+                               sizeof( pkcs11configLABEL_CLAIM_CERTIFICATE ) ) )
+        {
+            *pcFileName = pkcs11palFILE_NAME_CLAIM_CERTIFICATE;
+            *pHandle = ( CK_OBJECT_HANDLE ) eAwsClaimCertificate;
+        }
+        else if( 0 == strncmp( pkcs11configLABEL_CLAIM_PRIVATE_KEY,
+                               pcLabel,
+                               sizeof( pkcs11configLABEL_CLAIM_PRIVATE_KEY ) ) )
+        {
+            *pcFileName = pkcs11palFILE_NAME_CLAIM_KEY;
+            *pHandle = ( CK_OBJECT_HANDLE ) eAwsClaimPrivateKey;
+        }
         else
         {
             *pcFileName = NULL;
@@ -221,6 +239,18 @@ static CK_RV prvHandleToFilename( CK_OBJECT_HANDLE xHandle,
 
             case eAwsCMACSecretKey:
                 *pcFileName = pkcs11palFILE_CMAC_SECRET_KEY;
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
+                break;
+
+            case eAwsClaimCertificate:
+                *pcFileName = pkcs11palFILE_NAME_CLAIM_CERTIFICATE;
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
+                break;
+
+            case eAwsClaimPrivateKey:
+                *pcFileName = pkcs11palFILE_NAME_CLAIM_KEY;
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
                 break;

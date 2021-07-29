@@ -63,6 +63,8 @@ digestinit
 digestkey
 digestupdate
 drbg
+eawsclaimcertificate
+eawsclaimprivatekey
 eawscmacsecretkey
 eawscodesigningkey
 eawsdevicecertificate
@@ -311,10 +313,10 @@ www
 xapphandle
 xbyte
 xcertificatetype
-xcmackeyhandle
-xcmacsecretcontext
 xclass
 xcmackeyhandle
+xcmackeyhandle
+xcmacsecretcontext
 xcmacsecretcontext
 xfindobjectlabellen
 xfindobjectwithlabelandclass
