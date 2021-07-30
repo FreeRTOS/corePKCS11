@@ -244,18 +244,6 @@
 #endif
 
 /**
- * @brief The PKCS #11 label for the object to be used for code verification.
- *
- * Used by AWS IoT Over-the-Air Update (OTA) code to verify an incoming signed image.
- *
- * <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
- * <b>Default value:</b> `Code Verify Key`
- */
-#ifndef pkcs11configLABEL_CODE_VERIFICATION_KEY
-    #define pkcs11configLABEL_CODE_VERIFICATION_KEY    "Code Verify Key"
-#endif
-
-/**
  * @brief Macro that is called in the corePKCS11 library for logging "Error" level
  * messages.
  *
@@ -342,7 +330,7 @@
 #ifndef DOXYGEN
     #define PKCS11_MALLOC                    pkcs11configPKCS11_MALLOC
     #define PKCS11_FREE                      pkcs11configPKCS11_FREE
-    #define configPKCS11_DEFAULT_USER_PIN    pkcs11configPKCS11_MALLOC
+    #define configPKCS11_DEFAULT_USER_PIN    pkcs11configPKCS11_DEFAULT_USER_PIN
 #endif
 
 
