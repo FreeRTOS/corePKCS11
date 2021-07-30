@@ -32,6 +32,12 @@
 #ifndef CORE_PKCS11_CONFIG_DEFAULTS_H_
 #define CORE_PKCS11_CONFIG_DEFAULTS_H_
 
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    extern "C" {
+#endif
+/* *INDENT-ON* */
+
 /**
  * @brief Malloc API used by iot_pkcs11.h
  *
@@ -333,5 +339,10 @@
     #define configPKCS11_DEFAULT_USER_PIN    pkcs11configPKCS11_DEFAULT_USER_PIN
 #endif
 
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    }
+#endif
+/* *INDENT-ON* */
 
-#endif /* _AWS_PKCS11_CONFIG_H_ include guard. */
+#endif /* CORE_PKCS11_CONFIG_DEFAULTS_H_ include guard. */
