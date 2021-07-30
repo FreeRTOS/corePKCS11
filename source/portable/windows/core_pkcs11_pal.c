@@ -37,6 +37,7 @@
 #include "FreeRTOS.h"
 #include "core_pkcs11.h"
 #include "core_pkcs11_config.h"
+#include "core_pkcs11_config_defaults.h"
 
 
 /* C runtime includes. */

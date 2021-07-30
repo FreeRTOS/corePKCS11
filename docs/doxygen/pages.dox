@@ -7,8 +7,8 @@
 
 <span style="float:right;margin-right:4em"> &mdash; <i>Official documentation of PKCS #11 from [oasis](http://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html)</i></span><br>
 
-This PKCS #11 library implements a subset of the PKCS #11 API required to establish a secure connection to AWS IoT:
-- Verifying the contents of a message.
+This corePKCS11 library implements a subset of the PKCS #11 API required to establish a secure connection to AWS IoT:
+- Verifying the signature of the contents of a message.
 - Signing a message.
 - Managing certificates and keys.
 - Generating random numbers.
@@ -21,10 +21,10 @@ This PKCS #11 library implements a subset of the PKCS #11 API required to establ
 
 /**
 @page pkcs11_design Design
-@section PKCS11_Wrapper PKCS #11 Wrapper Dependencies
-Currently, the PKCS #11 wrapper library has a dependency on:
-- The C standard library stdint
-- PKCS #11.
+@section PKCS11_Wrapper Dependencies of the corePKCS11 Wrapper for the PKCS #11 standard
+Currently, the corePKCS11 library provides a wrapper header around the [PKCS #11 standard](http://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html). It has dependencies on:
+- `stdint.h` from the C standard library
+- PKCS #11 standard.
 
 Note: "core_pkcs11.h" should always be included first as it defines the macros that are needed by the standard PKCS #11 header files.
 
@@ -48,16 +48,16 @@ digraph pkcs11_wrapper_dependencies
 }
 @enddot
 
-@section PKCS11_implementation PKCS #11 Software Implementation Dependencies
+@section PKCS11_implementation corePKCS11 Software Implementation Dependencies
 
-PKCS #11 is a flexible library, and can easily be swapped out for other implementations. The PKCS #11 library documented here
-is a software based implementation, to allow for writing libraries and code that can easily interface with Hardware Security Modules (HSM).
+The corePKCS11 library provides one implementation of the PKCS #11 standard, and it can easily be swapped out for other implementations. The corePKCS11 library documented here
+is a software based implementation of the PKCS #11 standard, to allow for writing libraries and code that can easily interface with Hardware Security Modules (HSM).
 
-Currently, the software based PKCS #11 library has the following dependencies:
+Currently, the software based corePKCS11 library has the following dependencies:
 - The API defined by the PKCS #11 specification. The headers used can be found [here](https://github.com/amazon-freertos/pkcs11/tree/v2.40_errata01).
 - The PKCS #11 PAL layer. This is used for writing PKCS #11 objects to flash.
-- mbed TLS. This library uses mbed TLS for the cryptographic logic. Some examples include parsing key and certificate objects, signing operations, and creating digests.
-- The standard C library string, for memory manipulation.
+- [Mbed TLS](https://github.com/ARMmbed/mbedtls/tree/v2.26.0). This library uses Mbed TLS for the cryptographic logic. Some examples include parsing key and certificate objects, signing operations, and creating digests.
+- The standard C library `string.h`, for memory manipulation.
 
 @dot "PKCS #11 implementation direct dependencies"
 digraph pkcs11_software_implementation_dependencies
@@ -73,7 +73,7 @@ digraph pkcs11_software_implementation_dependencies
         node[fillcolor="#aed8a9ff"];
         rank = same;
         pkcs11_wrapper[label="PKCS #11"];
-        mbedtls[label="mbed TLS"];
+        mbedtls[label="Mbed TLS"];
         pkcs11_pal[label="PKCS #11 PAL"];
     }
 
@@ -83,11 +83,14 @@ digraph pkcs11_software_implementation_dependencies
 }
 @enddot
 
-@section PKCS11_utilities PKCS #11 Utilities Dependencies
+@section PKCS11_utilities corePKCS11 Utilities Dependencies
 
-The PKI utils module is a forked version of the PKI utilities provided by mbed TLS. They are used to convert from
-Currently, the module has the following dependencies:
-- The standard C library
+The PKI utils module is a forked version of the PKI utilities provided by Mbed TLS. They provide helper utilities to convert the format of ECDSA P-256 signatures.
+The conversions provided are:
+- DER format to PKCS #11 format.
+- PKCS #11 format to ASN.1 format.
+
+Currently, the module has a dependency only on the C standard library.
 
 @dot "PKCS #11 Utilities Dependencies"
 digraph pkcs11_utils_dependencies
@@ -122,119 +125,97 @@ digraph pkcs11_utils_dependencies
 
 @page pkcs11_rng_seq PKCS #11 RNG Sequence Diagram
 @brief Sequence diagram illustrating how to generate random bytes from PKCS #11.
-@image html pkcs11_rng.png "PKCS #11 RNG Sequence" width=80%
+@image html pkcs11_rng.png "PKCS #11 RNG Sequence" width=50%
 
 @page pkcs11_dig_seq PKCS #11 Digest Sequence Diagram
 @brief Sequence diagram illustrating how to create a message digest with PKCS #11.
-@image html pkcs11_digest.png "PKCS #11 Digest Sequence" width=80%
+@image html pkcs11_digest.png "PKCS #11 Digest Sequence" width=50%
 
 @page pkcs11_obj_imp_seq PKCS #11 Object Import Sequence Diagram
 @brief Sequence diagram illustrating how to import an object with PKCS #11.
-@image html pkcs11_object_import.png "PKCS #11 Object Import Sequence" width=80%
+@image html pkcs11_object_import.png "PKCS #11 Object Import Sequence" width=50%
 
 @page pkcs11_obj_gen_seq PKCS #11 Generate Key Pair Sequence Diagram
 @brief Sequence diagram illustrating how to generate a key pair with PKCS #11.
-@image html pkcs11_object_generate.png "PKCS #11 Generate Key Pair Sequence" width=80%
+@image html pkcs11_object_generate.png "PKCS #11 Generate Key Pair Sequence" width=50%
 
 @page pkcs11_sign_verify_seq PKCS #11 Sign and Verify Sequence Diagram
 @brief Sequence diagram illustrating how to sign a hash and verify a signature with PKCS #11.
-@image html pkcs11_sign_verify.png "PKCS #11 Sign and Verify Sequence" width=80%
+@image html pkcs11_sign_verify.png "PKCS #11 Sign and Verify Sequence" width=50%
 */
 
 /**
 @page pkcs11_config PKCS #11 Configuration Macros
-@brief These are the configuration macros used by the PKCS #11 Library.
+@brief These are the configuration macros used by the corePKCS11 Library.
 
-@section configPKCS11_DEFAULT_USER_PIN
-@brief The default user pin for PKCS #11. This feature is generally not used for microcontroller based applications.
+@section pkcs11configPKCS11_MALLOC
+@copydoc pkcs11configPKCS11_MALLOC
 
-<b>Possible values:</b> Any four digit code
-<b>Default value (if undefined): </b> `"0000"`
+@section pkcs11configPKCS11_FREE
+@copydoc pkcs11configPKCS11_FREE
+
+@section pkcs11configPKCS11_DEFAULT_USER_PIN
+@copydoc pkcs11configPKCS11_DEFAULT_USER_PIN
 
 @section pkcs11configMAX_LABEL_LENGTH
-@brief Max length of a PKCS #11 Label attribute
-
-PKCS #11 uses labels to map human readable strings to a PKCS #11 object. This defines the maximum allowable length for such a string.<br>
-
-<b>Possible values:</b> Any positive integer.<br>
-<b>Default value (if undefined): </b> `32`
+@copydoc pkcs11configMAX_LABEL_LENGTH
 
 @section pkcs11configMAX_NUM_OBJECTS
-@brief Maximum number of token objects that can be stored by the PKCS #11 module.<br>
-
-<b>Possible values:</b> Any positive integer.<br>
-<b>Default value (if undefined): </b> `6`
-
+@copydoc pkcs11configMAX_NUM_OBJECTS
 
 @section pkcs11configMAX_SESSIONS
-@brief Maximum number of sessions that can be stored by the PKCS #11 module.<br>
-The more sessions created, the higher RAM used by the PKCS #11 module.<br>
-<b>Possible values:</b> Any positive integer.<br>
-<b>Default value (if undefined): </b> 10
+@copydoc pkcs11configMAX_SESSIONS
 
-@section pkcs11testIMPORT_PRIVATE_KEY_SUPPORT
-@brief Set to 1 if the PKCS #11 stack or device/hsm can load objects from an external source.<br>
+@section pkcs11configPAL_DESTROY_SUPPORTED
+@copydoc pkcs11configPAL_DESTROY_SUPPORTED
 
-<b>Possible values:</b> 0 or 1 <br>
-<b>Default value (if undefined): </b> `0`
+@section pkcs11configOTA_SUPPORTED
+@copydoc pkcs11configOTA_SUPPORTED
 
-@section pkcs11testGENERATE_KEYPAIR_SUPPORT
-@brief Set to 1 if the PKCS #11 stack or device/hsm can generate a key pair.<br>
-@note The device should be able to store certificate onboard as well.<br>
-
-<b>Possible values:</b> 0 or 1 <br>
-<b>Default value (if undefined): </b> `0`
-
-@section pkcs11testPREPROVISIONED_SUPPORT
-@brief Set to 1 if the PKCS #11 stack or device/hsm is pre-provisioned with all objects necessary to connect to AWS IoT Core.<br>
-<b>Possible values:</b> 0 or 1 <br>
-<b>Default value (if undefined): </b> `0`
+@section pkcs11configJITP_CODEVERIFY_ROOT_CERT_SUPPORTED
+@copydoc pkcs11configJITP_CODEVERIFY_ROOT_CERT_SUPPORTED
 
 @section pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS
-@brief The PKCS #11 label for device private key.
-
-The PKCS #11 label for device private key. Private key for connection to AWS IoT endpoint.
-The corresponding public key should be registered with the AWS IoT endpoint.
-
-<b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
-<b>Default value (if undefined): </b> `Device Priv TLS Key`
-
+@copydoc pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS
 
 @section pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS
-@brief The PKCS #11 label for device private key.
-
-The public key corresponding to pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS.
-
-<b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
-<b>Default value (if undefined): </b> `Device Pub TLS Key`
+@copydoc pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS
 
 @section pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS
-@brief The PKCS #11 label for the device certificate.
-Device certificate corresponding to pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS.
-
-<b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
-<b>Default value (if undefined): </b> `Device Cert`
+@copydoc pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS
 
 @section pkcs11configLABEL_ROOT_CERTIFICATE
-@brief The PKCS #11 label for the AWS Trusted Root Certificate.
-
-The PKCS #11 label for the AWS Trusted Root Certificate.
-
-<b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
-<b>Default value (if undefined): </b> `Root Cert`
+@copydoc pkcs11configLABEL_ROOT_CERTIFICATE
 
 @section pkcs11configLABEL_HMAC_KEY
-@brief The PKCS #11 label for the AWS Trusted Root Certificate.
+@copydoc pkcs11configLABEL_HMAC_KEY
 
-The PKCS #11 label for the object to be used for HMAC operations.
+@section pkcs11configLABEL_CMAC_KEY
+@copydoc pkcs11configLABEL_CMAC_KEY
 
-<b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
-<b>Default value (if undefined): </b> `HMAC Key`
+@section pkcs11configLABEL_CODE_VERIFICATION_KEY
+@copydoc pkcs11configLABEL_CODE_VERIFICATION_KEY
+
+@section pkcs11configLABEL_JITP_CERTIFICATE
+@copydoc pkcs11configLABEL_JITP_CERTIFICATE
+
+@section LogError
+@copydoc LogError
+
+@section LogWarn
+@copydoc LogWarn
+
+@section LogInfo
+@copydoc LogInfo
+
+@section LogDebug
+@copydoc LogDebug
+
 */
 
 /**
-@page pkcs11_core_mbedtls_function PKCS #11 mbed TLS Implementation Functions
-@brief Primary functions of the PKCS #11 mbed TLS based Implementation Library:<br><br>
+@page pkcs11_core_mbedtls_function PKCS #11 Mbed TLS Implementation Functions
+@brief Primary functions of the PKCS #11 Mbed TLS based Implementation Library:<br><br>
 @subpage pkcs11_mbedtls_function_c_initialize <br>
 @subpage pkcs11_mbedtls_function_c_finalize <br>
 @subpage pkcs11_mbedtls_function_c_getfunctionlist <br>
@@ -357,7 +338,6 @@ The PKCS #11 label for the object to be used for HMAC operations.
 @copydoc C_GenerateRandom
 
 */
-
 
 /**
 @page pkcs11_core_wrapper_function PKCS #11 Wrapper Functions

@@ -1,5 +1,8 @@
 # Change Log for corePKCS11 Library
 
+## v3.2.0 (August 2021)
+- [#122] Add `core_pkcs11_config_defaults.h` file for default definition of configuration macros. and make doxygen documentation fixes.
+
 ## v3.1.0 (July 2021)
 - [#119](https://github.com/FreeRTOS/corePKCS11/pull/119) Update mbedTLS submodule to [v2.26.0](https://github.com/ARMmbed/mbedtls/tree/v2.26.0).
 * [#118](https://github.com/FreeRTOS/corePKCS11/pull/118) Update version numbers and add C++ header guards
