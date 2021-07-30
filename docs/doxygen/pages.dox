@@ -23,7 +23,7 @@ This corePKCS11 library implements a subset of the PKCS #11 API required to esta
 @page pkcs11_design Design
 @section PKCS11_Wrapper Dependencies of the corePKCS11 Wrapper for the PKCS #11 standard
 Currently, the corePKCS11 library provides a wrapper header around the [PKCS #11 standard](http://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html). It has dependencies on:
-- `stdint` from the C standard library
+- `stdint.h` from the C standard library
 - PKCS #11 standard.
 
 Note: "core_pkcs11.h" should always be included first as it defines the macros that are needed by the standard PKCS #11 header files.
@@ -50,7 +50,7 @@ digraph pkcs11_wrapper_dependencies
 
 @section PKCS11_implementation corePKCS11 Software Implementation Dependencies
 
-The implementation that corePKCS11 provides for the PKCS #11 wrapper header, `core_pkcs11.h`, is flexible library to be swapped out for other implementations. The corePKCS11 library documented here
+The corePKCS11 library provides one implementation of the PKCS #11 standard, and it can easily be swapped out for other implementations. The corePKCS11 library documented here
 is a software based implementation of the PKCS #11 standard, to allow for writing libraries and code that can easily interface with Hardware Security Modules (HSM).
 
 Currently, the software based corePKCS11 library has the following dependencies:
@@ -87,8 +87,8 @@ digraph pkcs11_software_implementation_dependencies
 
 The PKI utils module is a forked version of the PKI utilities provided by Mbed TLS. They provide helper utilities to convert the format of ECDSA P-256 signatures.
 The conversions provided are:
-- DER format to PKCS #11 format
-- PKCS #11 format to ASN.1 format
+- DER format to PKCS #11 format.
+- PKCS #11 format to ASN.1 format.
 
 Currently, the module has a dependency only on the C standard library.
 
