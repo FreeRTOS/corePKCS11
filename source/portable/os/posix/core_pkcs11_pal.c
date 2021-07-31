@@ -294,8 +294,8 @@ CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
 
 
     xResult = PAL_UTILS_HandleToFilename( xHandle,
-                                                &pcFileName,
-                                                &xIsPrivate );
+                                          &pcFileName,
+                                          &xIsPrivate );
 
     if( ( xResult == CKR_OK ) && ( prvFileExists( pcFileName ) == CKR_OK ) )
     {
