@@ -21,7 +21,8 @@ file(GLOB test_config_sources CONFIGURE_DEPENDS "${test_config}/*.h")
 list(APPEND real_source_files
             ${MBEDTLS_FILES}
             ${test_config_sources}
-            "${corePKCS11_location}/source/portable/posix/core_pkcs11_pal.c"
+            "${corePKCS11_location}/source/portable/os/posix/core_pkcs11_pal.c"
+            "${corePKCS11_location}/source/portable/os/core_pkcs11_pal_utils.c"
             "${CORE_PKCS11_3RDPARTY_LOCATION}/mbedtls_utils/mbedtls_utils.c"
             "${CORE_PKCS11_3RDPARTY_LOCATION}/mbedtls/library/error.c"
             )
@@ -32,6 +33,7 @@ list(APPEND real_include_directories
             ${test_config}
             ${PKCS_INCLUDE_PUBLIC_DIRS}
             ${LOGGING_INCLUDE_DIRS}
+            "${corePKCS11_location}/source/portable/os"
             "${CORE_PKCS11_3RDPARTY_LOCATION}/pkcs11"
             "${CORE_PKCS11_3RDPARTY_LOCATION}/mbedtls/include"
             "${CORE_PKCS11_3RDPARTY_LOCATION}/mbedtls_utils"
@@ -61,7 +63,7 @@ create_real_library(${real_name}
 target_compile_definitions(
     ${real_name}
     PUBLIC
-    MBEDTLS_CONFIG_FILE="mbedtls_config.h"
+    MBEDTLS_CONFIG_FILE="system_test_mbedtls_config.h"
 )
 
 list(APPEND stest_link_list
