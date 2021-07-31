@@ -54,12 +54,12 @@
 /**
  * @brief Malloc API used by core_pkcs11.h
  */
-#define PKCS11_MALLOC    malloc
+#define pkcs11configPKCS11_MALLOC    malloc
 
 /**
  * @brief Free API used by core_pkcs11.h
  */
-#define PKCS11_FREE      free
+#define pkcs11configPKCS11_FREE      free
 
 
 /**
@@ -71,7 +71,7 @@
  * both of those, the user PIN is assumed to be used herein for interoperability
  * purposes only, and not as a security feature.
  */
-#define configPKCS11_DEFAULT_USER_PIN                      "0000"
+#define pkcs11configPKCS11_DEFAULT_USER_PIN                "0000"
 
 /**
  * @brief Maximum length (in characters) for a PKCS #11 CKA_LABEL
