@@ -24,9 +24,9 @@
  */
 
 /**
- * @file iot_test_pkcs11_config.h
+ * @file system_test_pkcs11_config.h
  * @brief Port-specific variables for PKCS11 tests.
- */ 
+ */
 
 #ifndef _IOT_TEST_PKCS11_CONFIG_H_
 #define _IOT_TEST_PKCS11_CONFIG_H_
