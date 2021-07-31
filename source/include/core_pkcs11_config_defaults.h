@@ -39,6 +39,25 @@
 /* *INDENT-ON* */
 
 /**
+ * @brief Definitions mapping deprecated configuration macro names to their current equivalent
+ * configurations for backwards compatibility of API.
+ */
+#ifndef DOXYGEN
+    #ifdef PKCS11_MALLOC
+        #define pkcs11configPKCS11_MALLOC    PKCS11_MALLOC
+    #endif
+
+    #ifdef PKCS11_FREE
+        #define pkcs11configPKCS11_FREE    PKCS11_FREE
+    #endif
+
+    #ifdef configPKCS11_DEFAULT_USER_PIN
+        #define pkcs11configPKCS11_DEFAULT_USER_PIN    configPKCS11_DEFAULT_USER_PIN
+    #endif
+#endif /* ifndef DOXYGEN */
+
+
+/**
  * @brief Malloc API used by iot_pkcs11.h
  *
  * <br><b>Possible values:</b> Any platform-specific function for allocating memory.<br>
@@ -327,16 +346,6 @@
  */
 #ifndef LogDebug
     #define LogDebug( message )
-#endif
-
-/**
- * @brief Definitions mapping deprecated configuration macro names to their current equivalent
- * configurations for backwards compatibility of API.
- */
-#ifndef DOXYGEN
-    #define PKCS11_MALLOC                    pkcs11configPKCS11_MALLOC
-    #define PKCS11_FREE                      pkcs11configPKCS11_FREE
-    #define configPKCS11_DEFAULT_USER_PIN    pkcs11configPKCS11_DEFAULT_USER_PIN
 #endif
 
 /* *INDENT-OFF* */
