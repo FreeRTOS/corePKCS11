@@ -63,6 +63,7 @@ digestinfo
 digestinit
 digestkey
 digestupdate
+doxygen
 drbg
 eawsclaimcertificate
 eawsclaimprivatekey
