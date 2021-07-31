@@ -64,6 +64,8 @@ digestinit
 digestkey
 digestupdate
 drbg
+eawsclaimcertificate
+eawsclaimprivatekey
 eawscmacsecretkey
 eawscodesigningkey
 eawsdevicecertificate
