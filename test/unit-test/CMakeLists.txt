@@ -2,7 +2,7 @@ project( "pkcs11_wrapper" )
 #Include filepaths for source and include.
 include( ${MODULE_ROOT_DIR}/pkcsFilePaths.cmake )
 
-add_compile_definitions( MBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" )
+add_compile_definitions( MBEDTLS_CONFIG_FILE="unit_test_mbedtls_config.h" )
 
 # =============================  PKCS #11 wrapper unit tests  ===========================
 set(project_name "core_pkcs11")

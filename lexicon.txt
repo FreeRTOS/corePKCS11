@@ -187,6 +187,7 @@ phsession
 pinfo
 pinitargs
 pisprivate
+pisprivatekey
 pk
 pkcs
 pki
@@ -319,6 +320,7 @@ verifyrecoverinit
 verifyupdate
 waitforslotevent
 wether
+winsim
 wrapkey
 wtscrttv
 www

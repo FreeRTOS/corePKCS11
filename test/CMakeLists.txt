@@ -34,7 +34,7 @@ add_library( coverity_analysis
              ${PKCS_SOURCES} )
 
 # Build corePKCS11 library target without custom config dependency.
-target_compile_definitions( coverity_analysis PUBLIC -DMBEDTLS_CONFIG_FILE="aws_mbedtls_config.h" )
+target_compile_definitions( coverity_analysis PUBLIC -DMBEDTLS_CONFIG_FILE="unit_test_mbedtls_config.h" )
 
 # Build corePKCS11 library with gnuC90 standard due to mbedtls compatbility issues.
 target_compile_options( coverity_analysis PUBLIC -std=gnu90 )
@@ -75,12 +75,12 @@ include( ${MODULE_ROOT_DIR}/tools/cmock/create_test.cmake )
 
 # Include build configuration for unit tests.
 if(UNIT_TESTS)
-add_subdirectory( unit-test )
+    add_subdirectory( unit-test )
 endif()
 
 # Include build configuration for system tests.
 if(SYSTEM_TESTS)
-add_subdirectory( system-test )
+    add_subdirectory( system-test )
 endif()
 
 

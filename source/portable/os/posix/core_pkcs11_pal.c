@@ -36,44 +36,12 @@
 #include "core_pkcs11_config.h"
 #include "core_pkcs11_config_defaults.h"
 #include "core_pkcs11.h"
+#include "core_pkcs11_pal_utils.h"
 
 /* C runtime includes. */
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-/**
- * @ingroup pkcs11_macros
- * @brief Macros for managing PKCS #11 objects in flash.
- *
- */
-#define pkcs11palFILE_NAME_CLIENT_CERTIFICATE    "FreeRTOS_P11_Certificate.dat"       /**< The file name of the Certificate object. */
-#define pkcs11palFILE_NAME_KEY                   "FreeRTOS_P11_Key.dat"               /**< The file name of the Key object. */
-#define pkcs11palFILE_NAME_PUBLIC_KEY            "FreeRTOS_P11_PubKey.dat"            /**< The file name of the Public Key object. */
-#define pkcs11palFILE_CODE_SIGN_PUBLIC_KEY       "FreeRTOS_P11_CodeSignKey.dat"       /**< The file name of the Code Sign Key object. */
-#define pkcs11palFILE_HMAC_SECRET_KEY            "FreeRTOS_P11_HMACKey.dat"           /**< The file name of the HMAC Secret Key object. */
-#define pkcs11palFILE_CMAC_SECRET_KEY            "FreeRTOS_P11_CMACKey.dat"           /**< The file name of the CMAC Secret Key object. */
-#define pkcs11palFILE_NAME_CLAIM_CERTIFICATE     "FreeRTOS_P11_Claim_Certificate.dat" /**< The file name of the Provisioning Claim Certificate object. */
-#define pkcs11palFILE_NAME_CLAIM_KEY             "FreeRTOS_P11_Claim_Key.dat"         /**< The file name of the Provisioning Claim Key object. */
-
-
-/**
- * @ingroup pkcs11_enums
- * @brief Enums for managing PKCS #11 object types.
- *
- */
-enum eObjectHandles
-{
-    eInvalidHandle = 0,       /**< According to PKCS #11 spec, 0 is never a valid object handle. */
-    eAwsDevicePrivateKey = 1, /**< Private Key. */
-    eAwsDevicePublicKey,      /**< Public Key. */
-    eAwsDeviceCertificate,    /**< Certificate. */
-    eAwsCodeSigningKey,       /**< Code Signing Key. */
-    eAwsHMACSecretKey,        /**< HMAC Secret Key. */
-    eAwsCMACSecretKey,        /**< CMAC Secret Key. */
-    eAwsClaimPrivateKey,      /**< Provisioning Claim Private Key. */
-    eAwsClaimCertificate      /**< Provisioning Claim Certificate. */
-};
 
 /*-----------------------------------------------------------*/
 
@@ -101,169 +69,6 @@ static CK_RV prvFileExists( const char * pcFileName )
     {
         ( void ) fclose( pxFile );
         LogDebug( ( "Found file %s and was able to open it for reading.", pcFileName ) );
-    }
-
-    return xReturn;
-}
-
-/**
- * @brief Checks to see if a file exists
- *
- * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existence.
- * @param[out] pHandle           The type of the PKCS #11 object.
- *
- */
-static void prvLabelToFilenameHandle( const char * pcLabel,
-                                      const char ** pcFileName,
-                                      CK_OBJECT_HANDLE_PTR pHandle )
-{
-    if( ( pcLabel != NULL ) && ( pHandle != NULL ) && ( pcFileName != NULL ) )
-    {
-        if( 0 == strncmp( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
-                          pcLabel,
-                          sizeof( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
-        {
-            *pcFileName = pkcs11palFILE_NAME_CLIENT_CERTIFICATE;
-            *pHandle = ( CK_OBJECT_HANDLE ) eAwsDeviceCertificate;
-        }
-        else if( 0 == strncmp( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
-                               pcLabel,
-                               sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) ) )
-        {
-            *pcFileName = pkcs11palFILE_NAME_KEY;
-            *pHandle = ( CK_OBJECT_HANDLE ) eAwsDevicePrivateKey;
-        }
-        else if( 0 == strncmp( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
-                               pcLabel,
-                               sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
-        {
-            *pcFileName = pkcs11palFILE_NAME_PUBLIC_KEY;
-            *pHandle = ( CK_OBJECT_HANDLE ) eAwsDevicePublicKey;
-        }
-        else if( 0 == strncmp( pkcs11configLABEL_CODE_VERIFICATION_KEY,
-                               pcLabel,
-                               sizeof( pkcs11configLABEL_CODE_VERIFICATION_KEY ) ) )
-        {
-            *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
-            *pHandle = ( CK_OBJECT_HANDLE ) eAwsCodeSigningKey;
-        }
-        else if( 0 == strncmp( pkcs11configLABEL_HMAC_KEY,
-                               pcLabel,
-                               sizeof( pkcs11configLABEL_HMAC_KEY ) ) )
-        {
-            *pcFileName = pkcs11palFILE_HMAC_SECRET_KEY;
-            *pHandle = ( CK_OBJECT_HANDLE ) eAwsHMACSecretKey;
-        }
-        else if( 0 == strncmp( pkcs11configLABEL_CMAC_KEY,
-                               pcLabel,
-                               sizeof( pkcs11configLABEL_CMAC_KEY ) ) )
-        {
-            *pcFileName = pkcs11palFILE_CMAC_SECRET_KEY;
-            *pHandle = ( CK_OBJECT_HANDLE ) eAwsCMACSecretKey;
-        }
-        else if( 0 == strncmp( pkcs11configLABEL_CLAIM_CERTIFICATE,
-                               pcLabel,
-                               sizeof( pkcs11configLABEL_CLAIM_CERTIFICATE ) ) )
-        {
-            *pcFileName = pkcs11palFILE_NAME_CLAIM_CERTIFICATE;
-            *pHandle = ( CK_OBJECT_HANDLE ) eAwsClaimCertificate;
-        }
-        else if( 0 == strncmp( pkcs11configLABEL_CLAIM_PRIVATE_KEY,
-                               pcLabel,
-                               sizeof( pkcs11configLABEL_CLAIM_PRIVATE_KEY ) ) )
-        {
-            *pcFileName = pkcs11palFILE_NAME_CLAIM_KEY;
-            *pHandle = ( CK_OBJECT_HANDLE ) eAwsClaimPrivateKey;
-        }
-        else
-        {
-            *pcFileName = NULL;
-            *pHandle = ( CK_OBJECT_HANDLE ) eInvalidHandle;
-        }
-
-        LogDebug( ( "Converted %s to %s", pcLabel, *pcFileName ) );
-    }
-    else
-    {
-        LogError( ( "Could not convert label to filename. Received a NULL parameter." ) );
-    }
-}
-
-/**
- * @brief Maps object handle to file name
- *
- * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existence.
- * @param[out] pHandle           The type of the PKCS #11 object.
- *
- */
-static CK_RV prvHandleToFilename( CK_OBJECT_HANDLE xHandle,
-                                  const char ** pcFileName,
-                                  CK_BBOOL * pIsPrivate )
-{
-    CK_RV xReturn = CKR_OK;
-
-    if( pcFileName != NULL )
-    {
-        switch( ( CK_OBJECT_HANDLE ) xHandle )
-        {
-            case eAwsDeviceCertificate:
-                *pcFileName = pkcs11palFILE_NAME_CLIENT_CERTIFICATE;
-                /* coverity[misra_c_2012_rule_10_5_violation] */
-                *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
-                break;
-
-            case eAwsDevicePrivateKey:
-                *pcFileName = pkcs11palFILE_NAME_KEY;
-                /* coverity[misra_c_2012_rule_10_5_violation] */
-                *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
-                break;
-
-            case eAwsDevicePublicKey:
-                *pcFileName = pkcs11palFILE_NAME_PUBLIC_KEY;
-                /* coverity[misra_c_2012_rule_10_5_violation] */
-                *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
-                break;
-
-            case eAwsCodeSigningKey:
-                *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
-                /* coverity[misra_c_2012_rule_10_5_violation] */
-                *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
-                break;
-
-            case eAwsHMACSecretKey:
-                *pcFileName = pkcs11palFILE_HMAC_SECRET_KEY;
-                /* coverity[misra_c_2012_rule_10_5_violation] */
-                *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
-                break;
-
-            case eAwsCMACSecretKey:
-                *pcFileName = pkcs11palFILE_CMAC_SECRET_KEY;
-                /* coverity[misra_c_2012_rule_10_5_violation] */
-                *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
-                break;
-
-            case eAwsClaimCertificate:
-                *pcFileName = pkcs11palFILE_NAME_CLAIM_CERTIFICATE;
-                /* coverity[misra_c_2012_rule_10_5_violation] */
-                *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
-                break;
-
-            case eAwsClaimPrivateKey:
-                *pcFileName = pkcs11palFILE_NAME_CLAIM_KEY;
-                /* coverity[misra_c_2012_rule_10_5_violation] */
-                *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
-                break;
-
-            default:
-                xReturn = CKR_KEY_HANDLE_INVALID;
-                break;
-        }
-    }
-    else
-    {
-        LogError( ( "Could not convert label to filename. Received a NULL parameter." ) );
     }
 
     return xReturn;
@@ -357,9 +162,9 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
     if( ( pxLabel != NULL ) && ( pucData != NULL ) )
     {
         /* Converts a label to its respective filename and handle. */
-        prvLabelToFilenameHandle( pxLabel->pValue,
-                                  &pcFileName,
-                                  &xHandle );
+        PAL_UTILS_LabelToFilenameHandle( pxLabel->pValue,
+                                         &pcFileName,
+                                         &xHandle );
     }
     else
     {
@@ -419,9 +224,9 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 
     if( pxLabel != NULL )
     {
-        prvLabelToFilenameHandle( ( const char * ) pxLabel,
-                                  &pcFileName,
-                                  &xHandle );
+        PAL_UTILS_LabelToFilenameHandle( ( const char * ) pxLabel,
+                                         &pcFileName,
+                                         &xHandle );
 
         if( CKR_OK != prvFileExists( pcFileName ) )
         {
@@ -453,7 +258,7 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
     }
     else
     {
-        xReturn = prvHandleToFilename( xHandle, &pcFileName, pIsPrivate );
+        xReturn = PAL_UTILS_HandleToFilename( xHandle, &pcFileName, pIsPrivate );
     }
 
     if( xReturn == CKR_OK )
@@ -488,9 +293,9 @@ CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
     int ret = 0;
 
 
-    xResult = prvHandleToFilename( xHandle,
-                                   &pcFileName,
-                                   &xIsPrivate );
+    xResult = PAL_UTILS_HandleToFilename( xHandle,
+                                          &pcFileName,
+                                          &xIsPrivate );
 
     if( ( xResult == CKR_OK ) && ( prvFileExists( pcFileName ) == CKR_OK ) )
     {
