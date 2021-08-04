@@ -4217,6 +4217,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
         }
     }
 
+    if( xPalHandle != CK_INVALID_HANDLE )
+    {
+        PKCS11_PAL_GetObjectValueCleanup( pucKeyData, ulKeyDataLength );
+    }
+
     if( xResult == CKR_OK )
     {
         LogDebug( ( "Sign mechanism set to 0x%0lX.", ( unsigned long int ) pMechanism->mechanism ) );
@@ -4350,7 +4355,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                             lMbedTLSResult = mbedtls_md_hmac_finish( &pxSessionObj->xHMACSecretContext, pxSignatureBuffer );
                         }
 
-                        pxSessionObj->xHMACKeyHandle = CK_INVALID_HANDLE;
+                        prvHMACCleanUp( pxSessionObj );
                     }
                     else if( pxSessionObj->xOperationSignMechanism == CKM_AES_CMAC )
                     {
@@ -4361,7 +4366,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                             lMbedTLSResult = mbedtls_cipher_cmac_finish( &pxSessionObj->xCMACSecretContext, pxSignatureBuffer );
                         }
 
-                        pxSessionObj->xCMACKeyHandle = CK_INVALID_HANDLE;
+                        prvCMACCleanUp( pxSessionObj );
                     }
                     else
                     {
@@ -4391,6 +4396,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                                                               mbedtls_ctr_drbg_random,
                                                               &xP11Context.xMbedDrbgCtx );
                         }
+
+                        prvSignInitEC_RSACleanUp( pxSessionObj );
                     }
 
                     if( ( xResult == CKR_OK ) && ( lMbedTLSResult != 0 ) )
