@@ -269,6 +269,36 @@
 #endif
 
 /**
+ * @brief The PKCS #11 label for AWS IoT Fleet Provisioning claim certificate.
+ *
+ * This label is used for the provisioning claim certificate. The provisioning
+ * claim certificate is used to connect to AWS IoT Core for provisioning a
+ * client device using "Provisioning by Claim" workflow of the Fleet
+ * Provisioning Service.
+ *
+ * <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
+ * <b>Default value:</b> `Claim Cert`
+ */
+#ifndef pkcs11configLABEL_CLAIM_CERTIFICATE
+    #define pkcs11configLABEL_CLAIM_CERTIFICATE    "Claim Cert"
+#endif
+
+/**
+ * @brief The PKCS #11 label for AWS IoT Fleet Provisioning claim private key.
+ *
+ * This label is used for the provisioning claim private key. The provisioning
+ * claim private key corresponds to the provisioning claim certificate and is
+ * used to to connect to AWS IoT Core for provisioning a client device using
+ * "Provisioning by Claim" workflow of the Fleet Provisioning Service.
+ *
+ * <b>Possible values:</b> Any String smaller then pkcs11configMAX_LABEL_LENGTH.<br>
+ * <b>Default value:</b> `Claim Key`
+ */
+#ifndef pkcs11configLABEL_CLAIM_PRIVATE_KEY
+    #define pkcs11configLABEL_CLAIM_PRIVATE_KEY    "Claim Key"
+#endif
+
+/**
  * @brief Macro that is called in the corePKCS11 library for logging "Error" level
  * messages.
  *
