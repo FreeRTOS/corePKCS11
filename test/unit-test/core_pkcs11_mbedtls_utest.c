@@ -4391,6 +4391,7 @@ void test_pkcs11_C_SignSHA256HMAC( void )
 
         mbedtls_md_hmac_update_ExpectAnyArgsAndReturn( 0 );
         mbedtls_md_hmac_finish_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_md_free_CMockIgnore();
         xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
@@ -4438,6 +4439,7 @@ void test_pkcs11_C_SignSHA256HMACUpdateFail( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         mbedtls_md_hmac_update_ExpectAnyArgsAndReturn( -1 );
+        mbedtls_md_free_CMockIgnore();
         xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
     }
@@ -4486,6 +4488,7 @@ void test_pkcs11_C_SignAESCMAC( void )
 
         mbedtls_cipher_cmac_update_ExpectAnyArgsAndReturn( 0 );
         mbedtls_cipher_cmac_finish_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_cipher_free_CMockIgnore();
         xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
@@ -4533,6 +4536,7 @@ void test_pkcs11_C_SignAESCMACUpdateFail( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         mbedtls_cipher_cmac_update_ExpectAnyArgsAndReturn( -1 );
+        mbedtls_cipher_free_CMockIgnore();
         xResult = C_Sign( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, &ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
     }
