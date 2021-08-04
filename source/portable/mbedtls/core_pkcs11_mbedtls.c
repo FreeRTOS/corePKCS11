@@ -4396,6 +4396,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                                                               mbedtls_ctr_drbg_random,
                                                               &xP11Context.xMbedDrbgCtx );
                         }
+
                         prvSignInitEC_RSACleanUp( pxSessionObj );
                     }
 
