@@ -4895,6 +4895,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
 
                     xResult = CKR_SIGNATURE_INVALID;
                 }
+
+                prvVerifyInitEC_RSACleanUp( pxSessionObj );
             }
             /* Perform an ECDSA verification. */
             else if( pxSessionObj->xOperationVerifyMechanism == CKM_ECDSA )
@@ -4951,6 +4953,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
 
                 mbedtls_mpi_free( &xR );
                 mbedtls_mpi_free( &xS );
+                prvVerifyInitEC_RSACleanUp( pxSessionObj );
             }
             else if( pxSessionObj->xOperationVerifyMechanism == CKM_SHA256_HMAC )
             {
@@ -4967,7 +4970,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                 else
                 {
                     lMbedTLSResult = mbedtls_md_hmac_finish( &pxSessionObj->xHMACSecretContext, pxHMACBuffer );
-                    pxSessionObj->xHMACKeyHandle = CK_INVALID_HANDLE;
 
                     if( lMbedTLSResult != 0 )
                     {
@@ -4986,6 +4988,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                         }
                     }
                 }
+                prvHMACCleanUp( pxSessionObj );
             }
             else if( pxSessionObj->xOperationVerifyMechanism == CKM_AES_CMAC )
             {
@@ -5021,7 +5024,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                     }
                 }
 
-                pxSessionObj->xCMACKeyHandle = CK_INVALID_HANDLE;
+                prvCMACCleanUp( pxSessionObj );
             }
             else
             {
