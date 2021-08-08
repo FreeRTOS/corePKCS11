@@ -4988,6 +4988,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                         }
                     }
                 }
+
                 prvHMACCleanUp( pxSessionObj );
             }
             else if( pxSessionObj->xOperationVerifyMechanism == CKM_AES_CMAC )
