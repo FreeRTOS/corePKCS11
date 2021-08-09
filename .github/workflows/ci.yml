@@ -15,12 +15,14 @@ jobs:
         uses: actions/checkout@v2
       - name: Build
         run: |
+          CFLAGS="-Wall -Wextra -DNDEBUG -DLIBRARY_LOG_LEVEL=LOG_DEBUG"
+          CFLAGS+=" -fsanitize=address,undefined"
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
           -DBUILD_CLONE_SUBMODULES=ON \
           -DSYSTEM_TESTS=1 \
-          -DCMAKE_C_FLAGS='-Wall -Wextra -DNDEBUG -DLIBRARY_LOG_LEVEL=LOG_DEBUG'
+          -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
       - name: System Tests
         run: |
@@ -34,12 +36,14 @@ jobs:
       - name: Build
         run: |
           sudo apt-get install -y lcov
+          CFLAGS="--coverage -Wall -Wextra -DNDEBUG"
+          CFLAGS+=" -fsanitize=address,undefined"
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
           -DBUILD_CLONE_SUBMODULES=ON \
           -DUNIT_TESTS=1 \
-          -DCMAKE_C_FLAGS='--coverage -Wall -Wextra -DNDEBUG'
+          -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
       - name: Unit Tests
         run: |
