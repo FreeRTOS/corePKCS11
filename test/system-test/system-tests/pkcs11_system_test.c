@@ -1935,13 +1935,13 @@ static CK_RV provisionPublicKey( CK_SESSION_HANDLE session,
                                              NULL, 0 );
         CK_ATTRIBUTE publicKeyTemplate[] =
         {
-            { CKA_CLASS,           NULL /* &class */,           sizeof( CK_OBJECT_CLASS )                 },
-            { CKA_KEY_TYPE,        NULL /* &publicKeyType */,   sizeof( CK_KEY_TYPE )                     },
-            { CKA_TOKEN,           NULL /* &trueObject */,      sizeof( trueObject )                      },
-            { CKA_MODULUS,         NULL /* &( modulus[ 1 ] ) */,MODULUS_LENGTH                            },          /* Extra byte allocated at beginning for 0 padding. */
-            { CKA_VERIFY,          NULL /* &trueObject */,      sizeof( trueObject )                      },
-            { CKA_PUBLIC_EXPONENT, NULL /* publicExponent */,   sizeof( publicExponent )                  },
-            { CKA_LABEL,           publicKeyLabel,              strlen( ( const char * ) publicKeyLabel ) }
+            { CKA_CLASS,           NULL /* &class */,            sizeof( CK_OBJECT_CLASS )                 },
+            { CKA_KEY_TYPE,        NULL /* &publicKeyType */,    sizeof( CK_KEY_TYPE )                     },
+            { CKA_TOKEN,           NULL /* &trueObject */,       sizeof( trueObject )                      },
+            { CKA_MODULUS,         NULL /* &( modulus[ 1 ] ) */, MODULUS_LENGTH                            },         /* Extra byte allocated at beginning for 0 padding. */
+            { CKA_VERIFY,          NULL /* &trueObject */,       sizeof( trueObject )                      },
+            { CKA_PUBLIC_EXPONENT, NULL /* publicExponent */,    sizeof( publicExponent )                  },
+            { CKA_LABEL,           publicKeyLabel,               strlen( ( const char * ) publicKeyLabel ) }
         };
 
         /* Aggregate initializers must not use the address of an automatic variable. */
