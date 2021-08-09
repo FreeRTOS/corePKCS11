@@ -5363,6 +5363,7 @@ void test_pkcs11_C_VerifyRSA( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         mbedtls_pk_verify_IgnoreAndReturn( 0 );
+        mbedtls_pk_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
@@ -5445,7 +5446,6 @@ void test_pkcs11_C_VerifyBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_SIGNATURE_LEN_RANGE, xResult );
 
         xMechanism.mechanism = CKM_RSA_X_509;
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
@@ -5534,6 +5534,7 @@ void test_pkcs11_C_VerifySHA256HMAC( void )
         mbedtls_md_hmac_update_ExpectAnyArgsAndReturn( 0 );
         mbedtls_md_hmac_finish_ExpectAnyArgsAndReturn( 0 );
         mbedtls_md_hmac_finish_ReturnThruPtr_output( pxDummySignature );
+        mbedtls_md_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
@@ -5580,6 +5581,7 @@ void test_pkcs11_C_VerifySHA256HMACUpdateFail( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         mbedtls_md_hmac_update_ExpectAnyArgsAndReturn( -1 );
+        mbedtls_md_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
     }
@@ -5627,6 +5629,7 @@ void test_pkcs11_C_VerifySHA256HMACFinishFail( void )
 
         mbedtls_md_hmac_update_ExpectAnyArgsAndReturn( 0 );
         mbedtls_md_hmac_finish_ExpectAnyArgsAndReturn( -1 );
+        mbedtls_md_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
     }
@@ -5677,6 +5680,7 @@ void test_pkcs11_C_VerifySHA256HMACInvalidSig( void )
         mbedtls_md_hmac_update_ExpectAnyArgsAndReturn( 0 );
         mbedtls_md_hmac_finish_ExpectAnyArgsAndReturn( 0 );
         mbedtls_md_hmac_finish_ReturnThruPtr_output( pxBadSignature );
+        mbedtls_md_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
     }
@@ -5725,6 +5729,7 @@ void test_pkcs11_C_VerifyAESCMAC( void )
         mbedtls_cipher_cmac_update_ExpectAnyArgsAndReturn( 0 );
         mbedtls_cipher_cmac_finish_ExpectAnyArgsAndReturn( 0 );
         mbedtls_cipher_cmac_finish_ReturnThruPtr_output( pxDummySignature );
+        mbedtls_cipher_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
@@ -5771,6 +5776,7 @@ void test_pkcs11_C_VerifyAESCMACCipherUpdateFail( void )
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
         mbedtls_cipher_cmac_update_ExpectAnyArgsAndReturn( -1 );
+        mbedtls_cipher_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
     }
@@ -5818,6 +5824,7 @@ void test_pkcs11_C_VerifyAESCMACFinishFail( void )
 
         mbedtls_cipher_cmac_update_ExpectAnyArgsAndReturn( 0 );
         mbedtls_cipher_cmac_finish_ExpectAnyArgsAndReturn( -1 );
+        mbedtls_cipher_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
     }
@@ -5868,6 +5875,7 @@ void test_pkcs11_C_VerifyAESCMACInvalidSig( void )
         mbedtls_cipher_cmac_update_ExpectAnyArgsAndReturn( 0 );
         mbedtls_cipher_cmac_finish_ExpectAnyArgsAndReturn( 0 );
         mbedtls_cipher_cmac_finish_ReturnThruPtr_output( pxBadSignature );
+        mbedtls_cipher_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
     }

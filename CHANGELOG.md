@@ -1,7 +1,10 @@
 # Change Log for corePKCS11 Library
+- [#128](https://github.com/FreeRTOS/corePKCS11/pull/128) Fix invalid memory read in system tests.
+- [#126](https://github.com/FreeRTOS/corePKCS11/pull/126) Add default values for configuration macros.
+- [#125](https://github.com/FreeRTOS/corePKCS11/pull/125) Fix memory leaks in corePKCS11.
 
 ## v3.2.0 (August 2021)
-- [#123](https://github.com/FreeRTOS/corePKCS11/pull/121) Add backwards compatibility for deprecated configuration macros.
+- [#123](https://github.com/FreeRTOS/corePKCS11/pull/123) Add backwards compatibility for deprecated configuration macros.
 - [#121](https://github.com/FreeRTOS/corePKCS11/pull/121) Add labels for supporting Claim credentials useful for Fleet Provisioning feature of AWS IoT Core.
 - [#122](https://github.com/FreeRTOS/corePKCS11/pull/122) Add `core_pkcs11_config_defaults.h` file for default definition of configuration macros. and make doxygen documentation fixes.
 
