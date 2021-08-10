@@ -1,16 +1,17 @@
 # Change Log for corePKCS11 Library
-- [#129](https://github.com/FreeRTOS/corePKCS11/pull/129) Enable address sanitizer for tests in PR Checks.
-- [#128](https://github.com/FreeRTOS/corePKCS11/pull/128) Fix invalid memory read in system tests.
-- [#126](https://github.com/FreeRTOS/corePKCS11/pull/126) Add default values for configuration macros.
-- [#125](https://github.com/FreeRTOS/corePKCS11/pull/125) Fix memory leaks in corePKCS11.
 
-## v3.2.0 (August 2021)
-- [#123](https://github.com/FreeRTOS/corePKCS11/pull/123) Add backwards compatibility for deprecated configuration macros.
-- [#121](https://github.com/FreeRTOS/corePKCS11/pull/121) Add labels for supporting Claim credentials useful for Fleet Provisioning feature of AWS IoT Core.
-- [#122](https://github.com/FreeRTOS/corePKCS11/pull/122) Add `core_pkcs11_config_defaults.h` file for default definition of configuration macros. and make doxygen documentation fixes.
+## main
+* [#129](https://github.com/FreeRTOS/corePKCS11/pull/129) Enable address sanitizer for tests in PR Checks.
+* [#128](https://github.com/FreeRTOS/corePKCS11/pull/128) Fix invalid memory read in system tests.
+* [#126](https://github.com/FreeRTOS/corePKCS11/pull/126) Add default values for Claim credentials label configuration macros.
+* [#125](https://github.com/FreeRTOS/corePKCS11/pull/125) Fix memory leaks in corePKCS11.
+* [#123](https://github.com/FreeRTOS/corePKCS11/pull/123) Changes PAL folder structure and adds core+pkcs11\_pal\_utils for shared code between PAls.
+* [#124](https://github.com/FreeRTOS/corePKCS11/pull/124) Add backwards compatibility for deprecated configuration macros.
+* [#121](https://github.com/FreeRTOS/corePKCS11/pull/121) Add labels for supporting Claim credentials useful for Fleet Provisioning feature of AWS IoT Core.
+* [#122](https://github.com/FreeRTOS/corePKCS11/pull/122) Add `core_pkcs11_config_defaults.h` file for default definition of configuration macros. and make doxygen documentation fixes.
 
 ## v3.1.0 (July 2021)
-- [#119](https://github.com/FreeRTOS/corePKCS11/pull/119) Update mbedTLS submodule to [v2.26.0](https://github.com/ARMmbed/mbedtls/tree/v2.26.0).
+* [#119](https://github.com/FreeRTOS/corePKCS11/pull/119) Update mbedTLS submodule to [v2.26.0](https://github.com/ARMmbed/mbedtls/tree/v2.26.0).
 * [#118](https://github.com/FreeRTOS/corePKCS11/pull/118) Update version numbers and add C++ header guards
 * [#116](https://github.com/FreeRTOS/corePKCS11/pull/116) Remove redundant mbedtls error sources
 * [#115](https://github.com/FreeRTOS/corePKCS11/pull/115) Update broken links to MISRA in documentation
