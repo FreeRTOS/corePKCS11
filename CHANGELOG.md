@@ -1,4 +1,5 @@
 # Change Log for corePKCS11 Library
+- [#129](https://github.com/FreeRTOS/corePKCS11/pull/129) Enable address sanitizer for tests in PR Checks.
 - [#128](https://github.com/FreeRTOS/corePKCS11/pull/128) Fix invalid memory read in system tests.
 - [#126](https://github.com/FreeRTOS/corePKCS11/pull/126) Add default values for configuration macros.
 - [#125](https://github.com/FreeRTOS/corePKCS11/pull/125) Fix memory leaks in corePKCS11.
