@@ -37,7 +37,7 @@ jobs:
         run: |
           sudo apt-get install -y lcov
           CFLAGS="--coverage -Wall -Wextra -DNDEBUG"
-          CFLAGS+=" -fsanitize=address,undefined"
+          #CFLAGS+=" -fsanitize=address,undefined"
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
