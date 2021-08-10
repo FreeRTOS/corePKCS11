@@ -1962,7 +1962,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Login )( CK_SESSION_HANDLE hSession,
     ( void ) pPin;
     ( void ) ulPinLen;
 
-    LogWarn( ( "C_Login is not implemented." ) );
+    LogDebug( ( "C_Login is not implemented." ) );
 
     /* THIS FUNCTION IS NOT IMPLEMENTED FOR MBEDTLS-BASED PORTS.
      * If login capability is required, implement it here.

@@ -60,7 +60,7 @@ static CK_RV prvFileExists( const char * pcFileName )
     if( pxFile == NULL )
     {
         xReturn = CKR_OBJECT_HANDLE_INVALID;
-        LogError( ( "Could not open %s for reading.", pcFileName ) );
+        LogInfo( ( "Could not open %s for reading.", pcFileName ) );
     }
     else
     {
