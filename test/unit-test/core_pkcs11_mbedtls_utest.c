@@ -1379,7 +1379,7 @@ void test_pkcs11_C_CreateObjectECPrivKeyBadAtt( void )
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 
         xPrivateKeyTemplate[ 2 ].type = CKA_LABEL;
-        xPrivateKeyTemplate[ 5 ].pValue = &pucPrivLabel;
+        xPrivateKeyTemplate[ 5 ].pValue = pucPrivLabel;
         xResult = C_CreateObject( xSession,
                                   ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
                                   sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
