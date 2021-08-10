@@ -28,6 +28,26 @@ jobs:
         run: |
           cd build/
           ctest --output-on-failure
+  unit-tests-with-sanitizer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone This Repo
+        uses: actions/checkout@v2
+      - name: Build
+        run: |
+          CFLAGS="-Wall -Wextra -DNDEBUG"
+          CFLAGS+=" -fsanitize=address,undefined"
+          cmake -S test -B build/ \
+          -G "Unix Makefiles" \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DBUILD_CLONE_SUBMODULES=ON \
+          -DUNIT_TESTS=1 \
+          -DCMAKE_C_FLAGS="${CFLAGS}"
+          make -C build/ all
+      - name: Unit Tests
+        run: |
+          cd build/
+          ctest --output-on-failure
   unit-tests:
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +57,6 @@ jobs:
         run: |
           sudo apt-get install -y lcov
           CFLAGS="--coverage -Wall -Wextra -DNDEBUG"
-          #CFLAGS+=" -fsanitize=address,undefined"
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
