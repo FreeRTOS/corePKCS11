@@ -1,6 +1,6 @@
 /*
- * corePKCS11 PAL UTILS (common for Linux and FreeRTOS WinSim platforms)
- * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * corePKCS11 v3.2.0
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -18,9 +18,6 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * http://aws.amazon.com/freertos
- * http://www.FreeRTOS.org
  */
 
 /**
@@ -45,14 +42,14 @@
  * @brief Macros for managing PKCS #11 objects in flash.
  *
  */
-#define pkcs11palFILE_NAME_CLIENT_CERTIFICATE    "FreeRTOS_P11_Certificate.dat"       /**< The file name of the Certificate object. */
-#define pkcs11palFILE_NAME_KEY                   "FreeRTOS_P11_Key.dat"               /**< The file name of the Key object. */
-#define pkcs11palFILE_NAME_PUBLIC_KEY            "FreeRTOS_P11_PubKey.dat"            /**< The file name of the Public Key object. */
-#define pkcs11palFILE_CODE_SIGN_PUBLIC_KEY       "FreeRTOS_P11_CodeSignKey.dat"       /**< The file name of the Code Sign Key object. */
-#define pkcs11palFILE_HMAC_SECRET_KEY            "FreeRTOS_P11_HMACKey.dat"           /**< The file name of the HMAC Secret Key object. */
-#define pkcs11palFILE_CMAC_SECRET_KEY            "FreeRTOS_P11_CMACKey.dat"           /**< The file name of the CMAC Secret Key object. */
-#define pkcs11palFILE_NAME_CLAIM_CERTIFICATE     "FreeRTOS_P11_Claim_Certificate.dat" /**< The file name of the Provisioning Claim Certificate object. */
-#define pkcs11palFILE_NAME_CLAIM_KEY             "FreeRTOS_P11_Claim_Key.dat"         /**< The file name of the Provisioning Claim Key object. */
+#define pkcs11palFILE_NAME_CLIENT_CERTIFICATE    "corePKCS11_Certificate.dat"       /**< The file name of the Certificate object. */
+#define pkcs11palFILE_NAME_KEY                   "corePKCS11_Key.dat"               /**< The file name of the Key object. */
+#define pkcs11palFILE_NAME_PUBLIC_KEY            "corePKCS11_PubKey.dat"            /**< The file name of the Public Key object. */
+#define pkcs11palFILE_CODE_SIGN_PUBLIC_KEY       "corePKCS11_CodeSignKey.dat"       /**< The file name of the Code Sign Key object. */
+#define pkcs11palFILE_HMAC_SECRET_KEY            "corePKCS11_HMACKey.dat"           /**< The file name of the HMAC Secret Key object. */
+#define pkcs11palFILE_CMAC_SECRET_KEY            "corePKCS11_CMACKey.dat"           /**< The file name of the CMAC Secret Key object. */
+#define pkcs11palFILE_NAME_CLAIM_CERTIFICATE     "corePKCS11_Claim_Certificate.dat" /**< The file name of the Provisioning Claim Certificate object. */
+#define pkcs11palFILE_NAME_CLAIM_KEY             "corePKCS11_Claim_Key.dat"         /**< The file name of the Provisioning Claim Key object. */
 
 
 void PAL_UTILS_LabelToFilenameHandle( const char * pcLabel,
