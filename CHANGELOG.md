@@ -1,6 +1,6 @@
 # Change Log for corePKCS11 Library
 
-## main
+## v3.2.0 (August 2021)
 * [#129](https://github.com/FreeRTOS/corePKCS11/pull/129) Enable address sanitizer for tests in PR Checks.
 * [#128](https://github.com/FreeRTOS/corePKCS11/pull/128) Fix invalid memory read in system tests.
 * [#126](https://github.com/FreeRTOS/corePKCS11/pull/126) Add default values for Claim credentials label configuration macros.
