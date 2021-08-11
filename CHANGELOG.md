@@ -16,7 +16,7 @@
 * [#116](https://github.com/FreeRTOS/corePKCS11/pull/116) Remove redundant mbedtls error sources
 * [#115](https://github.com/FreeRTOS/corePKCS11/pull/115) Update broken links to MISRA in documentation
 * [#113](https://github.com/FreeRTOS/corePKCS11/pull/113) Fix description of CBMC in README
-* [#112](https://github.com/FreeRTOS/corePKCS11/pull/112) Add additional validation of the return value of mbedtls_pk_write_*_der functions
+* [#112](https://github.com/FreeRTOS/corePKCS11/pull/112) Add additional validation of the return value of mbedtls\_pk\_write\_\*\_der functions
 * [#111](https://github.com/FreeRTOS/corePKCS11/pull/111) Add AES-CMAC algorithm support in Windows port
 * [#110](https://github.com/FreeRTOS/corePKCS11/pull/110) Hygiene fixes in CI checks
 * [#104](https://github.com/FreeRTOS/corePKCS11/pull/104) Minor MISRA fixes
@@ -24,11 +24,11 @@
 * [#102](https://github.com/FreeRTOS/corePKCS11/pull/102) Feature: AES CMAC Sign/SignInit
 * [#101](https://github.com/FreeRTOS/corePKCS11/pull/101) Feature: AES CMAC - VerifyInit/Verify
 * [#98](https://github.com/FreeRTOS/corePKCS11/pull/98) Fix MISRA regressions
-* [#97](https://github.com/FreeRTOS/corePKCS11/pull/97) Implement C_CreateObject for AES CMAC keys
+* [#97](https://github.com/FreeRTOS/corePKCS11/pull/97) Implement C\_CreateObject for AES CMAC keys
 * [#96](https://github.com/FreeRTOS/corePKCS11/pull/96) Feature: SHA256-HMAC sign
-* [#95](https://github.com/FreeRTOS/corePKCS11/pull/95) Feature: SHA256-HMAC C_SignInit
+* [#95](https://github.com/FreeRTOS/corePKCS11/pull/95) Feature: SHA256-HMAC C\_SignInit
 * [#94](https://github.com/FreeRTOS/corePKCS11/pull/94) Fix system test output suppresion
-* [#91](https://github.com/FreeRTOS/corePKCS11/pull/91) Fix potential double free in core_pkcs11.c
+* [#91](https://github.com/FreeRTOS/corePKCS11/pull/91) Fix potential double free in core\_pkcs11.c
 * [#86](https://github.com/FreeRTOS/corePKCS11/pull/86) Feature: SHA256-HMAC VerifyInit
 * [#84](https://github.com/FreeRTOS/corePKCS11/pull/84) Feature: Import SHA256-HMAC secret Key
 
