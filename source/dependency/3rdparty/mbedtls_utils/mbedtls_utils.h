@@ -25,8 +25,17 @@
  * @brief Helper functions originating from mbedTLS.
  */
 
+#ifndef _MBEDTLS_UTILS_H_
+#define _MBEDTLS_UTILS_H_
+
 /* Standard includes. */
 #include <string.h>
+
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    extern "C" {
+#endif
+/* *INDENT-ON* */
 
 /*-----------------------------------------------------------*/
 
@@ -71,3 +80,11 @@ int convert_pem_to_der( const unsigned char * pucInput,
 int PKI_RSA_RSASSA_PKCS1_v15_Encode( const unsigned char * hash,
                                      size_t dst_len,
                                      unsigned char * dst );
+
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+    }
+#endif
+/* *INDENT-ON* */
+
+#endif /* ifndef _MBEDTLS_UTILS_H_ */
