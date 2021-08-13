@@ -1,5 +1,5 @@
 /*
- * AWS IoT Device SDK for Embedded C 202012.01
+ * corePKCS11 v3.2.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -18,9 +18,6 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * http://aws.amazon.com/freertos
- * http://www.FreeRTOS.org
  */
 
 /* Standard includes. */
@@ -1935,13 +1932,13 @@ static CK_RV provisionPublicKey( CK_SESSION_HANDLE session,
                                              NULL, 0 );
         CK_ATTRIBUTE publicKeyTemplate[] =
         {
-            { CKA_CLASS,           NULL /* &class */,         sizeof( CK_OBJECT_CLASS )                 },
-            { CKA_KEY_TYPE,        NULL /* &publicKeyType */, sizeof( CK_KEY_TYPE )                     },
-            { CKA_TOKEN,           NULL /* &trueObject */,    sizeof( trueObject )                      },
-            { CKA_MODULUS,         NULL /* &modulus + 1 */,   MODULUS_LENGTH                            },          /* Extra byte allocated at beginning for 0 padding. */
-            { CKA_VERIFY,          NULL /* &trueObject */,    sizeof( trueObject )                      },
-            { CKA_PUBLIC_EXPONENT, NULL /* publicExponent */, sizeof( publicExponent )                  },
-            { CKA_LABEL,           publicKeyLabel,            strlen( ( const char * ) publicKeyLabel ) }
+            { CKA_CLASS,           NULL /* &class */,            sizeof( CK_OBJECT_CLASS )                 },
+            { CKA_KEY_TYPE,        NULL /* &publicKeyType */,    sizeof( CK_KEY_TYPE )                     },
+            { CKA_TOKEN,           NULL /* &trueObject */,       sizeof( trueObject )                      },
+            { CKA_MODULUS,         NULL /* &( modulus[ 1 ] ) */, MODULUS_LENGTH                            },         /* Extra byte allocated at beginning for 0 padding. */
+            { CKA_VERIFY,          NULL /* &trueObject */,       sizeof( trueObject )                      },
+            { CKA_PUBLIC_EXPONENT, NULL /* publicExponent */,    sizeof( publicExponent )                  },
+            { CKA_LABEL,           publicKeyLabel,               strlen( ( const char * ) publicKeyLabel ) }
         };
 
         /* Aggregate initializers must not use the address of an automatic variable. */
@@ -1949,7 +1946,7 @@ static CK_RV provisionPublicKey( CK_SESSION_HANDLE session,
         publicKeyTemplate[ 0 ].pValue = &class;
         publicKeyTemplate[ 1 ].pValue = &publicKeyType;
         publicKeyTemplate[ 2 ].pValue = &trueObject;
-        publicKeyTemplate[ 3 ].pValue = &modulus + 1;
+        publicKeyTemplate[ 3 ].pValue = &( modulus[ 1 ] );
         publicKeyTemplate[ 4 ].pValue = &trueObject;
         publicKeyTemplate[ 5 ].pValue = publicExponent;
 

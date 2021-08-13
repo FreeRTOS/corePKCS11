@@ -1,5 +1,5 @@
 /*
- * corePKCS11 v3.1.0
+ * corePKCS11 v3.2.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -18,9 +18,6 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * http://aws.amazon.com/freertos
- * http://www.FreeRTOS.org
  */
 
 /**
@@ -1965,7 +1962,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Login )( CK_SESSION_HANDLE hSession,
     ( void ) pPin;
     ( void ) ulPinLen;
 
-    LogWarn( ( "C_Login is not implemented." ) );
+    LogDebug( ( "C_Login is not implemented." ) );
 
     /* THIS FUNCTION IS NOT IMPLEMENTED FOR MBEDTLS-BASED PORTS.
      * If login capability is required, implement it here.
@@ -4895,6 +4892,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
 
                     xResult = CKR_SIGNATURE_INVALID;
                 }
+
+                prvVerifyInitEC_RSACleanUp( pxSessionObj );
             }
             /* Perform an ECDSA verification. */
             else if( pxSessionObj->xOperationVerifyMechanism == CKM_ECDSA )
@@ -4951,6 +4950,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
 
                 mbedtls_mpi_free( &xR );
                 mbedtls_mpi_free( &xS );
+                prvVerifyInitEC_RSACleanUp( pxSessionObj );
             }
             else if( pxSessionObj->xOperationVerifyMechanism == CKM_SHA256_HMAC )
             {
@@ -4967,7 +4967,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                 else
                 {
                     lMbedTLSResult = mbedtls_md_hmac_finish( &pxSessionObj->xHMACSecretContext, pxHMACBuffer );
-                    pxSessionObj->xHMACKeyHandle = CK_INVALID_HANDLE;
 
                     if( lMbedTLSResult != 0 )
                     {
@@ -4986,6 +4985,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                         }
                     }
                 }
+
+                prvHMACCleanUp( pxSessionObj );
             }
             else if( pxSessionObj->xOperationVerifyMechanism == CKM_AES_CMAC )
             {
@@ -5021,7 +5022,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                     }
                 }
 
-                pxSessionObj->xCMACKeyHandle = CK_INVALID_HANDLE;
+                prvCMACCleanUp( pxSessionObj );
             }
             else
             {

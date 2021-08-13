@@ -1,5 +1,5 @@
 /*
- * corePKCS11 v3.1.0
+ * corePKCS11 v3.2.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -18,9 +18,6 @@
  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * http://aws.amazon.com/freertos
- * http://www.FreeRTOS.org
  */
 
 /* C runtime includes. */
@@ -642,12 +639,24 @@ void test_IotPkcs11_xInitializePkcs11TokenHasTokenInfo( void )
 void test_IotPkcs11_vAppendSHA256AlgorithmIdentifierSequence( void )
 {
     CK_RV xResult = CKR_OK;
-    uint8_t pucMessage[] = pkcs11STUFF_APPENDED_TO_RSA_SIG;
+    uint8_t pucDigestAlgorithmIdentifier[] = pkcs11STUFF_APPENDED_TO_RSA_SIG;
+    uint8_t pucHashData[ 32 ];
     uint8_t pucOidBuf[ 128 ] = { 0 };
 
-    xResult = vAppendSHA256AlgorithmIdentifierSequence( pucMessage, pucOidBuf );
+    memset( &( pucHashData[ 0 ] ), 0xAB, 32 );
+
+    xResult = vAppendSHA256AlgorithmIdentifierSequence( pucHashData, pucOidBuf );
 
     TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    TEST_ASSERT_EQUAL_UINT8_ARRAY( &( pucDigestAlgorithmIdentifier[ 0 ] ),
+                                   &( pucOidBuf[ 0 ] ),
+                                   sizeof( pucDigestAlgorithmIdentifier ) );
+    TEST_ASSERT_EQUAL_UINT8_ARRAY( &( pucHashData[ 0 ] ),
+                                   &( pucOidBuf[ sizeof( pucDigestAlgorithmIdentifier ) ] ),
+                                   32 );
+    TEST_ASSERT_EACH_EQUAL_UINT8( 0,
+                                  &( pucOidBuf[ sizeof( pucDigestAlgorithmIdentifier ) + 32 ] ),
+                                  128 - ( sizeof( pucDigestAlgorithmIdentifier ) + 32 ) );
 }
 
 /*!
