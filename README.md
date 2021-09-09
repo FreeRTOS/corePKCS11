@@ -78,7 +78,7 @@ These projects implement the PKCS #11 interface on real hardware and have simila
 
 * ARM's [Platform Security Architecture](https://github.com/Linaro/freertos-pkcs11-psa).
 * Microchip's [cryptoauthlib](https://github.com/MicrochipTech/cryptoauthlib).
-* Infineon's [Optiga Trust X](https://github.com/aws/amazon-freertos/blob/master/vendors/infineon/secure_elements/pkcs11/iot_pkcs11_trustx.c).
+* Infineon's [Optiga Trust X](https://github.com/aws/amazon-freertos/blob/main/vendors/infineon/secure_elements/pkcs11/iot_pkcs11_trustx.c).
 
 ## Documentation
 
