@@ -20,15 +20,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/**
- * @file core_pkcs11_pal.c
- * @brief Windows Simulator file save and read implementation
- * for PKCS#11 based on mbedTLS with for software keys. This
- * file deviates from the FreeRTOS style standard for some function names and
- * data types in order to maintain compliance with the PKCS#11 standard.
- */
+ /**
+  * @file core_pkcs11_pal.c
+  * @brief Windows Simulator file save and read implementation
+  * for PKCS#11 based on mbedTLS with for software keys. This
+  * file deviates from the FreeRTOS style standard for some function names and
+  * data types in order to maintain compliance with the PKCS#11 standard.
+  */
 
-/*-----------------------------------------------------------*/
+  /*-----------------------------------------------------------*/
 
 #include "FreeRTOS.h"
 #include "core_pkcs11.h"
@@ -52,13 +52,13 @@
  *
  * @returns pdTRUE if the file exists, pdFALSE if not.
  */
-BaseType_t prvFileExists( const char * pcFileName )
+BaseType_t prvFileExists(const char* pcFileName)
 {
     DWORD xReturn;
 
-    xReturn = GetFileAttributesA( pcFileName );
+    xReturn = GetFileAttributesA(pcFileName);
 
-    if( INVALID_FILE_ATTRIBUTES == xReturn )
+    if (INVALID_FILE_ATTRIBUTES == xReturn)
     {
         return pdFALSE;
     }
@@ -70,50 +70,50 @@ BaseType_t prvFileExists( const char * pcFileName )
 
 /*-----------------------------------------------------------*/
 
-CK_RV PKCS11_PAL_Initialize( void )
+CK_RV PKCS11_PAL_Initialize(void)
 {
     return CKR_OK;
 }
 
-CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
-                                        CK_BYTE_PTR pucData,
-                                        CK_ULONG ulDataSize )
+CK_OBJECT_HANDLE PKCS11_PAL_SaveObject(CK_ATTRIBUTE_PTR pxLabel,
+    CK_BYTE_PTR pucData,
+    CK_ULONG ulDataSize)
 {
     uint32_t ulStatus = 0;
     HANDLE hFile = INVALID_HANDLE_VALUE;
     DWORD lpNumberOfBytesWritten;
-    char * pcFileName = NULL;
+    char* pcFileName = NULL;
     CK_OBJECT_HANDLE xHandle = eInvalidHandle;
 
     /* Converts a label to its respective filename and handle. */
-    PAL_UTILS_LabelToFilenameHandle( pxLabel->pValue,
-                                     &pcFileName,
-                                     &xHandle );
+    PAL_UTILS_LabelToFilenameHandle(pxLabel->pValue,
+        &pcFileName,
+        &xHandle);
 
     /* If your project requires additional PKCS#11 objects, add them here. */
 
-    if( pcFileName != NULL )
+    if (pcFileName != NULL)
     {
         /* Create the file. */
-        hFile = CreateFileA( pcFileName,
-                             GENERIC_WRITE,
-                             0,
-                             NULL,
-                             CREATE_ALWAYS,
-                             FILE_ATTRIBUTE_NORMAL,
-                             NULL );
+        hFile = CreateFileA(pcFileName,
+            GENERIC_WRITE,
+            0,
+            NULL,
+            CREATE_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL,
+            NULL);
 
-        if( INVALID_HANDLE_VALUE == hFile )
+        if (INVALID_HANDLE_VALUE == hFile)
         {
             ulStatus = GetLastError();
-            LogError( ( "Unable to create file %d \r\n", ulStatus ) );
+            LogError(("Unable to create file %d \r\n", ulStatus));
             xHandle = eInvalidHandle;
         }
 
         /* Write the object data. */
-        if( ERROR_SUCCESS == ulStatus )
+        if (ERROR_SUCCESS == ulStatus)
         {
-            if( FALSE == WriteFile( hFile, pucData, ulDataSize, &lpNumberOfBytesWritten, NULL ) )
+            if (FALSE == WriteFile(hFile, pucData, ulDataSize, &lpNumberOfBytesWritten, NULL))
             {
                 ulStatus = GetLastError();
                 xHandle = eInvalidHandle;
@@ -121,9 +121,9 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
         }
 
         /* Clean up. */
-        if( INVALID_HANDLE_VALUE != hFile )
+        if (INVALID_HANDLE_VALUE != hFile)
         {
-            CloseHandle( hFile );
+            CloseHandle(hFile);
         }
     }
 
@@ -133,22 +133,22 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
 /*-----------------------------------------------------------*/
 
 
-CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
-                                        CK_ULONG usLength )
+CK_OBJECT_HANDLE PKCS11_PAL_FindObject(CK_BYTE_PTR pxLabel,
+    CK_ULONG usLength)
 {
     /* Avoid compiler warnings about unused variables. */
-    ( void ) usLength;
+    (void)usLength;
 
     CK_OBJECT_HANDLE xHandle = eInvalidHandle;
-    char * pcFileName = NULL;
+    char* pcFileName = NULL;
 
     /* Converts a label to its respective filename and handle. */
-    PAL_UTILS_LabelToFilenameHandle( pxLabel,
-                                     &pcFileName,
-                                     &xHandle );
+    PAL_UTILS_LabelToFilenameHandle(pxLabel,
+        &pcFileName,
+        &xHandle);
 
     /* Check if object exists/has been created before returning. */
-    if( pdTRUE != prvFileExists( pcFileName ) )
+    if (pdTRUE != prvFileExists(pcFileName))
     {
         xHandle = eInvalidHandle;
     }
@@ -157,83 +157,83 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 }
 /*-----------------------------------------------------------*/
 
-CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
-                                 CK_BYTE_PTR * ppucData,
-                                 CK_ULONG_PTR pulDataSize,
-                                 CK_BBOOL * pIsPrivate )
+CK_RV PKCS11_PAL_GetObjectValue(CK_OBJECT_HANDLE xHandle,
+    CK_BYTE_PTR* ppucData,
+    CK_ULONG_PTR pulDataSize,
+    CK_BBOOL* pIsPrivate)
 {
     CK_RV ulReturn = CKR_KEY_HANDLE_INVALID;
     uint32_t ulDriverReturn = 0;
     HANDLE hFile = INVALID_HANDLE_VALUE;
     uint32_t ulSize = 0;
-    char * pcFileName = NULL;
+    char* pcFileName = NULL;
 
 
-    ulReturn = PAL_UTILS_HandleToFilename( xHandle,
-                                           &pcFileName,
-                                           pIsPrivate );
+    ulReturn = PAL_UTILS_HandleToFilename(xHandle,
+        &pcFileName,
+        pIsPrivate);
 
-    if( ( pcFileName != NULL ) && ( pdTRUE == prvFileExists( pcFileName ) ) )
+    if ((pcFileName != NULL) && (pdTRUE == prvFileExists(pcFileName)))
     {
         /* Open the file. */
-        hFile = CreateFileA( pcFileName,
-                             GENERIC_READ,
-                             FILE_SHARE_READ,
-                             NULL,
-                             OPEN_EXISTING,
-                             FILE_ATTRIBUTE_NORMAL,
-                             NULL );
+        hFile = CreateFileA(pcFileName,
+            GENERIC_READ,
+            FILE_SHARE_READ,
+            NULL,
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL,
+            NULL);
 
-        if( INVALID_HANDLE_VALUE == hFile )
+        if (INVALID_HANDLE_VALUE == hFile)
         {
             ulDriverReturn = GetLastError();
-            LogError( ( "Unable to open file %d \r\n", ulDriverReturn ) );
+            LogError(("Unable to open file %d \r\n", ulDriverReturn));
             ulReturn = CKR_FUNCTION_FAILED;
         }
 
-        if( 0 == ulReturn )
+        if (0 == ulReturn)
         {
             /* Get the file size. */
-            *pulDataSize = GetFileSize( hFile, ( LPDWORD ) ( &ulSize ) );
+            *pulDataSize = GetFileSize(hFile, (LPDWORD)(&ulSize));
 
             /* Create a buffer. */
-            *ppucData = pvPortMalloc( *pulDataSize );
+            *ppucData = pvPortMalloc(*pulDataSize);
 
-            if( NULL == *ppucData )
+            if (NULL == *ppucData)
             {
                 ulReturn = CKR_HOST_MEMORY;
             }
         }
 
         /* Read the file. */
-        if( 0 == ulReturn )
+        if (0 == ulReturn)
         {
-            if( FALSE == ReadFile( hFile,
-                                   *ppucData,
-                                   *pulDataSize,
-                                   ( LPDWORD ) ( &ulSize ),
-                                   NULL ) )
+            if (FALSE == ReadFile(hFile,
+                *ppucData,
+                *pulDataSize,
+                (LPDWORD)(&ulSize),
+                NULL))
             {
-                LogError( ( "Unable to read file \r\n" ) );
+                LogError(("Unable to read file \r\n"));
                 ulReturn = CKR_FUNCTION_FAILED;
             }
         }
 
         /* Confirm the amount of data read. */
-        if( 0 == ulReturn )
+        if (0 == ulReturn)
         {
             ulReturn = CKR_OK;
 
-            if( ulSize != *pulDataSize )
+            if (ulSize != *pulDataSize)
             {
                 ulReturn = CKR_FUNCTION_FAILED;
             }
         }
 
         /* Clean up. */
-        if( INVALID_HANDLE_VALUE != hFile )
+        if (INVALID_HANDLE_VALUE != hFile)
         {
-            CloseHandle( hFile );
+            CloseHandle(hFile);
         }
     }
 
@@ -242,38 +242,38 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 
 /*-----------------------------------------------------------*/
 
-void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
-                                       CK_ULONG ulDataSize )
+void PKCS11_PAL_GetObjectValueCleanup(CK_BYTE_PTR pucData,
+    CK_ULONG ulDataSize)
 {
     /* Unused parameters. */
-    ( void ) ulDataSize;
+    (void)ulDataSize;
 
-    if( NULL != pucData )
+    if (NULL != pucData)
     {
-        vPortFree( pucData );
+        vPortFree(pucData);
     }
 }
 
 /*-----------------------------------------------------------*/
 
-CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
+CK_RV PKCS11_PAL_DestroyObject(CK_OBJECT_HANDLE xHandle)
 {
-    const char * pcFileName = NULL;
+    const char* pcFileName = NULL;
     CK_BBOOL xIsPrivate = CK_TRUE;
     CK_RV xResult = CKR_OBJECT_HANDLE_INVALID;
     BOOL ret = 0;
 
-    xResult = PAL_UTILS_HandleToFilename( xHandle,
-                                   &pcFileName,
-                                   &xIsPrivate );
+    xResult = PAL_UTILS_HandleToFilename(xHandle,
+        &pcFileName,
+        &xIsPrivate);
 
-    if( xResult == CKR_OK )
+    if (xResult == CKR_OK)
     {
-        if( pdTRUE == prvFileExists( pcFileName ) )
+        if (pdTRUE == prvFileExists(pcFileName))
         {
-            ret = DeleteFileA( pcFileName );
+            ret = DeleteFileA(pcFileName);
 
-            if( ret == 0 )
+            if (ret == 0)
             {
                 xResult = CKR_FUNCTION_FAILED;
             }
