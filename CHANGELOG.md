@@ -1,11 +1,15 @@
 # Change Log for corePKCS11 Library
 
+## v3.3.0 (November 2021)
+* [#137](https://github.com/FreeRTOS/corePKCS11/pull/137) Fix code in winsim PAL missed in prior refactor.
+* [#133](https://github.com/FreeRTOS/corePKCS11/pull/133) Update doxygen version for documentation.
+
 ## v3.2.0 (August 2021)
 * [#129](https://github.com/FreeRTOS/corePKCS11/pull/129) Enable address sanitizer for tests in PR Checks.
 * [#128](https://github.com/FreeRTOS/corePKCS11/pull/128) Fix invalid memory read in system tests.
 * [#126](https://github.com/FreeRTOS/corePKCS11/pull/126) Add default values for Claim credentials label configuration macros.
 * [#125](https://github.com/FreeRTOS/corePKCS11/pull/125) Fix memory leaks in corePKCS11.
-* [#123](https://github.com/FreeRTOS/corePKCS11/pull/123) Changes PAL folder structure and adds core+pkcs11\_pal\_utils for shared code between PAls.
+* [#123](https://github.com/FreeRTOS/corePKCS11/pull/123) Changes PAL folder structure and adds core+pkcs11\_pal\_utils for shared code between PALs.
 * [#124](https://github.com/FreeRTOS/corePKCS11/pull/124) Add backwards compatibility for deprecated configuration macros.
 * [#121](https://github.com/FreeRTOS/corePKCS11/pull/121) Add labels for supporting Claim credentials useful for Fleet Provisioning feature of AWS IoT Core.
 * [#122](https://github.com/FreeRTOS/corePKCS11/pull/122) Add `core_pkcs11_config_defaults.h` file for default definition of configuration macros. and make doxygen documentation fixes.
