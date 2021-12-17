@@ -1,4 +1,5 @@
 # Change Log for corePKCS11 Library
+
 ## Changes in `main`
 * [#144](http://github.com/FreeRTOS/corePKCS11/pull/144) Update mbedtls submodule to [v2.28.0](https://github.com/ARMmbed/mbedtls/tree/v2.28.0)
 
