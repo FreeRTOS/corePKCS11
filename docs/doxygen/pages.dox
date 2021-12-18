@@ -56,7 +56,7 @@ is a software based implementation of the PKCS #11 standard, to allow for writin
 Currently, the software based corePKCS11 library has the following dependencies:
 - The API defined by the PKCS #11 specification. The headers used can be found [here](https://github.com/amazon-freertos/pkcs11/tree/v2.40_errata01).
 - The PKCS #11 PAL layer. This is used for writing PKCS #11 objects to flash.
-- [Mbed TLS](https://github.com/ARMmbed/mbedtls/tree/v2.26.0). This library uses Mbed TLS for the cryptographic logic. Some examples include parsing key and certificate objects, signing operations, and creating digests.
+- [Mbed TLS](https://github.com/ARMmbed/mbedtls/tree/v2.28.0). This library uses Mbed TLS for the cryptographic logic. Some examples include parsing key and certificate objects, signing operations, and creating digests.
 - The standard C library `string.h`, for memory manipulation.
 
 @dot "PKCS #11 implementation direct dependencies"
