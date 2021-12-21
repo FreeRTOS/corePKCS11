@@ -1,5 +1,5 @@
 name : "corePKCS11"
-version: "v3.3.0"
+version: "v3.4.0"
 description: |
   "Software implementation of the PKCS #11 standard.\n"
 dependencies:

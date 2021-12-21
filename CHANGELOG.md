@@ -1,7 +1,7 @@
 # Change Log for corePKCS11 Library
 
-## Changes in `main`
-* [#144](http://github.com/FreeRTOS/corePKCS11/pull/144) Update mbedtls submodule to [v2.28.0](https://github.com/ARMmbed/mbedtls/tree/v2.28.0)
+## v3.4.0 (December 2021)
+* [#144](https://github.com/FreeRTOS/corePKCS11/pull/144) Update mbedtls submodule to [v2.28.0](https://github.com/ARMmbed/mbedtls/tree/v2.28.0)
 
 ## v3.3.0 (November 2021)
 * [#137](https://github.com/FreeRTOS/corePKCS11/pull/137) Fix code in winsim PAL missed in prior refactor.
