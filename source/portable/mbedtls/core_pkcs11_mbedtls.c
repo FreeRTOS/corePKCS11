@@ -34,9 +34,13 @@
 #include "core_pkcs11_pal.h"
 #include "core_pki_utils.h"
 
+/**
+ *  @brief Declaring MBEDTLS_ALLOW_PRIVATE_ACCESS allows access to mbedtls "private" fields.
+ */
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 /* mbedTLS includes. */
 #include "mbedtls/pk.h"
-#include "mbedtls/pk_internal.h"
 #include "mbedtls/x509_crt.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
@@ -2152,7 +2156,16 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
             {
-                lMbedTLSResult = mbedtls_pk_parse_key( pxMbedContext, pucData, ulDataLength, NULL, 0 );
+                #if MBEDTLS_VERSION_NUMBER < 0x03000000
+                    lMbedTLSResult = mbedtls_pk_parse_key( pxMbedContext,
+                                                           pucData, ulDataLength,
+                                                           NULL, 0 );
+                #else
+                    lMbedTLSResult = mbedtls_pk_parse_key( pxMbedContext,
+                                                           pucData, ulDataLength,
+                                                           NULL, 0,
+                                                           mbedtls_ctr_drbg_random, &xP11Context.xMbedDrbgCtx );
+                #endif /* MBEDTLS_VERSION_NUMBER < 0x03000000 */
             }
             else
             {
@@ -2190,7 +2203,7 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
         if( pxKeyPair != NULL )
         {
             /* Initialize the info. */
-            pxMbedContext->pk_info = &mbedtls_eckey_info;
+            pxMbedContext->pk_info = mbedtls_pk_info_from_type( MBEDTLS_PK_ECKEY );
 
             /* Initialize the context. */
             pxMbedContext->pk_ctx = pxKeyPair;
@@ -2332,8 +2345,13 @@ static CK_RV prvCreateRsaKey( CK_ATTRIBUTE * pxTemplate,
     {
         mbedtls_pk_init( &xMbedContext );
         xMbedContext.pk_ctx = pxRsaCtx;
-        xMbedContext.pk_info = &mbedtls_rsa_info;
-        mbedtls_rsa_init( pxRsaCtx, MBEDTLS_RSA_PKCS_V15, 0 /*ignored.*/ );
+        xMbedContext.pk_info = mbedtls_pk_info_from_type( MBEDTLS_PK_RSA );
+
+        #if MBEDTLS_VERSION_NUMBER < 0x03000000
+            mbedtls_rsa_init( pxRsaCtx, MBEDTLS_RSA_PKCS_V15, 0 /*ignored.*/ );
+        #else
+            mbedtls_rsa_init( pxRsaCtx );
+        #endif /* MBEDTLS_VERSION_NUMBER < 0x03000000 */
     }
     else
     {
@@ -3009,7 +3027,18 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
         /* Initialize mbed TLS x509 context. */
         mbedtls_x509_crt_init( &xMbedX509Context );
 
-        if( 0 == mbedtls_pk_parse_key( &xKeyContext, pxObjectValue, ulLength, NULL, 0 ) )
+        #if MBEDTLS_VERSION_NUMBER < 0x03000000
+            lMbedTLSResult = mbedtls_pk_parse_key( &xKeyContext,
+                                                   pxObjectValue, ulLength,
+                                                   NULL, 0 );
+        #else
+            lMbedTLSResult = mbedtls_pk_parse_key( &xKeyContext,
+                                                   pxObjectValue, ulLength,
+                                                   NULL, 0,
+                                                   mbedtls_ctr_drbg_random, &xP11Context.xMbedDrbgCtx );
+        #endif /* MBEDTLS_VERSION_NUMBER < 0x03000000 */
+
+        if( lMbedTLSResult == 0 )
         {
             /* See explanation in prvCheckValidSessionAndModule for this exception. */
             /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -3584,7 +3613,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestInit )( CK_SESSION_HANDLE hSession,
     if( xResult == CKR_OK )
     {
         mbedtls_sha256_init( &pxSession->xSHA256Context );
-        lMbedTLSResult = mbedtls_sha256_starts_ret( &pxSession->xSHA256Context, 0 );
+        #if MBEDTLS_VERSION_NUMBER < 0x03000000
+            lMbedTLSResult = mbedtls_sha256_starts_ret( &pxSession->xSHA256Context, 0 );
+        #else
+            lMbedTLSResult = mbedtls_sha256_starts( &pxSession->xSHA256Context, 0 );
+        #endif /* MBEDTLS_VERSION_NUMBER < 0x03000000 */
 
         if( 0 != lMbedTLSResult )
         {
@@ -3649,7 +3682,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestUpdate )( CK_SESSION_HANDLE hSession,
 
     if( xResult == CKR_OK )
     {
-        lMbedTLSResult = mbedtls_sha256_update_ret( &pxSession->xSHA256Context, pPart, ulPartLen );
+        #if MBEDTLS_VERSION_NUMBER < 0x03000000
+            lMbedTLSResult = mbedtls_sha256_update_ret( &pxSession->xSHA256Context, pPart, ulPartLen );
+        #else
+            lMbedTLSResult = mbedtls_sha256_update( &pxSession->xSHA256Context, pPart, ulPartLen );
+        #endif /* MBEDTLS_VERSION_NUMBER < 0x03000000 */
 
         if( 0 != lMbedTLSResult )
         {
@@ -3739,7 +3776,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE hSession,
         {
             if( *pulDigestLen == ( CK_ULONG ) pkcs11SHA256_DIGEST_LENGTH )
             {
-                lMbedTLSResult = mbedtls_sha256_finish_ret( &pxSession->xSHA256Context, pDigest );
+                #if MBEDTLS_VERSION_NUMBER < 0x03000000
+                    lMbedTLSResult = mbedtls_sha256_finish_ret( &pxSession->xSHA256Context, pDigest );
+                #else
+                    lMbedTLSResult = mbedtls_sha256_finish( &pxSession->xSHA256Context, pDigest );
+                #endif /* MBEDTLS_VERSION_NUMBER < 0x03000000 */
 
                 if( 0 != lMbedTLSResult )
                 {
@@ -4012,7 +4053,17 @@ static CK_RV prvSignInitEC_RSAKeys( P11Session_t * pxSession,
     CK_RV xResult = CKR_KEY_HANDLE_INVALID;
 
     mbedtls_pk_init( &pxSession->xSignKey );
-    lMbedTLSResult = mbedtls_pk_parse_key( &pxSession->xSignKey, pucKeyData, ulKeyDataLength, NULL, 0 );
+
+    #if MBEDTLS_VERSION_NUMBER < 0x03000000
+        lMbedTLSResult = mbedtls_pk_parse_key( &pxSession->xSignKey,
+                                               pucKeyData, ulKeyDataLength,
+                                               NULL, 0 );
+    #else
+        lMbedTLSResult = mbedtls_pk_parse_key( &pxSession->xSignKey,
+                                               pucKeyData, ulKeyDataLength,
+                                               NULL, 0,
+                                               mbedtls_ctr_drbg_random, &xP11Context.xMbedDrbgCtx );
+    #endif /* MBEDTLS_VERSION_NUMBER < 0x03000000 */
 
     if( 0 == lMbedTLSResult )
     {
@@ -4268,19 +4319,19 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
     P11Session_t * pxSessionObj = prvSessionPointerFromHandle( hSession );
     CK_RV xResult = prvCheckValidSessionAndModule( pxSessionObj );
 
-    CK_ULONG xSignatureLength = 0;
+    size_t xSignatureLength = 0;
     size_t xExpectedInputLength = 0;
-    CK_BYTE_PTR pxSignatureBuffer = pSignature;
+    size_t xSignatureBufferLength = 0;
+    CK_BYTE_PTR pucSignatureBuffer = pSignature;
     /* See explanation in prvCheckValidSessionAndModule for this exception. */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xSignatureGenerated = ( CK_BBOOL ) CK_FALSE;
 
     /* 8 bytes added to hold ASN.1 encoding information. */
-    uint8_t ecSignature[ pkcs11ECDSA_P256_SIGNATURE_LENGTH + 8 ];
+    uint8_t ecSignature[ MBEDTLS_ECDSA_MAX_SIG_LEN( 256 ) ];
 
     int32_t lMbedTLSResult = -1;
     mbedtls_md_type_t xHashType = MBEDTLS_MD_NONE;
-
 
     if( ( NULL == pulSignatureLen ) || ( NULL == pData ) )
     {
@@ -4294,13 +4345,15 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
         if( pxSessionObj->xOperationSignMechanism == CKM_RSA_PKCS )
         {
             xSignatureLength = pkcs11RSA_2048_SIGNATURE_LENGTH;
+            xSignatureBufferLength = pkcs11RSA_2048_SIGNATURE_LENGTH;
             xExpectedInputLength = pkcs11RSA_SIGNATURE_INPUT_LENGTH;
         }
         else if( pxSessionObj->xOperationSignMechanism == CKM_ECDSA )
         {
             xSignatureLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
+            xSignatureBufferLength = MBEDTLS_ECDSA_MAX_SIG_LEN( 256 );
+            pucSignatureBuffer = ecSignature;
             xExpectedInputLength = pkcs11SHA256_DIGEST_LENGTH;
-            pxSignatureBuffer = ecSignature;
             xHashType = MBEDTLS_MD_SHA256;
         }
         else if( pxSessionObj->xOperationSignMechanism == CKM_SHA256_HMAC )
@@ -4349,7 +4402,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
 
                         if( lMbedTLSResult == 0 )
                         {
-                            lMbedTLSResult = mbedtls_md_hmac_finish( &pxSessionObj->xHMACSecretContext, pxSignatureBuffer );
+                            lMbedTLSResult = mbedtls_md_hmac_finish( &pxSessionObj->xHMACSecretContext, pSignature );
                         }
 
                         prvHMACCleanUp( pxSessionObj );
@@ -4360,7 +4413,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
 
                         if( lMbedTLSResult == 0 )
                         {
-                            lMbedTLSResult = mbedtls_cipher_cmac_finish( &pxSessionObj->xCMACSecretContext, pxSignatureBuffer );
+                            lMbedTLSResult = mbedtls_cipher_cmac_finish( &pxSessionObj->xCMACSecretContext, pSignature );
                         }
 
                         prvCMACCleanUp( pxSessionObj );
@@ -4379,19 +4432,31 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                         }
                         else
                         {
+                            LogDebug( ( "Ready to sign: xSignatureLength=%ld *pulSignatureLen=%ld", xSignatureLength, *pulSignatureLen ) );
+
                             /* Per mbed TLS documentation, if using RSA, md_alg should
                              * be MBEDTLS_MD_NONE. If ECDSA, md_alg should never be
                              * MBEDTLS_MD_NONE. SHA-256 will be used for ECDSA for
                              * consistency with the rest of the port.
                              */
-                            lMbedTLSResult = mbedtls_pk_sign( &pxSessionObj->xSignKey,
-                                                              xHashType,
-                                                              pData,
-                                                              ulDataLen,
-                                                              pxSignatureBuffer,
-                                                              &xExpectedInputLength,
-                                                              mbedtls_ctr_drbg_random,
-                                                              &xP11Context.xMbedDrbgCtx );
+                            #if MBEDTLS_VERSION_NUMBER < 0x03000000
+                                lMbedTLSResult = mbedtls_pk_sign( &pxSessionObj->xSignKey,
+                                                                  xHashType,
+                                                                  pData, ulDataLen,
+                                                                  pucSignatureBuffer,
+                                                                  &xSignatureBufferLength,
+                                                                  mbedtls_ctr_drbg_random,
+                                                                  &xP11Context.xMbedDrbgCtx );
+                            #else
+                                lMbedTLSResult = mbedtls_pk_sign( &pxSessionObj->xSignKey,
+                                                                  xHashType,
+                                                                  pData, ulDataLen,
+                                                                  pucSignatureBuffer,
+                                                                  xSignatureBufferLength,
+                                                                  &xSignatureBufferLength,
+                                                                  mbedtls_ctr_drbg_random,
+                                                                  &xP11Context.xMbedDrbgCtx );
+                            #endif /* MBEDTLS_VERSION_NUMBER < 0x03000000 */
                         }
 
                         prvSignInitEC_RSACleanUp( pxSessionObj );
@@ -4542,7 +4607,16 @@ static CK_RV prvVerifyInitEC_RSAKeys( P11Session_t * pxSession,
     /* If we fail to parse the public key, try again as a private key. */
     if( xResult != CKR_OK )
     {
-        lMbedTLSResult = mbedtls_pk_parse_key( &pxSession->xVerifyKey, pucKeyData, ulKeyDataLength, NULL, 0 );
+        #if MBEDTLS_VERSION_NUMBER < 0x03000000
+            lMbedTLSResult = mbedtls_pk_parse_key( &pxSession->xVerifyKey,
+                                                   pucKeyData, ulKeyDataLength,
+                                                   NULL, 0 );
+        #else
+            lMbedTLSResult = mbedtls_pk_parse_key( &pxSession->xVerifyKey,
+                                                   pucKeyData, ulKeyDataLength,
+                                                   NULL, 0,
+                                                   mbedtls_ctr_drbg_random, &xP11Context.xMbedDrbgCtx );
+        #endif /* MBEDTLS_VERSION_NUMBER < 0x03000000 */
 
         if( 0 == lMbedTLSResult )
         {
