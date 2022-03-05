@@ -13,4 +13,5 @@ build/
 *.gcov
 
 **/*.dat
-**/*.DS_STORE
+**/*.DS_Store
+
