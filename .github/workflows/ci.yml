@@ -20,8 +20,8 @@ jobs:
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DBUILD_CLONE_SUBMODULES=ON \
           -DSYSTEM_TESTS=1 \
+          -DUNIT_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
       - name: System Tests
@@ -40,8 +40,8 @@ jobs:
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DBUILD_CLONE_SUBMODULES=ON \
           -DUNIT_TESTS=1 \
+          -DSYSTEM_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
       - name: Unit Tests
@@ -60,8 +60,8 @@ jobs:
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DBUILD_CLONE_SUBMODULES=ON \
           -DUNIT_TESTS=1 \
+          -DSYSTEM_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
       - name: Unit Tests
