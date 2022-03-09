@@ -24,7 +24,7 @@ jobs:
           -DUNIT_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
-      - name: System Tests
+      - name: Integration Tests
         run: |
           cd build/
           ctest --output-on-failure
@@ -177,6 +177,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: git submodule update --init --recursive --checkout
+      - name: Fetch dependencies (mbedtls)
+        run: |
+          cmake -S test -B build/ \
+          -G "Unix Makefiles" \
+          -DUNIT_TESTS=0 \
+          -DSYSTEM_TESTS=0 \
+          -DCMAKE_C_FLAGS="${CFLAGS}"
       - name: Install Python3
         uses: actions/setup-python@v2
         with:
