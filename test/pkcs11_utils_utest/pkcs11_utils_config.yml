@@ -23,7 +23,6 @@
   :includes:        # This will add these includes to each mock.
     - <stdbool.h>
     - <stdint.h>
-    # - pkcs11_defs.h
   :treat_externs: :exclude  # Now the extern-ed functions will be mocked.
   :weak: __attribute__((weak))
   :verbosity: 3
