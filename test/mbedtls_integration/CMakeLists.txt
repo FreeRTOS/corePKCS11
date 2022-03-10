@@ -41,7 +41,6 @@ target_include_directories(
     INTERFACE "${MODULE_ROOT_DIR}/source/include"
     INTERFACE "${MODULE_ROOT_DIR}/source/portable/os"
     INTERFACE "${CORE_PKCS11_3RDPARTY_LOCATION}/mbedtls_utils"
-    INTERFACE "${PKCS11_API_PATH}"
     INTERFACE "${CMAKE_CURRENT_LIST_DIR}"
 )
 

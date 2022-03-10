@@ -71,13 +71,12 @@ add_library(core_pkcs11_mbedtls STATIC)
 target_sources(
     core_pkcs11_mbedtls PRIVATE ${MODULE_ROOT_DIR}/source/portable/mbedtls/core_pkcs11_mbedtls.c
 )
-target_link_libraries(core_pkcs11_mbedtls PRIVATE MbedTLS2::interface)
+target_link_libraries(core_pkcs11_mbedtls PRIVATE MbedTLS2::interface pkcs11_api)
 
 target_include_directories(
     core_pkcs11_mbedtls
     PUBLIC "${CMAKE_CURRENT_LIST_DIR}/../include"
     PUBLIC "${MODULE_ROOT_DIR}/source/include"
-    PUBLIC "${PKCS11_API_PATH}"
 )
 
 target_compile_options(
