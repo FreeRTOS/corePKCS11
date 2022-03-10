@@ -24,11 +24,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 /* PKCS includes. */
 #include "core_pki_utils.h"
 #include "core_pkcs11_config.h"
 #include "core_pkcs11.h"
-#include "system_test_pkcs11_config.h"
+#include "core_pkcs11_test_config.h"
 
 /* Logging includes. */
 #include "logging_levels.h"
@@ -40,11 +42,9 @@
 /* mbedTLS includes. */
 #include "mbedtls/sha256.h"
 #include "mbedtls/pk.h"
-#include "mbedtls/pk_internal.h"
 #include "mbedtls/oid.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
-#include "mbedtls/entropy_poll.h"
 #include "mbedtls/x509_crt.h"
 #include "mbedtls/base64.h"
 
@@ -122,6 +122,8 @@ static CK_RV provisionPublicKey( CK_SESSION_HANDLE session,
                                  uint8_t * publicKeyLabel,
                                  CK_OBJECT_HANDLE_PTR publicKeyHandlePtr );
 
+/*-----------------------------------------------------------*/
+
 static CK_RV generateKeyPairEC( CK_SESSION_HANDLE session,
                                 uint8_t * privateKeyLabel,
                                 uint8_t * publicKeyLabel,
@@ -147,11 +149,44 @@ static CK_RV destroyProvidedObjects( CK_SESSION_HANDLE session,
 
 /*-----------------------------------------------------------*/
 
+static int lWrapPkParseKey( mbedtls_pk_context * pxMbedContext,
+                            const unsigned char * pucData,
+                            unsigned long ulDataLen )
+{
+    int lRslt = -1;
+
+    #if MBEDTLS_VERSION_NUMBER < 0x03000000
+        lRslt = mbedtls_pk_parse_key( pxMbedContext,
+                                      pucData, ulDataLen,
+                                      NULL, 0 );
+    #else
+        mbedtls_entropy_context entropyCtx;
+        mbedtls_ctr_drbg_context drbgCtx;
+        mbedtls_entropy_init( &entropyCtx );
+        mbedtls_ctr_drbg_init( &drbgCtx );
+        lRslt = mbedtls_ctr_drbg_seed( &drbgCtx, mbedtls_entropy_func, &entropyCtx, NULL, 0 );
+
+        if( lRslt == 0 )
+        {
+            lRslt = mbedtls_pk_parse_key( pxMbedContext,
+                                          pucData, ulDataLen,
+                                          NULL, 0,
+                                          mbedtls_ctr_drbg_random, &drbgCtx );
+        }
+
+        mbedtls_ctr_drbg_free( &drbgCtx );
+        mbedtls_entropy_free( &entropyCtx );
+    #endif /* if MBEDTLS_VERSION_NUMBER < 0x03000000 */
+    return lRslt;
+}
+
+/*-----------------------------------------------------------*/
+
 /* @brief Converts PEM documents into DER formatted byte arrays.
  * This is a helper function from mbedTLS util pem2der.c
  * (https://github.com/ARMmbed/mbedtls/blob/development/programs/util/pem2der.c#L75)
  *
- * @param pucInput[in]       Pointer to PEM object
+ * @param pcInput[in]        Pointer to PEM object
  * @param xLen[in]           Length of PEM object
  * @param pucOutput[out]     Pointer to buffer where DER oboject will be placed
  * @param pxOlen[in/out]     Pointer to length of DER buffer.  This value is updated
@@ -163,59 +198,59 @@ static CK_RV destroyProvidedObjects( CK_SESSION_HANDLE session,
  * - -1 if buffer is not  large enough to hold converted object. pxOlen is still updated.
  *
  */
-int convert_pem_to_der( const unsigned char * pucInput,
-                        size_t xLen,
-                        unsigned char * pucOutput,
-                        size_t * pxOlen )
+extern int convert_pem_to_der( const char * pcInput,
+                               size_t xLen,
+                               unsigned char * pucOutput,
+                               size_t * pxOlen )
 {
     int lRet;
-    const unsigned char * pucS1;
-    const unsigned char * pucS2;
-    const unsigned char * pucEnd = pucInput + xLen;
+    const char * pcS1;
+    const char * pcS2;
+    const char * pcEnd = &pcInput[ xLen ];
     size_t xOtherLen = 0;
 
-    pucS1 = ( unsigned char * ) strstr( ( const char * ) pucInput, "-----BEGIN" );
+    pcS1 = strstr( pcInput, "-----BEGIN" );
 
-    if( pucS1 == NULL )
+    if( pcS1 == NULL )
     {
         return( -1 );
     }
 
-    pucS2 = ( unsigned char * ) strstr( ( const char * ) pucInput, "-----END" );
+    pcS2 = strstr( pcInput, "-----END" );
 
-    if( pucS2 == NULL )
+    if( pcS2 == NULL )
     {
         return( -1 );
     }
 
-    pucS1 += 10;
+    pcS1 += 10;
 
-    while( pucS1 < pucEnd && *pucS1 != '-' )
+    while( pcS1 < pcEnd && *pcS1 != '-' )
     {
-        pucS1++;
+        pcS1++;
     }
 
-    while( pucS1 < pucEnd && *pucS1 == '-' )
+    while( pcS1 < pcEnd && *pcS1 == '-' )
     {
-        pucS1++;
+        pcS1++;
     }
 
-    if( *pucS1 == '\r' )
+    if( *pcS1 == '\r' )
     {
-        pucS1++;
+        pcS1++;
     }
 
-    if( *pucS1 == '\n' )
+    if( *pcS1 == '\n' )
     {
-        pucS1++;
+        pcS1++;
     }
 
-    if( ( pucS2 <= pucS1 ) || ( pucS2 > pucEnd ) )
+    if( ( pcS2 <= pcS1 ) || ( pcS2 > pcEnd ) )
     {
         return( -1 );
     }
 
-    lRet = mbedtls_base64_decode( NULL, 0, &xOtherLen, ( const unsigned char * ) pucS1, pucS2 - pucS1 );
+    lRet = mbedtls_base64_decode( NULL, 0, &xOtherLen, ( const unsigned char * ) pcS1, pcS2 - pcS1 );
 
     if( lRet == MBEDTLS_ERR_BASE64_INVALID_CHARACTER )
     {
@@ -227,8 +262,8 @@ int convert_pem_to_der( const unsigned char * pucInput,
         return( -1 );
     }
 
-    if( ( lRet = mbedtls_base64_decode( pucOutput, xOtherLen, &xOtherLen, ( const unsigned char * ) pucS1,
-                                        pucS2 - pucS1 ) ) != 0 )
+    if( ( lRet = mbedtls_base64_decode( pucOutput, xOtherLen, &xOtherLen, ( const unsigned char * ) pcS1,
+                                        pcS2 - pcS1 ) ) != 0 )
     {
         return( lRet );
     }
@@ -746,7 +781,7 @@ static const char validRSAPublicKey[] =
     "-----END RSA PUBLIC KEY-----\n";
 
 /* Valid RSA certificate. */
-static const char validRSACertificate[] =
+static char validRSACertificate[] =
     "-----BEGIN CERTIFICATE-----\n"
     "MIIDsTCCApmgAwIBAgIJALg4YJlPspxyMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNV\n"
     "BAYTAlVTMQswCQYDVQQIDAJXQTEQMA4GA1UEBwwHU2VhdHRsZTENMAsGA1UECgwE\n"
@@ -998,13 +1033,14 @@ static void commonVerifySign_RSA( const char * pPrivateKeyLabel,
 
     if( TEST_PROTECT() )
     {
-        mbedTLSResult = mbedtls_pk_parse_key( ( mbedtls_pk_context * ) &mbedPkContext,
-                                              ( const unsigned char * ) validRSAPrivateKey,
-                                              sizeof( validRSAPrivateKey ),
-                                              NULL,
-                                              0 );
-
-        mbedTLSResult = mbedtls_rsa_pkcs1_verify( mbedPkContext.pk_ctx, NULL, NULL, MBEDTLS_RSA_PUBLIC, MBEDTLS_MD_SHA256, 32, hashedMessage, signature );
+        mbedTLSResult = lWrapPkParseKey( ( mbedtls_pk_context * ) &mbedPkContext,
+                                         ( const unsigned char * ) validRSAPrivateKey,
+                                         sizeof( validRSAPrivateKey ) );
+        #if MBEDTLS_VERSION_NUMBER < 0x03000000
+            mbedTLSResult = mbedtls_rsa_pkcs1_verify( ( mbedtls_rsa_context * ) mbedPkContext.pk_ctx, NULL, NULL, MBEDTLS_RSA_PUBLIC, MBEDTLS_MD_SHA256, 32, hashedMessage, signature );
+        #else
+            mbedTLSResult = mbedtls_rsa_pkcs1_verify( ( mbedtls_rsa_context * ) mbedPkContext.pk_ctx, MBEDTLS_MD_SHA256, 32, hashedMessage, signature );
+        #endif
         TEST_ASSERT_EQUAL_MESSAGE( 0, mbedTLSResult, "mbedTLS failed to parse valid RSA key (verification)" );
     }
 
@@ -1156,7 +1192,7 @@ void test_Sign_EC( void )
     /* Note that ECDSA operations on a signature of all 0's is not permitted. */
     CK_BYTE hashedMessage[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xab };
     CK_MECHANISM mechanism;
-    CK_BYTE signature[ pkcs11RSA_2048_SIGNATURE_LENGTH ] = { 0 };
+    CK_BYTE signature[ pkcs11ECDSA_P256_SIGNATURE_LENGTH ] = { 0 };
     CK_ULONG signatureLength;
     int mbedTLSResult;
 
@@ -1176,7 +1212,7 @@ void test_Sign_EC( void )
     result = globalFunctionList->C_SignInit( globalSession, &mechanism, privateKeyHandle );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to SignInit ECDSA." );
 
-    signatureLength = sizeof( signature );
+    signatureLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
     result = globalFunctionList->C_Sign( globalSession, hashedMessage, pkcs11SHA256_DIGEST_LENGTH, signature, &signatureLength );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Failed to ECDSA Sign." );
     TEST_ASSERT_EQUAL_MESSAGE( pkcs11ECDSA_P256_SIGNATURE_LENGTH, signatureLength, "ECDSA Sign returned an unexpected ECDSA Signature length." );
@@ -1203,7 +1239,7 @@ void test_Sign_EC( void )
     TEST_ASSERT_NOT_EQUAL_MESSAGE( NULL, keyPair, "Failed to allocate memory for the mbed TLS context." );
 
     /* Initialize the info. */
-    ecdsaContextPtr->pk_info = &mbedtls_eckey_info;
+    ecdsaContextPtr->pk_info = mbedtls_pk_info_from_type( MBEDTLS_PK_ECKEY );
     mbedtls_ecp_keypair_init( keyPair );
     mbedtls_ecp_group_init( &keyPair->grp );
 
@@ -1270,9 +1306,12 @@ void test_Verify_EC( void )
     CK_OBJECT_HANDLE certificateHandle;
     CK_MECHANISM mechanism;
     CK_BYTE hashedMessage[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xbe };
-    CK_BYTE signature[ pkcs11ECDSA_P256_SIGNATURE_LENGTH + 10 ] = { 0 };
-    CK_BYTE signaturePKCS[ 64 ] = { 0 };
-    size_t signatureLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
+
+    CK_BYTE signatureDer[ MBEDTLS_ECDSA_MAX_SIG_LEN( 256 ) ] = { 0 };
+    size_t xSignatureDerLength = MBEDTLS_ECDSA_MAX_SIG_LEN( 256 );
+
+    CK_BYTE signaturePKCS[ pkcs11ECDSA_P256_SIGNATURE_LENGTH ] = { 0 };
+    size_t xSignaturePKCSLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
 
     /* TODO: Consider switching this out for a C_GenerateRandom dependent function for ports not implementing mbedTLS. */
 
@@ -1292,13 +1331,13 @@ void test_Verify_EC( void )
     mechanism.ulParameterLen = 0;
     result = globalFunctionList->C_SignInit( globalSession, &mechanism, privateKeyHandle );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "SignInit failed." );
-    result = globalFunctionList->C_Sign( globalSession, hashedMessage, sizeof( hashedMessage ), signature, ( CK_ULONG * ) &signatureLength );
+    result = globalFunctionList->C_Sign( globalSession, hashedMessage, sizeof( hashedMessage ), signaturePKCS, ( CK_ULONG * ) &xSignaturePKCSLength );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Sign failed." );
 
     result = globalFunctionList->C_VerifyInit( globalSession, &mechanism, publicKeyHandle );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "VerifyInit failed." );
 
-    result = globalFunctionList->C_Verify( globalSession, hashedMessage, pkcs11SHA256_DIGEST_LENGTH, signature, sizeof( signaturePKCS ) );
+    result = globalFunctionList->C_Verify( globalSession, hashedMessage, pkcs11SHA256_DIGEST_LENGTH, signaturePKCS, xSignaturePKCSLength );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Verify failed." );
 
     #if ( pkcs11testIMPORT_PRIVATE_KEY_SUPPORT == 1 )
@@ -1309,11 +1348,9 @@ void test_Verify_EC( void )
 
         /* Initialize the private key. */
         mbedtls_pk_init( &pkCtx );
-        mbedResult = mbedtls_pk_parse_key( &pkCtx,
-                                           ( const unsigned char * ) validECDSAPrivateKey,
-                                           sizeof( validECDSAPrivateKey ),
-                                           NULL,
-                                           0 );
+        mbedResult = lWrapPkParseKey( &pkCtx,
+                                      ( const unsigned char * ) validECDSAPrivateKey,
+                                      sizeof( validECDSAPrivateKey ) );
         TEST_ASSERT_EQUAL_MESSAGE( 0, mbedResult, "Failed to parse valid ECDSA key." );
         /* Initialize the RNG. */
         mbedtls_entropy_init( &entropyCtx );
@@ -1321,7 +1358,17 @@ void test_Verify_EC( void )
         mbedResult = mbedtls_ctr_drbg_seed( &drbgCtx, mbedtls_entropy_func, &entropyCtx, NULL, 0 );
         TEST_ASSERT_EQUAL_MESSAGE( 0, mbedResult, "Failed to initialize DRBG" );
 
-        mbedResult = mbedtls_pk_sign( &pkCtx, MBEDTLS_MD_SHA256, hashedMessage, sizeof( hashedMessage ), signature, &signatureLength, mbedtls_ctr_drbg_random, &drbgCtx );
+        #if MBEDTLS_VERSION_NUMBER < 0x03000000
+            mbedResult = mbedtls_pk_sign( &pkCtx, MBEDTLS_MD_SHA256,
+                                          hashedMessage, sizeof( hashedMessage ),
+                                          signatureDer, &xSignatureDerLength,
+                                          mbedtls_ctr_drbg_random, &drbgCtx );
+        #else
+            mbedResult = mbedtls_pk_sign( &pkCtx, MBEDTLS_MD_SHA256,
+                                          hashedMessage, sizeof( hashedMessage ),
+                                          signatureDer, xSignatureDerLength, &xSignatureDerLength,
+                                          mbedtls_ctr_drbg_random, &drbgCtx );
+        #endif
         TEST_ASSERT_EQUAL_MESSAGE( 0, mbedResult, "Failed to perform ECDSA signature." );
 
         mbedtls_pk_free( &pkCtx );
@@ -1330,7 +1377,7 @@ void test_Verify_EC( void )
 
         /* Reconstruct the signature in PKCS #11 format. */
         mbedResult = PKI_mbedTLSSignatureToPkcs11Signature( signaturePKCS,
-                                                            signature );
+                                                            signatureDer );
         TEST_ASSERT_EQUAL_MESSAGE( 0, mbedResult, "Null buffers." );
 
         /* Verify with PKCS #11. */
@@ -1340,7 +1387,7 @@ void test_Verify_EC( void )
         result = globalFunctionList->C_VerifyInit( globalSession, &mechanism, publicKeyHandle );
         TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "VerifyInit failed." );
 
-        result = globalFunctionList->C_Verify( globalSession, hashedMessage, pkcs11SHA256_DIGEST_LENGTH, signaturePKCS, sizeof( signaturePKCS ) );
+        result = globalFunctionList->C_Verify( globalSession, hashedMessage, pkcs11SHA256_DIGEST_LENGTH, signaturePKCS, xSignaturePKCSLength );
         TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "Verify failed." );
     #endif /* if ( pkcs11testIMPORT_PRIVATE_KEY_SUPPORT == 1 ) */
     /* Modify signature value and make sure verification fails. */
@@ -1362,7 +1409,7 @@ void test_FindObject_EC( void )
                     &publicKeyHandle );
 }
 
-extern int convert_pem_to_der( const unsigned char * pucInput,
+extern int convert_pem_to_der( const char * pucInput,
                                size_t xLen,
                                unsigned char * pucOutput,
                                size_t * pxOlen );
@@ -1392,7 +1439,7 @@ void test_GetAttributeValue_EC( void )
     size_t length = sizeof( certificateValueExpected );
     int conversion;
 
-    conversion = convert_pem_to_der( ( const unsigned char * ) validECDSACertificate,
+    conversion = convert_pem_to_der( validECDSACertificate,
                                      sizeof( validECDSACertificate ),
                                      certificateValueExpected,
                                      &length );
@@ -1665,7 +1712,7 @@ static CK_RV provisionPrivateECKey( CK_SESSION_HANDLE session,
 
     DPtr = pkcs11configPKCS11_MALLOC( EC_D_LENGTH );
 
-    if( ( DPtr == NULL ) )
+    if( DPtr == NULL )
     {
         result = CKR_HOST_MEMORY;
     }
@@ -1843,7 +1890,7 @@ static CK_RV provisionPrivateKey( CK_SESSION_HANDLE session,
     mbedtls_pk_context mbedPkContext = { 0 };
 
     mbedtls_pk_init( &mbedPkContext );
-    mbedResult = mbedtls_pk_parse_key( &mbedPkContext, privateKey, privateKeyLength, NULL, 0 );
+    mbedResult = lWrapPkParseKey( &mbedPkContext, privateKey, privateKeyLength );
 
     if( mbedResult != 0 )
     {
@@ -1904,7 +1951,7 @@ static CK_RV provisionPublicKey( CK_SESSION_HANDLE session,
     mbedtls_pk_init( &mbedPkContext );
 
     /* Try parsing the private key using mbedtls_pk_parse_key. */
-    mbedResult = mbedtls_pk_parse_key( &mbedPkContext, keyPtr, keyLength, NULL, 0 );
+    mbedResult = lWrapPkParseKey( &mbedPkContext, ( unsigned char * ) keyPtr, keyLength );
 
     /* If mbedtls_pk_parse_key didn't work, maybe the private key is not included in the input passed in.
      * Try to parse just the public key. */
