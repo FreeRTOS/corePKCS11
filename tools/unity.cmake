@@ -4,8 +4,11 @@ FetchContent_Declare(
     unity GIT_REPOSITORY https://github.com/ThrowTheSwitch/unity.git GIT_TAG v2.5.1
 )
 
-FetchContent_GetProperties(unity)
-if(NOT unity_POPULATED)
+FetchContent_GetProperties(
+    unity
+    POPULATED unity_POPULATED
+)
+if(NOT ${unity_POPULATED})
     FetchContent_Populate(unity)
 endif()
 

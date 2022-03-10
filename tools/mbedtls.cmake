@@ -9,9 +9,16 @@ FetchContent_Declare(
     PATCH_COMMAND ${MODULE_ROOT_DIR}/tools/mbedtls_configure.sh <SOURCE_DIR> config.h
 )
 
-if(NOT mbedtls_2_POPULATED)
-    FetchContent_Populate(mbedtls_2)
+FetchContent_GetProperties(
+    mbedtls_2
+    POPULATED mbedtls_2_POPULATED
+)
 
+if(NOT ${mbedtls_2_POPULATED})
+    FetchContent_Populate(mbedtls_2)
+endif()
+
+if(NOT TARGET MbedTLS2_mbedtls)
     set(MBEDTLS_2_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib/mbedtls_2)
     set(MBEDTLS_TARGET_PREFIX "MbedTLS2_")
 
@@ -44,6 +51,7 @@ if(NOT mbedtls_2_POPULATED)
 endif()
 
 set(MBEDTLS_3_VERSION 3.1.0)
+
 FetchContent_Declare(
     mbedtls_3
     GIT_REPOSITORY "https://github.com/ARMmbed/mbedtls"
@@ -51,8 +59,16 @@ FetchContent_Declare(
     PATCH_COMMAND ${MODULE_ROOT_DIR}/tools/mbedtls_configure.sh <SOURCE_DIR> mbedtls_config.h
 )
 
-if(NOT mbedtls_3_POPULATED)
+FetchContent_GetProperties(
+    mbedtls_3
+    POPULATED mbedtls_3_POPULATED
+)
+
+if(NOT ${mbedtls_3_POPULATED})
     FetchContent_Populate(mbedtls_3)
+endif()
+
+if(NOT TARGET MbedTLS3_mbedtls)
     set(MBEDTLS_3_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib/mbedtls_3)
     set(MBEDTLS_TARGET_PREFIX "MbedTLS3_")
 

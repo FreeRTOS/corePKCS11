@@ -10,8 +10,12 @@ FetchContent_Declare(
     GIT_TAG afa294982e8a28bc06f341cc77fd4276641b42bd
 )
 
-FetchContent_GetProperties(cmock)
-if(NOT cmock_POPULATED)
+FetchContent_GetProperties(
+    cmock
+    POPULATED cmock_POPULATED
+)
+
+if(NOT ${cmock_POPULATED})
     FetchContent_Populate(cmock)
 endif()
 
