@@ -4,8 +4,13 @@ FetchContent_Declare(
     pkcs11_api GIT_REPOSITORY https://github.com/oasis-tcs/pkcs11.git GIT_TAG 2-40-errata-1
 )
 
-FetchContent_GetProperties(pkcs11_api)
-if(NOT pkcs11_api_POPULATED)
+FetchContent_GetProperties(
+    pkcs11_api
+    POPULATED pkcs11_api_POPULATED
+    SOURCE_DIR pkcs11_api_SOURCE_DIR
+)
+
+if(NOT ${pkcs11_api_POPULATED})
     FetchContent_Populate(pkcs11_api)
 endif()
 
