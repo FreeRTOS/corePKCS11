@@ -29,8 +29,8 @@
 #ifndef _AWS_PKCS11_CONFIG_H_
 #define _AWS_PKCS11_CONFIG_H_
 
-
-#include "mock_osal.h"
+#include <stddef.h>
+#include "malloc_stub.h"
 
 /*
  * @brief define away log macros.
@@ -55,12 +55,12 @@
 /**
  * @brief Malloc API used by core_pkcs11.h
  */
-#define pkcs11configPKCS11_MALLOC                          mock_osal_malloc
+#define pkcs11configPKCS11_MALLOC                          pvPkcs11Malloc
 
 /**
  * @brief Free API used by core_pkcs11.h
  */
-#define pkcs11configPKCS11_FREE                            mock_osal_free
+#define pkcs11configPKCS11_FREE                            vPkcs11Free
 
 /**
  * @brief PKCS #11 default user PIN.

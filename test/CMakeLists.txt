@@ -1,95 +1,74 @@
-cmake_minimum_required ( VERSION 3.13.0 )
-project ( "corePKCS11 unit test"
-          LANGUAGES C )
+cmake_minimum_required(VERSION 3.13.0)
+project("corePKCS11 tests" LANGUAGES C)
 
 # Allow the project to be organized into folders.
-set_property( GLOBAL PROPERTY USE_FOLDERS ON )
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_directory_properties(PROPERTIES EP_PREFIX "${CMAKE_BINARY_DIR}/_deps")
 
 # Do not allow in-source build.
-if( ${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR} )
-    message( FATAL_ERROR "In-source build is not allowed. Please build in a separate directory, such as ${PROJECT_SOURCE_DIR}/build." )
+if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
+    message(
+        FATAL_ERROR
+            "In-source build is not allowed. Please build in a separate directory, such as ${PROJECT_SOURCE_DIR}/build."
+    )
 endif()
 
 # Set global path variables.
 get_filename_component(__MODULE_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 set(MODULE_ROOT_DIR ${__MODULE_ROOT_DIR} CACHE INTERNAL "corePKCS11 repository root.")
 
-# Configure options to always show in CMake GUI.
-option( BUILD_CLONE_SUBMODULES
-        "Set this to ON to automatically clone any required Git submodules. When OFF, submodules must be manually cloned."
-        OFF )
+option(SYSTEM_TESTS "Set this to ON to build system tests" ON)
+
+option(UNIT_TESTS "Set this to ON to build unit tests" ON)
 
 # Set output directories.
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# ===================================== Coverity Analysis Configuration =================================================
+include(${MODULE_ROOT_DIR}/tools/mbedtls.cmake)
+include(${MODULE_ROOT_DIR}/tools/unity.cmake)
+include(${MODULE_ROOT_DIR}/tools/cmock.cmake)
 
-# Include filepaths for source and include.
-include( ${MODULE_ROOT_DIR}/pkcsFilePaths.cmake )
-
-# Target for Coverity analysis that builds the library.
-add_library( coverity_analysis
-             ${PKCS_SOURCES} )
-
-# Build corePKCS11 library target without custom config dependency.
-target_compile_definitions( coverity_analysis PUBLIC -DMBEDTLS_CONFIG_FILE="unit_test_mbedtls_config.h" )
-
-# Build corePKCS11 library with gnuC90 standard due to mbedtls compatbility issues.
-target_compile_options( coverity_analysis PUBLIC -std=gnu90 )
-
-# corePKCS11 public include path.
-target_include_directories( coverity_analysis PUBLIC ${PKCS_INCLUDE_PUBLIC_DIRS} ${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls/include ${MODULE_ROOT_DIR}/source/dependency/3rdparty/mbedtls_utils ${MODULE_ROOT_DIR}/test/unit-test/config )
-
-#  ====================================  Test Configuration ========================================
+# ========================================
+# Test Configuration
+# ========================================
 
 # Define a CMock resource path.
-set( CMOCK_DIR ${MODULE_ROOT_DIR}/test/unit-test/CMock CACHE INTERNAL "CMock library source directory." )
+set(CMOCK_DIR ${MODULE_ROOT_DIR}/test/unit-test/CMock CACHE INTERNAL
+                                                            "CMock library source directory."
+)
 
-# Include CMock build configuration.
-include( unit-test/cmock_build.cmake )
-
-# Check if the CMock source directory exists, and if not present, clone the submodule
-# if BUILD_CLONE_SUBMODULES configuration is enabled.
-if( NOT EXISTS ${CMOCK_DIR}/src )
-    # Attempt to clone CMock.
-    if( ${BUILD_CLONE_SUBMODULES} )
-        clone_cmock()
-    else()
-        message( FATAL_ERROR "The required submodule CMock does not exist. Either clone it manually, or set BUILD_CLONE_SUBMODULES to 1 to automatically clone it during build." )
-    endif()
-endif()
-
-# Add unit test and coverage configuration.
-
-# Use CTest utility for managing test runs. This has to be added BEFORE
-# defining test targets with add_test()
+# Use CTest utility for managing test runs. This has to be added BEFORE defining test targets with
+# add_test()
 enable_testing()
 
-# Add build targets for CMock and Unit, required for unit testing.
-add_cmock_targets()
-
-# Add function to enable CMock based tests and coverage.
-include( ${MODULE_ROOT_DIR}/tools/cmock/create_test.cmake )
-
-# Include build configuration for unit tests.
 if(UNIT_TESTS)
-    add_subdirectory( unit-test )
+    add_subdirectory(pkcs11_mbedtls_utest)
+    add_subdirectory(pkcs11_utils_utest)
+    add_subdirectory(wrapper_utest)
 endif()
 
-# Include build configuration for system tests.
 if(SYSTEM_TESTS)
-    add_subdirectory( system-test )
+    add_subdirectory(mbedtls_integration)
 endif()
 
+add_subdirectory(coverity_analysis)
 
-#  ==================================== Coverage Analysis configuration ========================================
-
+# ========================================
+# Coverage Analysis configuration
+# ========================================
 
 # Add a target for running coverage on tests.
-add_custom_target( coverage
+add_custom_target(
+    coverage
     COMMAND ${CMAKE_COMMAND} -P ${MODULE_ROOT_DIR}/tools/cmock/coverage.cmake
-    DEPENDS cmock unity core_pkcs11_mbedtls_utest core_pkcs11_utest core_pki_utils_utest
+    DEPENDS cmock
+            unity
+            $<$<TARGET_EXISTS:core_pkcs11_mbedtls_utest>:core_pkcs11_mbedtls_utest>
+            $<$<TARGET_EXISTS:pkcs11_wrapper_utest>:pkcs11_wrapper_utest>
+            $<$<TARGET_EXISTS:pkcs11_utils_utest>:pkcs11_utils_utest>
+            $<$<TARGET_EXISTS:integration_mbedtls_2>:integration_mbedtls_2>
+            $<$<TARGET_EXISTS:integration_mbedtls_3>:integration_mbedtls_3>
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )

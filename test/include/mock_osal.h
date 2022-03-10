@@ -28,12 +28,11 @@
 #define MOCK_OSAL_H_
 
 #include <stddef.h>
-#include "threading_alt.h"
+#include "mbedtls/threading.h"
 
-void * mock_osal_malloc( size_t size );
-void * mock_osal_calloc( size_t nitems,
-                         size_t size );
-void mock_osal_free( void * ptr );
+void * mbedtls_calloc( size_t n,
+                       size_t size );
+void mbedtls_free( void * ptr );
 
 void mock_osal_mutex_init( mbedtls_threading_mutex_t * );
 void mock_osal_mutex_free( mbedtls_threading_mutex_t * );
