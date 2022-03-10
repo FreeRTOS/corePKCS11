@@ -1,5 +1,5 @@
 # corePKCS11 Library
-[PKCS #11](https://en.wikipedia.org/wiki/PKCS_11) is a standardised and widely used API for manipulating common cryptographic objects. It is important because the functions it specifies allow application software to use, create, modify, and delete cryptographic objects, without ever exposing those objects to the application’s memory.
+[PKCS #11](https://en.wikipedia.org/wiki/PKCS_11) is a standardized and widely used API for manipulating common cryptographic objects. It is important because the functions it specifies allow application software to use, create, modify, and delete cryptographic objects, without ever exposing those objects to the application’s memory.
 For example, FreeRTOS AWS reference integrations use a small subset of the PKCS #11 API to, among other things, access the secret (private) key necessary to create a network connection that is authenticated and secured by the [Transport Layer Security (TLS)](https://en.wikipedia.org/wiki/Transport_Layer_Security) protocol – without the application ever ‘seeing’ the key.
 
 
@@ -26,42 +26,54 @@ The purpose of the corePKCS11 software only mock library is therefore to provide
 
 Since the PKCS #11 interface is defined as part of the PKCS #11 [specification](https://docs.oasis-open.org/pkcs11/pkcs11-base/v2.40/os/pkcs11-base-v2.40-os.html) replacing this library with another implementation should require little porting effort, as the interface will not change. The system tests distributed in this repository can be leveraged to verify the behavior of a different implementation is similar to corePKCS11.
 
-## Building Unit Tests.
+## corePKCS11 Configuration
 
-### PKCS Config File
-
-The PKCS #11 library exposes build configuration macros that are required for building the library.
+The corePKCS11 library exposes preprocessor macros which must be defined prior to building the library.
 A list of all the configurations and their default values are defined in the doxygen documentation for this library.
 
-### Platform Prerequisites
+## Build Prerequisites
+### Library Usage
+For building the library the following are required:
+- **A C99 compiler**
+- **mbedcrypto** library from [mbedtls](https://github.com/ARMmbed/mbedtls) version 2.x or 3.x.
+- **pkcs11 API header(s)** available from [OASIS](https://github.com/oasis-tcs/pkcs11) or [OpenSC](https://github.com/OpenSC/libp11/blob/master/src/pkcs11.h)
 
-- For building the library, **CMake 3.13.0 or later** and a **C99 compiler**.
-- For running unit tests, Ruby 2.0.0 or later is additionally required for the CMock test framework (that we use).
-- For running the coverage target, gcov is additionally required.
+Optionally, variables from the pkcsFilePaths.cmake file may be referenced if your project uses cmake.
 
-### Steps to build **Library** and **Unit Tests**
+### Integration and Unit Tests
+In order to run the integration and unit test suites the following are dependencies are necessary:
+- **C Compiler**
+- **CMake 3.13.0 or later**
+- **Ruby 2.0.0 or later** required by CMock.
+- **Python 3** required for configuring mbedtls.
+- **git** required for fetching dependencies.
+- **GNU Make** or **Ninja**
 
-### Checkout CMock Submodule
-By default, the submodules in this repository are configured with `update=none` in [.gitmodules](.gitmodules) to avoid increasing clone time and disk space usage of other repositories (like [amazon-freertos](https://github.com/aws/amazon-freertos) that submodule this repository.
+The *mbedtls*, *CMock*, and *Unity* libraries are downloaded and built automatically using the cmake FetchContent feature.
 
-To build unit tests, the submodule dependency of CMock is required. Use the following command to clone the submodule:
-```
-git submodule update --checkout --init --recursive test/unit-test/CMock
-```
+### Coverage Measurement and Instrumentation
+The following software is required to run the coverage target:
+- Linux, MacOS, or another POSIX-like environment.
+- A recent version of **GCC** or **Clang** with support for gcov-like coverage instrumentation.
+- **gcov** binary corresponding to your chosen compiler
+- **lcov** from the [Linux Test Project](https://github.com/linux-test-project/lcov)
+- **perl** needed to run the lcov utility.
 
-1. Go to the root directory of this repository. (Make sure that the **CMock** submodule is cloned as described [above](#checkout-cmock-submodule))
+Coverage builds are validated on recent versions of Ubuntu Linux.
 
-1. Create the build directory: `mkdir build`
+### Running the Integration and Unit Tests
 
-1. Enter the build directory: `cd build`
+1. Navigate to the root directory of this repository in your shell.
 
-1. Run *cmake* while inside build directory: `cmake -S ../test -DUNIT_TESTS=1`
+1. Run **cmake** to construct a build tree: `cmake -S test -B build`
+    - You may specify your preferred build tool by appending `-G'Unix Makefiles'` or `-GNinja` to the command above.
+    - You may append `-DUNIT_TESTS=0` or `-DSYSTEM_TESTS=0` to disable Unit Tests or Integration Tests respectively.
 
-1. Run this command to build the library and unit tests: `make all`
+1. Build the test binaries: `cmake --build ./build --target all`
 
-1. The built library will be present in `build/lib` folder, and generated test executables will be present in `build/bin/tests` folder.
+1. Run `ctest --test-dir ./build` or `cmake --build ./build --target test` to run the tests without capturing coverage.
 
-1. Run `ctest` to execute all tests and view the test run summary.
+1. Run `cmake --build ./build --target coverage` to run the tests and capture coverage data.
 
 ## Reference examples
 
