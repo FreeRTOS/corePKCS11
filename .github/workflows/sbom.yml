@@ -1,8 +1,9 @@
 name: test-sbom-generator
 
-on: pull_request:
-      branches: [main]
-    workflow_dispatch:
+on: 
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
   jobs:
     sbom-generation:
       runs-on: ubuntu-latest
