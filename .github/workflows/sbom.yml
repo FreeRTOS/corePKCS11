@@ -1,6 +1,6 @@
 name: test-sbom-generator
 
-on: pull_request:
+on: pull_request
       branches: [main]
   jobs:
     sbom-generation:
