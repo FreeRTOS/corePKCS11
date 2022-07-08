@@ -15,8 +15,8 @@ jobs:
           python-version: '3.x'
       - name: Install dependencies
         run: |
-          echo '$GITHUB_ACTION_PATH'
-          pip install -r $GITHUB_ACTION_PATH/requirements.txt
+          echo $GITHUB_ACTION_PATH
+          pip install -r requirements.txt
         shell: bash 
       - name: Checkout the FreeRTOS/corePKCS11 repository for testing action on.
         uses: actions/checkout@v2
