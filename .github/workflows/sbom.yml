@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Check doxygen build
+      - name: Generate SBOM
         uses: xlin7799/CI-CD-Github-Actions/sbom-generator@main
         with:
           path: ./
