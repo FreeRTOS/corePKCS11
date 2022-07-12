@@ -3,10 +3,10 @@ name: SBOM Generation
 on:
   pull_request:
     branches: [main]
-  workflow_dispatch:
 
 jobs:
   sbom:
+    if: github.head_ref != 'update-sbom'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
