@@ -191,12 +191,3 @@ jobs:
         with:
             config: .github/memory_statistics_config.json
             check_against: docs/doxygen/include/size_table.md
-  sbom:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Check doxygen build
-        uses: xlin7799/CI-CD-Github-Actions/sbom-generator@main
-        with:
-          path: ./
-          token: ${{ github.token }}
