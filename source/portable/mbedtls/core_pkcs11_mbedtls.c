@@ -240,7 +240,7 @@
 #define PKCS11_USING_HMAC                  ( 1 )
 
 /**
- * @brief Define the MBEDTLS_VERSION_NUMBER as 0 if it isn't defined, done for MISRA rule 20.9
+ * @brief Define the MBEDTLS_VERSION_NUMBER as 0 if it is not defined, done for MISRA rule 20.9
  */
 #ifndef MBEDTLS_VERSION_NUMBER
 #define MBEDTLS_VERSION_NUMBER 0
