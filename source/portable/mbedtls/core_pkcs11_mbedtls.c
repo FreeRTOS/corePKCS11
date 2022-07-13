@@ -240,6 +240,13 @@
 #define PKCS11_USING_HMAC                  ( 1 )
 
 /**
+ * @brief Define the MBEDTLS_VERSION_NUMBER as 0 if it isn't defined, done for MISRA rule 20.9
+ */
+#ifndef MBEDTLS_VERSION_NUMBER
+#define MBEDTLS_VERSION_NUMBER 0
+#endif
+
+/**
  * @ingroup pkcs11_datatypes
  * @brief PKCS #11 object container.
  *
@@ -4138,7 +4145,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
     /* See explanation in prvCheckValidSessionAndModule for this exception. */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
-    CK_OBJECT_HANDLE xPalHandle;
+    CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
     CK_BYTE_PTR pxLabel = NULL;
     CK_ULONG xLabelLength = 0;
 
@@ -4328,6 +4335,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
     CK_BBOOL xSignatureGenerated = ( CK_BBOOL ) CK_FALSE;
 
     /* 8 bytes added to hold ASN.1 encoding information. */
+    /* coverity[misra_c_2012_rule_12_1_violation] */
     uint8_t ecSignature[ MBEDTLS_ECDSA_MAX_SIG_LEN( 256 ) ];
 
     int32_t lMbedTLSResult = -1;
@@ -4351,6 +4359,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
         else if( pxSessionObj->xOperationSignMechanism == CKM_ECDSA )
         {
             xSignatureLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
+            /* coverity[misra_c_2012_rule_12_1_violation] */
             xSignatureBufferLength = MBEDTLS_ECDSA_MAX_SIG_LEN( 256 );
             pucSignatureBuffer = ecSignature;
             xExpectedInputLength = pkcs11SHA256_DIGEST_LENGTH;
@@ -4855,7 +4864,12 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
     P11Session_t * pxSessionObj;
     int32_t lMbedTLSResult;
     CK_RV xResult = CKR_OK;
-    CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
+    /* If using SHA512 a larger buffer is needed for the call to mbedtls_md_hmac_finish */
+#if defined(MBEDTLS_SHA512_C)
+    CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH * 2 ] = { 0 };
+#else
+    CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH] = { 0 };
+#endif
     CK_BYTE pxCMACBuffer[ MBEDTLS_AES_BLOCK_SIZE ] = { 0 };
 
     pxSessionObj = prvSessionPointerFromHandle( hSession );
