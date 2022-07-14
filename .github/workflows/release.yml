@@ -34,7 +34,7 @@ jobs:
         run: |
           git add .
           git commit -m 'Update SBOM'
-          git push
+          git push -u origin master
       - name: Tag Commit and Push to remote
         run: |
           git tag ${{ github.event.inputs.version_number }} -a -m "corePKCS11 Library ${{ github.event.inputs.version_number }}"
