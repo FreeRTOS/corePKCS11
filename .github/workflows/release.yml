@@ -27,6 +27,7 @@ jobs:
           branch: '${{ github.event.inputs.version_number }}'
           sha: '${{ github.event.inputs.commit_id }}'
       - name: check out the branch
+        working-directory: ./corePKCS11
         run: git checkout ${{ github.event.inputs.version_number }}
       - name: Configure git identity
         run: |
