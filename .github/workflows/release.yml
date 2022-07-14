@@ -19,6 +19,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.inputs.commit_id }}
+      - name: Configure git identity
+        run: |
+            git config --global user.name "Release Workflow"
       - name: Tag Commit and Push to remote
         run: |
           git tag ${{ github.event.inputs.version_number }} -a -m "corePKCS11 Library ${{ github.event.inputs.version_number }}"
