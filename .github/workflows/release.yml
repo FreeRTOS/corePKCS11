@@ -21,9 +21,20 @@ jobs:
           ref: ${{ github.event.inputs.commit_id }}
       - name: create new branch for release
         run: git checkout -b ${{ github.event.inputs.version_number }} ${{ github.event.inputs.commit_id }}
+      - name: Generate SBOM
+        uses: xlin7799/CI-CD-Github-Actions/sbom-generator@main
+        with:
+          path: ./
+          token: ${{ github.token }}
+          script: scan_corePKCS11.py
       - name: Configure git identity
         run: |
             git config --global user.name "Release Workflow"
+      - name: commit SBOM file
+        run: |
+          git add .
+          git commit -m 'Update SBOM'
+          git push
       - name: Tag Commit and Push to remote
         run: |
           git tag ${{ github.event.inputs.version_number }} -a -m "corePKCS11 Library ${{ github.event.inputs.version_number }}"
