@@ -20,15 +20,7 @@ jobs:
         with:
           ref: ${{ github.event.inputs.commit_id }}
       - name: create new branch for release
-        uses: peterjgrainger/action-create-branch@v2.2.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          branch: '${{ github.event.inputs.version_number }}'
-          sha: '${{ github.event.inputs.commit_id }}'
-      - name: check out the branch
-        working-directory: ./corePKCS11
-        run: git checkout ${{ github.event.inputs.version_number }}
+        run: git checkout -b ${{ github.event.inputs.version_number }} ${{ github.event.inputs.commit_id }}
       - name: Configure git identity
         run: |
             git config --global user.name "Release Workflow"
