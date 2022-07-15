@@ -23,7 +23,6 @@
 /**
  * @file core_pki_utils.c
  * @brief Helper functions for PKCS #11
- * test sbom
  */
 #include "core_pki_utils.h"
 
