@@ -19,16 +19,16 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.inputs.commit_id }}
-      - name: create a new branch that references commit id
-        run: git checkout -b ${{ github.event.inputs.version_number }} ${{ github.event.inputs.commit_id }}
-      - name: Generate SBOM
-        uses: xlin7799/CI-CD-Github-Actions/sbom-generator@main
-        with:
-          path: ./
-          script: scan_corePKCS11.py
       - name: Configure git identity
         run: |
             git config --global user.name "Release Workflow"
+      - name: create a new branch that references commit id
+        run: git checkout -b ${{ github.event.inputs.version_number }} ${{ github.event.inputs.commit_id }}
+      - name: Generate SBOM
+        uses: FreeRTOS/CI-CD-Github-Actions/sbom-generator@main
+        with:
+          path: ./
+          script: scan_corePKCS11.py
       - name: commit SBOM file
         run: |
           git add .
