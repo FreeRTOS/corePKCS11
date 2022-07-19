@@ -25,7 +25,8 @@ jobs:
         uses: xlin7799/CI-CD-Github-Actions/sbom-generator@main
         with:
           path: ./
-          script: scan_corePKCS11.py
+          source_path: ./source
+          url: 'https://github.com/FreeRTOS/corePKCS11'
       - name: Configure git identity
         run: |
             git config --global user.name "Release Workflow"
