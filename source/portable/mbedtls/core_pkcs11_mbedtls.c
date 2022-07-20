@@ -243,7 +243,7 @@
  * @brief Define the MBEDTLS_VERSION_NUMBER as 0 if it is not defined, done for MISRA rule 20.9
  */
 #ifndef MBEDTLS_VERSION_NUMBER
-#define MBEDTLS_VERSION_NUMBER 0
+    #define MBEDTLS_VERSION_NUMBER    0
 #endif
 
 /**
@@ -4864,12 +4864,13 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
     P11Session_t * pxSessionObj;
     int32_t lMbedTLSResult;
     CK_RV xResult = CKR_OK;
+
     /* If using SHA512 a larger buffer is needed for the call to mbedtls_md_hmac_finish */
-#if defined(MBEDTLS_SHA512_C)
-    CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH * 2 ] = { 0 };
-#else
-    CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH] = { 0 };
-#endif
+    #if defined( MBEDTLS_SHA512_C )
+        CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH * 2 ] = { 0 };
+    #else
+        CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
+    #endif
     CK_BYTE pxCMACBuffer[ MBEDTLS_AES_BLOCK_SIZE ] = { 0 };
 
     pxSessionObj = prvSessionPointerFromHandle( hSession );

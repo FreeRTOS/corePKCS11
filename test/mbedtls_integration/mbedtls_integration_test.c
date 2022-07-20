@@ -949,6 +949,7 @@ static void commonValidateCredentialStorageRSA( const char * pPrivateKeyLabel,
     /* Get the certificate value. */
     uint8_t expectedCertInDer[ sizeof( validRSACertificate ) ];
     size_t expectedCertLen = sizeof( expectedCertInDer );
+
     TEST_ASSERT_EQUAL( 0, convert_pem_to_der( validRSACertificate, strlen( validRSACertificate ), expectedCertInDer, &expectedCertLen ) );
     template.type = CKA_VALUE;
     template.pValue = dataBuffer;
@@ -1544,7 +1545,6 @@ void test_GetAttributeValue_EC( void )
     result = globalFunctionList->C_GetAttributeValue( globalSession, publicKey, &template, 1 );
     TEST_ASSERT_EQUAL_MESSAGE( CKR_OK, result, "GetAttributeValue for EC point failed." );
     #if pkcs11testIMPORT_PRIVATE_KEY_SUPPORT == 1
-
         /* The EC point can only be known for a public key that was previously created
          * therefore this check is only done for implementations that support importing
          * a private key, as the credentials that are on the device are all known.
