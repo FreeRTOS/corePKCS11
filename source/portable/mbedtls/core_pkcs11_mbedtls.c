@@ -345,6 +345,8 @@ static CK_RV prvCheckValidSessionAndModule( const P11Session_t * pxSession )
      * may be cast to a type which is defined as essentially Boolean.
      * This allows the implementation of non-C99 Boolean models."
      */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     if( xP11Context.xIsInitialized == ( CK_BBOOL ) CK_FALSE )
     {
@@ -356,6 +358,8 @@ static CK_RV prvCheckValidSessionAndModule( const P11Session_t * pxSession )
         LogDebug( ( "Could not get a valid session. PKCS #11 session handle pSession was NULL." ) );
         xResult = CKR_SESSION_HANDLE_INVALID;
     }
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     else if( pxSession->xOpened == ( CK_BBOOL ) CK_FALSE )
     {
@@ -395,31 +399,36 @@ static P11Session_t * prvSessionPointerFromHandle( CK_SESSION_HANDLE xSession )
  */
 static CK_BBOOL prvOperationActive( const P11Session_t * pxSession )
 {
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xResult = ( CK_BBOOL ) CK_FALSE;
 
     if( ( pxSession->xOperationDigestMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = ( CK_BBOOL ) CK_TRUE;
     }
     else if( ( pxSession->xOperationSignMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = ( CK_BBOOL ) CK_TRUE;
     }
     else if( ( pxSession->xOperationVerifyMechanism < pkcs11NO_OPERATION ) == CK_TRUE )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = ( CK_BBOOL ) CK_TRUE;
     }
     else if( pxSession->pxFindObjectLabel != NULL )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = ( CK_BBOOL ) CK_TRUE;
     }
@@ -438,7 +447,8 @@ static CK_RV prvMbedTLS_Initialize( void )
 {
     CK_RV xResult = CKR_OK;
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     int32_t lMbedTLSResult = 0;
 
@@ -466,7 +476,8 @@ static CK_RV prvMbedTLS_Initialize( void )
     }
     else
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xP11Context.xIsInitialized = ( CK_BBOOL ) CK_TRUE;
         LogDebug( ( "PKCS #11 module was successfully initialized." ) );
@@ -512,7 +523,8 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
                               CK_ATTRIBUTE ** ppxLabel )
 {
     CK_RV xResult = CKR_OK;
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
 
@@ -564,7 +576,8 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
@@ -593,7 +606,8 @@ static CK_RV prvCertAttParse( CK_ATTRIBUTE * pxAttribute,
  */
 static CK_RV prvRsaPrivKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
 {
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
     CK_RV xResult = CKR_OK;
@@ -605,7 +619,8 @@ static CK_RV prvRsaPrivKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
             ( void ) memcpy( &xBool, pxAttribute->pValue, pxAttribute->ulValueLen );
         }
 
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         if( xBool == ( CK_BBOOL ) CK_FALSE )
         {
@@ -622,7 +637,8 @@ static CK_RV prvRsaPrivKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
  */
 static CK_RV prvRsaPubKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
 {
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
     CK_RV xResult = CKR_OK;
@@ -634,7 +650,8 @@ static CK_RV prvRsaPubKeyAttParse( const CK_ATTRIBUTE * pxAttribute )
             ( void ) memcpy( &xBool, pxAttribute->pValue, pxAttribute->ulValueLen );
         }
 
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         if( xBool == ( CK_BBOOL ) CK_FALSE )
         {
@@ -742,7 +759,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                 CK_BBOOL xIsPrivate )
 {
     CK_RV xResult = CKR_OK;
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
 
@@ -761,7 +779,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
@@ -772,7 +791,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         case ( CKA_VERIFY ):
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xIsPrivate == ( CK_BBOOL ) CK_FALSE )
             {
@@ -787,7 +807,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
 
         case ( CKA_SIGN ):
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
             {
@@ -826,7 +847,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
     static CK_RV prvEcPrivKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                        const mbedtls_pk_context * pxMbedContext )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
         int32_t lMbedTLSResult = 0;
@@ -841,7 +863,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool == ( CK_BBOOL ) CK_FALSE )
             {
@@ -875,7 +898,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
     static CK_RV prvEcPubKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                       const mbedtls_pk_context * pxMbedContext )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
         int32_t lMbedTLSResult = 0;
@@ -890,7 +914,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, pxAttribute->ulValueLen );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool == ( CK_BBOOL ) CK_FALSE )
             {
@@ -936,7 +961,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                    CK_BBOOL xIsPrivate )
     {
         CK_RV xResult = CKR_OK;
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
         const CK_BYTE pxEcCurve[] = pkcs11DER_ENCODED_OID_P256;
@@ -959,7 +985,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                     ( void ) memcpy( &xBool, pxEcBoolAtt, sizeof( CK_BBOOL ) );
                 }
 
-                /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 if( xBool != ( CK_BBOOL ) CK_TRUE )
                 {
@@ -986,7 +1013,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             case ( CKA_VERIFY ):
             case ( CKA_EC_POINT ):
 
-                /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 if( xIsPrivate == ( CK_BBOOL ) CK_FALSE )
                 {
@@ -1005,7 +1033,8 @@ static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
             case ( CKA_SIGN ):
             case ( CKA_VALUE ):
 
-                /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
                 {
@@ -1156,7 +1185,8 @@ static CK_RV prvAddObjectToList( CK_OBJECT_HANDLE xPalHandle,
 {
     CK_RV xResult = CKR_HOST_MEMORY;
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xObjectFound = ( CK_BBOOL ) CK_FALSE;
     uint32_t ulSearchIndex = 0;
@@ -1173,7 +1203,8 @@ static CK_RV prvAddObjectToList( CK_OBJECT_HANDLE xPalHandle,
             if( xP11Context.xObjectList.xObjects[ ulSearchIndex ].xHandle == xPalHandle )
             {
                 /* Object already exists in list. */
-                /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 xResult = CKR_OK;
                 xObjectFound = ( CK_BBOOL ) CK_TRUE;
@@ -1188,7 +1219,8 @@ static CK_RV prvAddObjectToList( CK_OBJECT_HANDLE xPalHandle,
             }
         }
 
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         if( ( xResult == CKR_OK ) && ( xObjectFound == ( CK_BBOOL ) CK_FALSE ) && ( xLabelLength <= pkcs11configMAX_LABEL_LENGTH ) )
         {
@@ -1263,7 +1295,8 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
     CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
     uint32_t ulDerBufSize = 0;
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
     {
@@ -1306,7 +1339,8 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
     }
     else
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+/* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
         {
@@ -1331,7 +1365,8 @@ static CK_RV prvSaveDerKeyToPal( mbedtls_pk_context * pxMbedContext,
         ulActualKeyLength = ( uint32_t ) lDerKeyLength;
     }
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     if( ( xResult == CKR_OK ) && ( xIsPrivate == ( CK_BBOOL ) CK_TRUE ) && ( xKeyType == CKK_EC ) )
     {
@@ -1388,7 +1423,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pInitArgs )
 
     ( void ) ( pInitArgs );
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     if( xP11Context.xIsInitialized != ( CK_BBOOL ) CK_TRUE )
     {
@@ -1435,7 +1471,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pReserved )
 
     if( xResult == CKR_OK )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         if( xP11Context.xIsInitialized == ( CK_BBOOL ) CK_FALSE )
         {
@@ -1451,7 +1488,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pReserved )
         mbedtls_mutex_free( &xP11Context.xObjectList.xMutex );
         mbedtls_mutex_free( &xP11Context.xSessionMutex );
 
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xP11Context.xIsInitialized = ( CK_BBOOL ) CK_FALSE;
         LogInfo( ( "PKCS #11 was successfully uninitialized." ) );
@@ -1592,7 +1630,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetSlotList )( CK_BBOOL tokenPresent,
      * on a physical token, this parameter is ignored. */
     ( void ) ( tokenPresent );
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     if( xP11Context.xIsInitialized != ( CK_BBOOL ) CK_TRUE )
     {
@@ -1785,11 +1824,11 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
 
     /* Allow unused parameters to be cast to void to silence compiler warnings.
      * Even if they are a function pointer. */
-    /* coverity[misra_c_2012_rule_11_1_violation] */
     ( void ) Notify;
 
     /* Check that the PKCS #11 module is initialized. */
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     if( xP11Context.xIsInitialized != ( CK_BBOOL ) CK_TRUE )
     {
@@ -2121,7 +2160,8 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
     {
         CK_BYTE_PTR pucData = NULL;
         CK_ULONG ulDataLength = 0;
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
         CK_RV xResult = CKR_OK;
@@ -2138,7 +2178,8 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
         else if( 0 == strncmp( pxLabel->pValue, pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS, pxLabel->ulValueLen ) )
         {
             *pxPalHandle = PKCS11_PAL_FindObject( pxPubKeyLabel, pxLabel->ulValueLen );
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             xIsPrivate = ( CK_BBOOL ) CK_FALSE;
         }
@@ -2159,7 +2200,8 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
 
         if( ( xResult == CKR_OK ) && ( *pxPalHandle != CK_INVALID_HANDLE ) )
         {
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
             {
@@ -2404,7 +2446,8 @@ static CK_RV prvHMACKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                  CK_ULONG * pulHmacKeyLen )
 {
     CK_RV xResult = CKR_OK;
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
 
@@ -2425,7 +2468,8 @@ static CK_RV prvHMACKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
@@ -2527,7 +2571,8 @@ static CK_RV prvCMACKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                                  CK_ULONG * pulCmacKeyLen )
 {
     CK_RV xResult = CKR_OK;
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
 
@@ -2548,7 +2593,8 @@ static CK_RV prvCMACKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
@@ -2662,7 +2708,8 @@ static CK_RV prvCreatePrivateKey( CK_ATTRIBUTE * pxTemplate,
         xResult = prvCreateRsaKey( pxTemplate,
                                    ulCount,
                                    pxObject,
-                                   /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                                   /* MISRA Ref 10.5.1 [Essential type casting] */
+                                   /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                                    /* coverity[misra_c_2012_rule_10_5_violation] */
                                    ( CK_BBOOL ) CK_TRUE );
     }
@@ -2674,7 +2721,8 @@ static CK_RV prvCreatePrivateKey( CK_ATTRIBUTE * pxTemplate,
             xResult = prvCreateECKey( pxTemplate,
                                       ulCount,
                                       pxObject,
-                                      /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                                      /* MISRA Ref 10.5.1 [Essential type casting] */
+                                      /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                                       /* coverity[misra_c_2012_rule_10_5_violation] */
                                       ( CK_BBOOL ) CK_TRUE );
         }
@@ -2708,7 +2756,8 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
 
     if( xKeyType == CKK_RSA )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         xResult = prvCreateRsaKey( pxTemplate, ulCount, pxObject, ( CK_BBOOL ) CK_FALSE );
     }
@@ -2716,7 +2765,8 @@ static CK_RV prvCreatePublicKey( CK_ATTRIBUTE * pxTemplate,
     #ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
         else if( xKeyType == CKK_EC ) /* CKK_EC = CKK_ECDSA. */
         {
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             xResult = prvCreateECKey( pxTemplate, ulCount, pxObject, ( CK_BBOOL ) CK_FALSE );
         }
@@ -2971,7 +3021,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                                                    CK_ATTRIBUTE_PTR pTemplate,
                                                    CK_ULONG ulCount )
 {
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
     CK_ULONG iAttrib;
@@ -3047,7 +3098,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
 
         if( lMbedTLSResult == 0 )
         {
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
             {
@@ -3113,7 +3165,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                 case CKA_PUBLIC_KEY_INFO:
                 case CKA_VALUE:
 
-                    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                    /* MISRA Ref 10.5.1 [Essential type casting] */
+                    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                     /* coverity[misra_c_2012_rule_10_5_violation] */
                     if( xIsPrivate == ( CK_BBOOL ) CK_TRUE )
                     {
@@ -3343,7 +3396,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE hSession,
 
     if( xResult == CKR_OK )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         if( prvOperationActive( pxSession ) == ( CK_BBOOL ) CK_TRUE )
         {
@@ -3438,7 +3492,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE hSession,
     P11Session_t * pxSession = prvSessionPointerFromHandle( hSession );
     CK_RV xResult = prvCheckValidSessionAndModule( pxSession );
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
 
@@ -3594,7 +3649,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_DigestInit )( CK_SESSION_HANDLE hSession,
 
     if( xResult == CKR_OK )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         if( prvOperationActive( pxSession ) == ( CK_BBOOL ) CK_TRUE )
         {
@@ -4142,7 +4198,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
                                           CK_MECHANISM_PTR pMechanism,
                                           CK_OBJECT_HANDLE hKey )
 {
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
     CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
@@ -4162,7 +4219,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
         xResult = CKR_ARGUMENTS_BAD;
     }
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     if( ( xResult == CKR_OK ) && ( prvOperationActive( pxSession ) == ( CK_BBOOL ) CK_TRUE ) )
     {
@@ -4199,7 +4257,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE hSession,
     /* Check that a private key was retrieved. */
     if( xResult == CKR_OK )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         if( xIsPrivate != ( CK_BBOOL ) CK_TRUE )
         {
@@ -4330,11 +4389,14 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
     size_t xExpectedInputLength = 0;
     size_t xSignatureBufferLength = 0;
     CK_BYTE_PTR pucSignatureBuffer = pSignature;
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xSignatureGenerated = ( CK_BBOOL ) CK_FALSE;
 
     /* 8 bytes added to hold ASN.1 encoding information. */
+    /* MISRA Ref 12.1.1 [Operator precedence] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-121 */
     /* coverity[misra_c_2012_rule_12_1_violation] */
     uint8_t ecSignature[ MBEDTLS_ECDSA_MAX_SIG_LEN( 256 ) ];
 
@@ -4359,6 +4421,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
         else if( pxSessionObj->xOperationSignMechanism == CKM_ECDSA )
         {
             xSignatureLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
+            /* MISRA Ref 12.1.1 [Operator precedence] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-121 */
             /* coverity[misra_c_2012_rule_12_1_violation] */
             xSignatureBufferLength = MBEDTLS_ECDSA_MAX_SIG_LEN( 256 );
             pucSignatureBuffer = ecSignature;
@@ -4480,7 +4544,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                     }
 
                     ( void ) mbedtls_mutex_unlock( &pxSessionObj->xSignMutex );
-                    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                    /* MISRA Ref 10.5.1 [Essential type casting] */
+                    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                     /* coverity[misra_c_2012_rule_10_5_violation] */
                     xSignatureGenerated = ( CK_BBOOL ) CK_TRUE;
                 }
@@ -4499,7 +4564,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
 
     if( xResult == CKR_OK )
     {
-        /* See explanation in prvCheckValidSessionAndModule for this exception. */
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
         if( ( pxSessionObj->xOperationSignMechanism == CKM_ECDSA ) && ( xSignatureGenerated == ( CK_BBOOL ) CK_TRUE ) )
         {
@@ -4705,7 +4771,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
     CK_BYTE_PTR pucKeyData = NULL;
     CK_ULONG ulKeyDataLength = 0;
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
 
@@ -4719,7 +4786,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
         xResult = CKR_ARGUMENTS_BAD;
     }
 
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     if( ( xResult == CKR_OK ) && ( prvOperationActive( pxSession ) == ( CK_BBOOL ) CK_TRUE ) )
     {
@@ -4766,7 +4834,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
                 case CKM_RSA_X_509:
                 case CKM_ECDSA:
 
-                    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+                    /* MISRA Ref 10.5.1 [Essential type casting] */
+                    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                     /* coverity[misra_c_2012_rule_10_5_violation] */
                     if( xIsPrivate != ( CK_BBOOL ) CK_FALSE )
                     {
@@ -5155,7 +5224,8 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
                                                      uint32_t * pulAttributeMap )
 {
     CK_RV xResult = CKR_OK;
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_FALSE;
     CK_ULONG xTemp = 0;
@@ -5190,7 +5260,8 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
@@ -5210,7 +5281,8 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
@@ -5230,7 +5302,8 @@ static CK_RV prvCheckGenerateKeyPairPrivateTemplate( CK_ATTRIBUTE ** ppxLabel,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
@@ -5269,7 +5342,8 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
                                                     uint32_t * pulAttributeMap )
 {
     CK_RV xResult = CKR_OK;
-    /* See explanation in prvCheckValidSessionAndModule for this exception. */
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     CK_BBOOL xBool = ( CK_BBOOL ) CK_TRUE;
     CK_KEY_TYPE xKeyType = 0xFFFFFFFFUL;
@@ -5322,7 +5396,8 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {
@@ -5342,7 +5417,8 @@ static CK_RV prvCheckGenerateKeyPairPublicTemplate( CK_ATTRIBUTE ** ppxLabel,
                 ( void ) memcpy( &xBool, pxAttribute->pValue, sizeof( CK_BBOOL ) );
             }
 
-            /* See explanation in prvCheckValidSessionAndModule for this exception. */
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
             /* coverity[misra_c_2012_rule_10_5_violation] */
             if( xBool != ( CK_BBOOL ) CK_TRUE )
             {

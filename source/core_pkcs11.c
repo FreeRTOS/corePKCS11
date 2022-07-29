@@ -107,6 +107,9 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
     {
         if( *pxSlotCount == ( ( sizeof( CK_SLOT_ID ) * ( *pxSlotCount ) ) / ( sizeof( CK_SLOT_ID ) ) ) )
         {
+            /* MISRA Ref 11.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-115 */
+            /* coverity[misra_c_2012_rule_11_5_violation] */
             pxSlotId = pkcs11configPKCS11_MALLOC( sizeof( CK_SLOT_ID ) * ( *pxSlotCount ) );
 
             if( pxSlotId == NULL )
@@ -205,6 +208,9 @@ CK_RV xInitializePkcs11Token( void )
         ( NULL != pxFunctionList->C_InitToken ) )
     {
         /* Check if the token requires further initialization. */
+        /* MISRA Ref 11.5.1 [Pointer assignment] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-115 */
+        /* coverity[misra_c_2012_rule_11_5_violation] */
         pxTokenInfo = pkcs11configPKCS11_MALLOC( sizeof( CK_TOKEN_INFO ) );
 
         if( pxTokenInfo != NULL )
