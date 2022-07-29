@@ -21,6 +21,15 @@ _Ref 10.5.1_
     inappropriate essential type. The boolean type of the PKCS #11 standard is
     an unsigned char, which is an acceptable base type for a boolean type.
 
+#### Rule 11.1
+
+_Ref 11.1.1_
+
+- MISRA C-2012 Rule 11.1 Doesn't allow conversions between function pointers and any other type
+    However, since we're just using this to supress the compiler warning, we're also fine with
+    supressing the MISRA violation related to this line as well.
+
+
 #### Rule 12.1
 
 _Ref 12.1.1_

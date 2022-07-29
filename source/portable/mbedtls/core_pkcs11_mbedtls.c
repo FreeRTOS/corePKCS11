@@ -1824,6 +1824,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
 
     /* Allow unused parameters to be cast to void to silence compiler warnings.
      * Even if they are a function pointer. */
+    /* MISRA Ref 11.1.1 [Object type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-111 */
     ( void ) Notify;
 
     /* Check that the PKCS #11 module is initialized. */
