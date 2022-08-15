@@ -1864,11 +1864,15 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
         {
             for( ulSessionCount = 0; ulSessionCount < pkcs11configMAX_SESSIONS; ++ulSessionCount )
             {
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 if( pxP11Sessions[ ulSessionCount ].xOpened == ( CK_BBOOL ) CK_FALSE )
                 {
                     xResult = CKR_OK;
                     pxSessionObj = &pxP11Sessions[ ulSessionCount ];
+                    /* MISRA Ref 10.5.1 [Essential type casting] */
+                    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                     /* coverity[misra_c_2012_rule_10_5_violation] */
                     pxSessionObj->xOpened = ( CK_BBOOL ) CK_TRUE;
                     break;
@@ -1949,6 +1953,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_CloseSession )( CK_SESSION_HANDLE hSession )
     P11Session_t * pxSession = prvSessionPointerFromHandle( hSession );
     CK_RV xResult = CKR_OK;
 
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     if( xP11Context.xIsInitialized == ( CK_BBOOL ) CK_FALSE )
     {
@@ -1962,6 +1968,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_CloseSession )( CK_SESSION_HANDLE hSession )
         LogError( ( "Could not close a session. The PKCS #11 session handle "
                     "was invalid." ) );
     }
+    /* MISRA Ref 10.5.1 [Essential type casting] */
+    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
     /* coverity[misra_c_2012_rule_10_5_violation] */
     else if( pxSession->xOpened == ( CK_BBOOL ) CK_TRUE )
     {
