@@ -19,12 +19,12 @@
     </tr>
     <tr>
         <td>core_pkcs11_mbedtls.c</td>
-        <td><center>8.8K</center></td>
+        <td><center>8.9K</center></td>
         <td><center>7.4K</center></td>
     </tr>
     <tr>
         <td><b>Total estimates</b></td>
-        <td><b><center>10.1K</center></b></td>
+        <td><b><center>10.2K</center></b></td>
         <td><b><center>8.5K</center></b></td>
     </tr>
 </table>

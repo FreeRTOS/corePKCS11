@@ -75,6 +75,14 @@ Coverage builds are validated on recent versions of Ubuntu Linux.
 
 1. Run `cmake --build ./build --target coverage` to run the tests and capture coverage data.
 
+## CBMC
+
+To learn more about CBMC and proofs specifically, review the training material [here](https://model-checking.github.io/cbmc-training).
+
+The `test/cbmc/proofs` directory contains CBMC proofs.
+
+In order to run these proofs you will need to install CBMC and other tools by following the instructions [here](https://model-checking.github.io/cbmc-training/installation.html).
+
 ## Reference examples
 
 The FreeRTOS-Labs repository contains demos using the PKCS #11 library [here](https://github.com/FreeRTOS/FreeRTOS-Labs/tree/master/FreeRTOS-Plus/Demo/FreeRTOS_Plus_PKCS11_Windows_Simulator/examples) using FreeRTOS on the Windows simulator platform. These can be used as reference examples for the library API.
