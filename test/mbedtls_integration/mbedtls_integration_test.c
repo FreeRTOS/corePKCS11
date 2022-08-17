@@ -949,6 +949,7 @@ static void commonValidateCredentialStorageRSA( const char * pPrivateKeyLabel,
     /* Get the certificate value. */
     uint8_t expectedCertInDer[ sizeof( validRSACertificate ) ];
     size_t expectedCertLen = sizeof( expectedCertInDer );
+
     TEST_ASSERT_EQUAL( 0, convert_pem_to_der( validRSACertificate, strlen( validRSACertificate ), expectedCertInDer, &expectedCertLen ) );
     template.type = CKA_VALUE;
     template.pValue = dataBuffer;
