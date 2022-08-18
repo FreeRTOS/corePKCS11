@@ -2457,3 +2457,4 @@ void test_AES_CMAC( void )
     TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE( knownSignature, signature, sizeof( knownSignature ), "The PKCS #11 generated signature was different to the known signature." );
 }
 /*-----------------------------------------------------------*/
+
