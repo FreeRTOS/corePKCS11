@@ -17,7 +17,7 @@ This library has gone through code quality checks including verification that no
 
 See memory requirements for this library [here](./docs/doxygen/include/size_table.md).
 
-**corePKCS11 v3.5.0 [source code](https://github.com/FreeRTOS/corePKCS11/tree/v3.5.0/source) is part of the [FreeRTOS 202209.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202209.00-LTS) release.**
+**corePKCS11 v3.5.0 [source code](https://github.com/FreeRTOS/corePKCS11/tree/v3.5.0/source) is part of the [FreeRTOS 202210.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS) release.**
 
 **corePKCS11 v3.0.0 [source code](https://github.com/FreeRTOS/corePKCS11/tree/v3.0.0/source) is part of the [FreeRTOS 202012.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202012.00-LTS) release.**
 

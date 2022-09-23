@@ -1,6 +1,6 @@
 # Change Log for corePKCS11 Library
 
-## v3.5.0 (August 2022)
+## v3.5.0 (October 2022)
 * [#156](https://github.com/FreeRTOS/corePKCS11/pull/156) MISRA C:2012 compliance updates
 * [#155](https://github.com/FreeRTOS/corePKCS11/pull/155) Update CBMC Starter kit
 * [#150](https://github.com/FreeRTOS/corePKCS11/pull/150) Update CorePKCS11 mbedtls implementation to support mbedtls version 3.x in addition to version 2.x
