@@ -1,6 +1,6 @@
 include(FetchContent)
 
-set(MBEDTLS_2_VERSION 2.28.0)
+set(MBEDTLS_2_VERSION 2.28.1)
 
 FetchContent_Declare(
     mbedtls_2
