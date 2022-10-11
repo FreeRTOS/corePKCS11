@@ -1,5 +1,7 @@
 include(FetchContent)
 
+set(FETCHCONTENT_QUIET OFF)
+
 set(MBEDTLS_2_VERSION 2.28.1)
 
 FetchContent_Declare(
@@ -56,7 +58,9 @@ FetchContent_Declare(
     mbedtls_3
     GIT_REPOSITORY "https://github.com/ARMmbed/mbedtls"
     GIT_TAG v${MBEDTLS_3_VERSION}
-    PATCH_COMMAND ${MODULE_ROOT_DIR}/tools/mbedtls_configure.sh <SOURCE_DIR> mbedtls_config.h
+    PATCH_COMMAND
+        ${CMAKE_CURRENT_LIST_DIR}/mbedtls_configure.sh <SOURCE_DIR> mbedtls_config.h &&
+        ${CMAKE_CURRENT_LIST_DIR}/mbedtls_patch.sh <SOURCE_DIR> ${CMAKE_CURRENT_LIST_DIR}/0001-Fix-missing-prototype-warning-when-MBEDTLS_DEPRECATE.patch
 )
 
 FetchContent_GetProperties(
