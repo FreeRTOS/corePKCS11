@@ -50,7 +50,7 @@ if(NOT TARGET MbedTLS2_mbedtls)
     add_library(MbedTLS2::interface ALIAS MbedTLS2_interface)
 endif()
 
-set(MBEDTLS_3_VERSION 3.1.0)
+set(MBEDTLS_3_VERSION 3.2.1)
 
 FetchContent_Declare(
     mbedtls_3
