@@ -26,6 +26,7 @@
     - <stdint.h>
     - <stddef.h>
     - <fcntl.h>
+    - psa/crypto_types.h
     - mock_osal.h
   :treat_externs: :exclude  # Now the extern-ed functions will be mocked.co
   :weak: __attribute__((weak))
