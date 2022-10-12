@@ -84,14 +84,6 @@ typedef struct RsaParams_t
  * prevent memory leaks in the case of TEST_PROTECT() actions being triggered. */
 CK_SESSION_HANDLE globalSession = 0;
 CK_FUNCTION_LIST_PTR globalFunctionList = NULL_PTR;
-CK_SLOT_ID globalSlotId = 0;
-CK_MECHANISM_TYPE globalMechanismType = 0;
-
-
-/* PKCS #11 Global Data Containers. */
-CK_BYTE rsaHashedMessage[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
-CK_BYTE ecdsaSignature[ pkcs11RSA_2048_SIGNATURE_LENGTH ] = { 0x00 };
-CK_BYTE ecdsaHashedMessage[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xab };
 
 /*-----------------------------------------------------------*/
 
@@ -986,7 +978,6 @@ static void commonVerifySign_RSA( const char * pPrivateKeyLabel,
 {
     CK_RV result;
     CK_OBJECT_HANDLE privateKeyHandle;
-    CK_OBJECT_HANDLE publicKeyHandle;
     CK_OBJECT_HANDLE certificateHandle;
     CK_MECHANISM mechanism;
     CK_BYTE hashedMessage[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };

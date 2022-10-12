@@ -1,6 +1,8 @@
 include(FetchContent)
 
-set(MBEDTLS_2_VERSION 2.28.0)
+set(FETCHCONTENT_QUIET OFF)
+
+set(MBEDTLS_2_VERSION 2.28.1)
 
 FetchContent_Declare(
     mbedtls_2
@@ -50,13 +52,15 @@ if(NOT TARGET MbedTLS2_mbedtls)
     add_library(MbedTLS2::interface ALIAS MbedTLS2_interface)
 endif()
 
-set(MBEDTLS_3_VERSION 3.1.0)
+set(MBEDTLS_3_VERSION 3.2.1)
 
 FetchContent_Declare(
     mbedtls_3
     GIT_REPOSITORY "https://github.com/ARMmbed/mbedtls"
     GIT_TAG v${MBEDTLS_3_VERSION}
-    PATCH_COMMAND ${MODULE_ROOT_DIR}/tools/mbedtls_configure.sh <SOURCE_DIR> mbedtls_config.h
+    PATCH_COMMAND
+        ${CMAKE_CURRENT_LIST_DIR}/mbedtls_configure.sh <SOURCE_DIR> mbedtls_config.h &&
+        ${CMAKE_CURRENT_LIST_DIR}/mbedtls_patch.sh <SOURCE_DIR> ${CMAKE_CURRENT_LIST_DIR}/0001-Fix-missing-prototype-warning-when-MBEDTLS_DEPRECATE.patch
 )
 
 FetchContent_GetProperties(

@@ -120,6 +120,8 @@ static uint16_t usMallocFreeCalls = 0;
 void * pvPkcs11MallocCb( size_t size,
                          int numCalls )
 {
+    ( void ) numCalls;
+
     usMallocFreeCalls++;
     return ( void * ) malloc( size );
 }
@@ -135,6 +137,8 @@ void * pvPkcs11MallocCbFailEveryOtherCall( size_t size,
 {
     static uint32_t ulCalls = 1;
     void * pvReturn = NULL;
+
+    ( void ) numCalls;
 
     ulCalls++;
 
@@ -154,6 +158,8 @@ void * pvPkcs11MallocCbFailEveryOtherCall( size_t size,
 void vPkcs11FreeCb( void * ptr,
                     int numCalls )
 {
+    ( void ) numCalls;
+
     usMallocFreeCalls--;
     free( ptr );
 }
@@ -204,6 +210,8 @@ static CK_RV prvSetFunctionList2( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
 static CK_RV prvUninitializedToken( CK_SLOT_ID slotID,
                                     CK_TOKEN_INFO_PTR pInfo )
 {
+    ( void ) slotID;
+
     pInfo->flags = CKF_TOKEN_INITIALIZED;
     return CKR_OK;
 }
@@ -219,6 +227,10 @@ static CK_RV xSecondGetFails( CK_BBOOL arg1,
 {
     static uint32_t ulCalls = 1;
     CK_RV xResult = CKR_OK;
+
+    ( void ) arg1;
+    ( void ) arg2;
+    ( void ) arg3;
 
     ulCalls++;
 
@@ -239,6 +251,9 @@ static CK_RV xGet1Item( CK_BBOOL arg1,
                         CK_SLOT_ID_PTR arg2,
                         CK_ULONG_PTR arg3 )
 {
+    ( void ) arg1;
+    ( void ) arg2;
+
     *arg3 = 1;
     return CKR_OK;
 }
@@ -253,6 +268,10 @@ static CK_RV xGet1Item2( CK_BBOOL arg1,
                          CK_ULONG_PTR arg3,
                          CK_ULONG_PTR arg4 )
 {
+    ( void ) arg1;
+    ( void ) arg2;
+    ( void ) arg3;
+
     *arg4 = 1;
     return CKR_OK;
 }
