@@ -134,6 +134,7 @@
 /* Malloc calls */
 static uint16_t usMallocFreeCalls = 0;
 
+static mbedtls_pk_type_t xPkType = MBEDTLS_PK_NONE;
 
 /* Internal struct to facilitate passing RSA params to mbedTLS. */
 
@@ -238,6 +239,15 @@ const mbedtls_pk_info_t * pk_info_from_type_stub( mbedtls_pk_type_t pk_type,
     }
 
     return pxPkInfo;
+}
+
+static mbedtls_pk_type_t pk_get_type_stub( const mbedtls_pk_context * ctx,
+                                           int cmock_num_calls )
+{
+    ( void ) ctx;
+    ( void ) cmock_num_calls;
+
+    return xPkType;
 }
 
 /* ============================   UNITY FIXTURES ============================ */
@@ -358,6 +368,8 @@ static void prvCommonInitStubs( CK_SESSION_HANDLE_PTR pxSession )
     TEST_ASSERT_EQUAL( CKR_OK, xResult );
     xResult = prvOpenSession( pxSession );
     TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+    mbedtls_pk_get_type_Stub( pk_get_type_stub );
 }
 
 static void prvCommonDeinitStubs( CK_SESSION_HANDLE_PTR pxSession )
@@ -3275,7 +3287,7 @@ void test_pkcs11_C_GetAttributeValuePrivKey( void )
         xTemplate.pValue = NULL;
         xTemplate.ulValueLen = 0;
 
-        mbedtls_pk_get_type_ExpectAnyArgsAndReturn( CKK_EC );
+        xPkType = MBEDTLS_PK_ECKEY;
         xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
         TEST_ASSERT_EQUAL( sizeof( CK_KEY_TYPE ), xTemplate.ulValueLen );
@@ -3304,7 +3316,7 @@ void test_pkcs11_C_GetAttributeValuePrivKey( void )
         xTemplate.ulValueLen = sizeof( CK_KEY_TYPE );
         xKnownKeyType = CKK_RSA;
 
-        mbedtls_pk_get_type_ExpectAnyArgsAndReturn( MBEDTLS_PK_RSA );
+        xPkType = MBEDTLS_PK_RSA;
         xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
         TEST_ASSERT_EQUAL( sizeof( CK_KEY_TYPE ), xTemplate.ulValueLen );
@@ -3323,7 +3335,7 @@ void test_pkcs11_C_GetAttributeValuePrivKey( void )
         xTemplate.ulValueLen = sizeof( CK_KEY_TYPE );
         xKnownKeyType = CKK_ECDSA;
 
-        mbedtls_pk_get_type_ExpectAnyArgsAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
         TEST_ASSERT_EQUAL( sizeof( CK_KEY_TYPE ), xTemplate.ulValueLen );
@@ -3353,7 +3365,8 @@ void test_pkcs11_C_GetAttributeValuePrivKey( void )
         xTemplate.ulValueLen = sizeof( CKA_KEY_TYPE );
         ulCount = 1;
         mbedtls_pk_parse_key_ExpectAnyArgsAndReturn( 0 );
-        mbedtls_pk_get_type_ExpectAnyArgsAndReturn( -1 );
+
+        xPkType = MBEDTLS_PK_NONE;
         xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
 
@@ -4042,7 +4055,7 @@ void test_pkcs11_C_SignInitECDSA( void )
         mbedtls_pk_init_CMockIgnore();
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
@@ -4092,14 +4105,14 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
         TEST_ASSERT_EQUAL( CKR_KEY_HANDLE_INVALID, xResult );
 
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
+        xPkType = MBEDTLS_PK_RSA;
         xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_KEY_TYPE_INCONSISTENT, xResult );
 
         xMechanism.mechanism = CKM_RSA_PKCS;
 
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_KEY_TYPE_INCONSISTENT, xResult );
 
@@ -4138,7 +4151,7 @@ void test_pkcs11_C_SignInitECDSABadArgs( void )
         mbedtls_pk_init_CMockIgnore();
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_SignInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
@@ -4258,7 +4271,7 @@ void test_pkcs11_C_SignECDSA( void )
         mbedtls_pk_init_CMockIgnore();
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_SignInit( xSession, &xMechanism, xKey );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
@@ -4307,7 +4320,7 @@ void test_pkcs11_C_SignECDSAGetSize( void )
         mbedtls_pk_init_CMockIgnore();
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_SignInit( xSession, &xMechanism, xKey );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
@@ -4357,7 +4370,7 @@ void test_pkcs11_C_SignRSA( void )
         mbedtls_pk_init_CMockIgnore();
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
+        xPkType = MBEDTLS_PK_RSA;
         xResult = C_SignInit( xSession, &xMechanism, xKey );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
@@ -4628,7 +4641,7 @@ void test_pkcs11_C_SignBadArgs( void )
         mbedtls_pk_init_CMockIgnore();
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_SignInit( xSession, &xMechanism, xKey );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
@@ -4707,7 +4720,7 @@ void test_pkcs11_C_VerifyInitECDSA( void )
         mbedtls_pk_init_ReturnThruPtr_ctx( &xVerifyKey );
         mbedtls_pk_parse_public_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
@@ -5125,7 +5138,7 @@ void test_pkcs11_C_VerifyInitECDSAPriv( void )
         mbedtls_pk_parse_public_key_IgnoreAndReturn( -1 );
         mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
@@ -5184,7 +5197,7 @@ void test_pkcs11_C_VerifyInitBadArgs( void )
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
         mbedtls_pk_parse_public_key_IgnoreAndReturn( 0 );
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
+        xPkType = MBEDTLS_PK_RSA;
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_KEY_TYPE_INCONSISTENT, xResult );
 
@@ -5192,7 +5205,7 @@ void test_pkcs11_C_VerifyInitBadArgs( void )
 
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_KEY_TYPE_INCONSISTENT, xResult );
 
@@ -5217,11 +5230,11 @@ void test_pkcs11_C_VerifyInitBadArgs( void )
 
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
+        xPkType = MBEDTLS_PK_RSA;
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
+        xPkType = MBEDTLS_PK_RSA;
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OPERATION_ACTIVE, xResult );
     }
@@ -5266,7 +5279,7 @@ void test_pkcs11_C_VerifyECDSA( void )
         mbedtls_pk_init_ReturnThruPtr_ctx( &xVerifyKey );
         mbedtls_pk_parse_public_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
@@ -5318,7 +5331,7 @@ void test_pkcs11_C_VerifyECDSAInvalidSig( void )
         mbedtls_pk_init_ReturnThruPtr_ctx( &xVerifyKey );
         mbedtls_pk_parse_public_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
@@ -5379,7 +5392,7 @@ void test_pkcs11_C_VerifyRSA( void )
         mbedtls_pk_init_ReturnThruPtr_ctx( &xMbedContext );
         mbedtls_pk_parse_public_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
+        xPkType = MBEDTLS_PK_RSA;
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
@@ -5428,7 +5441,7 @@ void test_pkcs11_C_VerifyBadArgs( void )
         mbedtls_pk_init_ReturnThruPtr_ctx( &xVerifyKey );
         mbedtls_pk_parse_public_key_IgnoreAndReturn( 0 );
         PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
         mbedtls_pk_init_CMockIgnore();
@@ -5457,7 +5470,7 @@ void test_pkcs11_C_VerifyBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
 
         xMechanism.mechanism = CKM_RSA_X_509;
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_RSA );
+        xPkType = MBEDTLS_PK_RSA;
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
@@ -5499,7 +5512,7 @@ void test_pkcs11_C_VerifyBadArgs( void )
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 
         xMechanism.mechanism = CKM_ECDSA;
-        mbedtls_pk_get_type_IgnoreAndReturn( MBEDTLS_PK_ECDSA );
+        xPkType = MBEDTLS_PK_ECDSA;
         PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
         PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
         xResult = C_VerifyInit( xSession, &xMechanism, xObject );
