@@ -154,6 +154,7 @@ memcpy
 memset
 microcontroller
 misra
+mit
 mutex
 mutext
 noninfringement
@@ -275,6 +276,7 @@ signrecoverinit
 signupdate
 sizeof
 slotid
+spdx
 staticsemaphore
 stdint
 stdlib
