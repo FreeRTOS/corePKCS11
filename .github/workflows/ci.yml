@@ -132,7 +132,7 @@ jobs:
             exit 1
           fi
   formatting:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Check formatting
@@ -147,7 +147,7 @@ jobs:
       - name: Setup Python for link verifier action
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.11.0'
       - name: Check Links
         uses: FreeRTOS/CI-CD-GitHub-Actions/link-verifier@main
         with:
@@ -185,7 +185,7 @@ jobs:
       - name: Install Python3
         uses: actions/setup-python@v2
         with:
-          python-version: '3.7.10'
+          python-version: '3.11.0'
       - name: Measure sizes
         uses: FreeRTOS/CI-CD-Github-Actions/memory_statistics@main
         with:
