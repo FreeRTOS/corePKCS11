@@ -1143,7 +1143,7 @@ static CK_RV prvDeleteObjectFromList( CK_OBJECT_HANDLE xPalHandle )
 {
     CK_RV xResult = CKR_OK;
     int32_t lGotSemaphore = ( int32_t ) 0;
-    uint32_t ulIndex = 0;
+    CK_ULONG ulIndex;
 
     lGotSemaphore = mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex );
 
@@ -1187,49 +1187,57 @@ static CK_RV prvAddObjectToList( CK_OBJECT_HANDLE xPalHandle,
 {
     CK_RV xResult = CKR_HOST_MEMORY;
 
-    /* MISRA Ref 10.5.1 [Essential type casting] */
-    /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
-    /* coverity[misra_c_2012_rule_10_5_violation] */
-    CK_BBOOL xObjectFound = ( CK_BBOOL ) CK_FALSE;
-    uint32_t ulSearchIndex = 0;
-
-    if( 0 == mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex ) )
+    if( xLabelLength > pkcs11configMAX_LABEL_LENGTH )
     {
+        xResult = CKR_ARGUMENTS_BAD;
+        LogError( ( "Failed to add object to internal object list: "
+                    "xLabelLength exceeds pkcs11configMAX_LABEL_LENGTH." ) );
+    }
+    else if( 0 == mbedtls_mutex_lock( &xP11Context.xObjectList.xMutex ) )
+    {
+        CK_ULONG ulSearchIndex;
+        CK_ULONG ulEmptyIndex = 0;
+        P11Object_t * pxEmptyP11Object = NULL;
+
+        /* Iterate over list to find an existing entry containing xPalHandle */
         for( ulSearchIndex = 0; ulSearchIndex < pkcs11configMAX_NUM_OBJECTS; ulSearchIndex++ )
         {
-            if( xResult == CKR_OK )
-            {
-                break;
-            }
+            P11Object_t * pxP11Object = &( xP11Context.xObjectList.xObjects[ ulSearchIndex ] );
 
-            if( xP11Context.xObjectList.xObjects[ ulSearchIndex ].xHandle == xPalHandle )
+            /* Update an existing entry with the desired xPalHandle */
+            if( pxP11Object->xHandle == xPalHandle )
             {
-                /* Object already exists in list. */
-                /* MISRA Ref 10.5.1 [Essential type casting] */
-                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
-                /* coverity[misra_c_2012_rule_10_5_violation] */
+                ( void ) memcpy( pxP11Object->xLabel, pcLabel, xLabelLength );
+                pxP11Object->xLabelSize = xLabelLength;
+
                 xResult = CKR_OK;
-                xObjectFound = ( CK_BBOOL ) CK_TRUE;
-            }
-            else if( xP11Context.xObjectList.xObjects[ ulSearchIndex ].xHandle == CK_INVALID_HANDLE )
-            {
-                xResult = CKR_OK;
+                *pxAppHandle = ulSearchIndex + 1;
+
+                /* Entry updated, so exit the loop. */
+                break;
             }
             else
             {
-                /* Cannot find a free object. */
+                if( ( pxP11Object->xHandle == CK_INVALID_HANDLE ) &&
+                    ( pxEmptyP11Object == NULL ) )
+                {
+                    pxEmptyP11Object = pxP11Object;
+                    ulEmptyIndex = ulSearchIndex;
+                }
             }
         }
 
-        /* MISRA Ref 10.5.1 [Essential type casting] */
-        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
-        /* coverity[misra_c_2012_rule_10_5_violation] */
-        if( ( xResult == CKR_OK ) && ( xObjectFound == ( CK_BBOOL ) CK_FALSE ) && ( xLabelLength <= pkcs11configMAX_LABEL_LENGTH ) )
+        /* Check if we have reached the end of the list without writing */
+        if( ( xResult != CKR_OK ) &&
+            ( pxEmptyP11Object != NULL ) )
         {
-            xP11Context.xObjectList.xObjects[ ulSearchIndex - 1UL ].xHandle = xPalHandle;
-            ( void ) memcpy( xP11Context.xObjectList.xObjects[ ulSearchIndex - 1UL ].xLabel, pcLabel, xLabelLength );
-            xP11Context.xObjectList.xObjects[ ulSearchIndex - 1UL ].xLabelSize = xLabelLength;
-            *pxAppHandle = ulSearchIndex;
+            pxEmptyP11Object->xHandle = xPalHandle;
+            pxEmptyP11Object->xLabelSize = xLabelLength;
+
+            ( void ) memcpy( pxEmptyP11Object->xLabel, pcLabel, xLabelLength );
+
+            *pxAppHandle = ulEmptyIndex + 1;
+            xResult = CKR_OK;
         }
 
         ( void ) mbedtls_mutex_unlock( &xP11Context.xObjectList.xMutex );
