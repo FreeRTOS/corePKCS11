@@ -16,7 +16,7 @@ MAX_LABEL_SIZE=32
 
 DEFINES += -DMAX_OBJECT_NUM=$(MAX_OBJECT_NUM)
 
-INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY += C_Finalize

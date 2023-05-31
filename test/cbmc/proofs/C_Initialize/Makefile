@@ -9,7 +9,7 @@ HARNESS_FILE = C_Initialize_harness
 PROOF_UID = C_Initialize
 
 DEFINES +=
-INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY += C_Finalize
