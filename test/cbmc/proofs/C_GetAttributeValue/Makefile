@@ -20,7 +20,7 @@ MAX_OBJECT_NUM=2
 
 DEFINES += -DTEMPLATE_SIZE=$(TEMPLATE_SIZE)
 DEFINES += -DMAX_OBJECT_NUM=$(MAX_OBJECT_NUM)
-INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY +=
