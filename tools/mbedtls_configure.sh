@@ -22,6 +22,8 @@ cp "${MBEDTLS_DIR}/include/mbedtls/${CONFIG}" mbedtls_config_patch.h
 "${MBEDTLS_DIR}/scripts/config.py" --file mbedtls_config_patch.h unset MBEDTLS_PSA_CRYPTO_STORAGE_C
 "${MBEDTLS_DIR}/scripts/config.py" --file mbedtls_config_patch.h unset MBEDTLS_PSA_ITS_FILE_C
 "${MBEDTLS_DIR}/scripts/config.py" --file mbedtls_config_patch.h unset MBEDTLS_PSA_CRYPTO_SE_C
+"${MBEDTLS_DIR}/scripts/config.py" --file mbedtls_config_patch.h unset MBEDTLS_LMS_C
+"${MBEDTLS_DIR}/scripts/config.py" --file mbedtls_config_patch.h unset MBEDTLS_LMS_PRIVATE
 
 cmp --quiet "${MBEDTLS_DIR}/include/mbedtls/config.h" mbedtls_config_patch.h || {
     cp mbedtls_config_patch.h "${MBEDTLS_DIR}/include/mbedtls/${CONFIG}"
