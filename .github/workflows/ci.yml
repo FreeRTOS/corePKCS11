@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build
         run: |
           CFLAGS="-Wall -Wextra -DNDEBUG -DLIBRARY_LOG_LEVEL=LOG_DEBUG"
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build
         run: |
           CFLAGS="-Wall -Wextra -DNDEBUG"
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build
         run: |
           sudo apt-get install -y lcov
@@ -90,7 +90,7 @@ jobs:
   complexity:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check complexity
         uses: FreeRTOS/CI-CD-Github-Actions/complexity@main
         with:
@@ -100,7 +100,7 @@ jobs:
   doxygen:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check doxygen build
         uses: FreeRTOS/CI-CD-Github-Actions/doxygen@main
         with:
@@ -110,13 +110,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Parent Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: main
           repository: aws/aws-iot-device-sdk-embedded-C
       - run: rm -r libraries/standard/corePKCS11
       - name: Clone This Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: libraries/standard/corePKCS11
       - name: Install spell
@@ -141,7 +141,7 @@ jobs:
   formatting:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check formatting
         uses: FreeRTOS/CI-CD-Github-Actions/formatting@main
         with:
@@ -151,7 +151,7 @@ jobs:
   link-verifier:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Python for link verifier action
         uses: actions/setup-python@v4
         with:
@@ -166,9 +166,9 @@ jobs:
   git-secrets:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Checkout awslabs/git-secrets
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: awslabs/git-secrets
           ref: master
@@ -183,7 +183,7 @@ jobs:
   memory_statistics:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: git submodule update --init --recursive --checkout
       - name: Fetch dependencies (mbedtls)
         run: |
