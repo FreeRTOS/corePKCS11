@@ -89,12 +89,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup
-        run: sudo apt-get install complexity
-      - name: Complexity
-        run: |
-          find source/ -iname '*.c' -not -path 'source/portable/windows/*' -not -path 'source/dependency*' |\
-          xargs complexity --scores --threshold=0 --horrid-threshold=8
+      - name: Check complexity
+        uses: FreeRTOS/CI-CD-Github-Actions/complexity@main
+        with:
+          path: ./
+          horrid_threshold: 20
 
   doxygen:
     runs-on: ubuntu-latest
