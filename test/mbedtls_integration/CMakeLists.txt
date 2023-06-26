@@ -19,11 +19,9 @@ target_link_libraries(target_lib INTERFACE pkcs11_api)
 
 add_library(target_lib_mb2 STATIC)
 target_link_libraries(target_lib_mb2 PRIVATE target_lib MbedTLS2::mbedcrypto)
-target_enable_gcov(target_lib_mb2 PRIVATE)
 
 add_library(target_lib_mb3 STATIC)
 target_link_libraries(target_lib_mb3 PRIVATE target_lib MbedTLS3::mbedcrypto)
-target_enable_gcov(target_lib_mb3 PRIVATE)
 
 add_library(mbedtls_test INTERFACE)
 target_sources(mbedtls_test INTERFACE mbedtls_integration_test.c INTERFACE "${PKCS_PAL_POSIX_SOURCES}")
