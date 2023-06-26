@@ -256,12 +256,12 @@ void setUp( void )
     mbedtls_pk_info_from_type_Stub( pk_info_from_type_stub );
 }
 
-/* called before each testcase */
+/* called after each testcase */
 void tearDown( void )
 {
     TEST_ASSERT_EQUAL_INT_MESSAGE( 0, usMallocFreeCalls,
-                                   "free is not called the same number of times as malloc, \
-        you might have a memory leak!!" );
+                                   "free was not called the same number of times as malloc, \
+                                    you might have a memory leak!!" );
     usMallocFreeCalls = 0;
 }
 
@@ -6651,6 +6651,47 @@ void test_pkcs11_C_DestroyObject( void )
 }
 
 /*!
+ * @brief C_DestroyObject where the call to PKCS11_PAL_DestroyObject fails
+ *
+ */
+void test_pkcs11_C_DestroyObjectPalFailure( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonInitStubs( &xSession );
+
+        xResult = prvCreateEcPub( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        xResult = prvCreateEcPriv( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+
+        mbedtls_calloc_Stub( pvPkcs11CallocCb );
+        vPkcs11Free_Stub( vPkcs11FreeCb );
+        mbedtls_free_Stub( vPkcs11FreeCb );
+
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 2 );
+
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        PKCS11_PAL_DestroyObject_IgnoreAndReturn( CKR_FUNCTION_FAILED );
+
+        xResult = C_DestroyObject( xSession, xObject );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
  * @brief C_DestroyObject failed to get mutex when removing object from internal list.
  *
  */
@@ -6732,6 +6773,230 @@ void test_pkcs11_C_DestroyObjectBadHandle( void )
     {
         xResult = C_DestroyObject( xSession, xObject );
         TEST_ASSERT_EQUAL( CKR_OBJECT_HANDLE_INVALID, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+void test_pkcs11_prvAddObjectToList( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+
+    vPkcs11Free_Stub( vPkcs11FreeCb );
+    mbedtls_free_Stub( vPkcs11FreeCb );
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        CK_OBJECT_HANDLE xCreatedObjectHandle = 0;
+        CK_OBJECT_CLASS xCertificateClass = CKO_CERTIFICATE;
+        CK_CERTIFICATE_TYPE xCertificateType = CKC_X_509;
+        CK_BBOOL xTokenStorage = CK_TRUE;
+        CK_BYTE pxSubject[] = "TestSubject";
+        CK_BYTE pxCertData[] = "Empty Cert";
+
+        CK_BYTE pxCertLabel1[] = "test_cert_label_1";
+        CK_OBJECT_HANDLE xObjectPalHandle1 = 0x12345678;
+
+        CK_ATTRIBUTE pCertificateTemplate1[ 6 ] =
+        {
+            {
+                CKA_CLASS,
+                &xCertificateClass,
+                sizeof( xCertificateClass )
+            },
+            {
+                CKA_SUBJECT,
+                pxSubject,
+                sizeof( pxSubject ) - 1
+            },
+            {
+                CKA_VALUE,
+                pxCertData,
+                ( CK_ULONG ) sizeof( pxCertData )
+            },
+            {
+                CKA_LABEL,
+                pxCertLabel1,
+                strlen( ( const char * ) pxCertLabel1 )
+            },
+            {
+                CKA_CERTIFICATE_TYPE,
+                &xCertificateType,
+                sizeof( CK_CERTIFICATE_TYPE )
+            },
+            {
+                CKA_TOKEN,
+                &xTokenStorage,
+                sizeof( xTokenStorage )
+            }
+        };
+
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( xObjectPalHandle1 );
+
+        xResult = C_CreateObject( xSession,
+                                  pCertificateTemplate1,
+                                  sizeof( pCertificateTemplate1 ) / sizeof( CK_ATTRIBUTE ),
+                                  &xCreatedObjectHandle );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        /* First Object is always handle 1 */
+        TEST_ASSERT_EQUAL( 1, xCreatedObjectHandle );
+
+        CK_OBJECT_HANDLE xObjectPalHandle2 = 0xABCDEF;
+        CK_BYTE pxCertLabel2[] = "test_cert_label_2";
+        CK_ATTRIBUTE pCertificateTemplate2[ 6 ] =
+        {
+            {
+                CKA_CLASS,
+                &xCertificateClass,
+                sizeof( xCertificateClass )
+            },
+            {
+                CKA_SUBJECT,
+                pxSubject,
+                sizeof( pxSubject ) - 1
+            },
+            {
+                CKA_VALUE,
+                pxCertData,
+                ( CK_ULONG ) sizeof( pxCertData )
+            },
+            {
+                CKA_LABEL,
+                pxCertLabel2,
+                strlen( ( const char * ) pxCertLabel2 )
+            },
+            {
+                CKA_CERTIFICATE_TYPE,
+                &xCertificateType,
+                sizeof( CK_CERTIFICATE_TYPE )
+            },
+            {
+                CKA_TOKEN,
+                &xTokenStorage,
+                sizeof( xTokenStorage )
+            }
+        };
+
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( xObjectPalHandle2 );
+
+        xResult = C_CreateObject( xSession,
+                                  pCertificateTemplate2,
+                                  sizeof( pCertificateTemplate2 ) / sizeof( CK_ATTRIBUTE ),
+                                  &xCreatedObjectHandle );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        /* Second Object is always handle 2 */
+        TEST_ASSERT_EQUAL( 2, xCreatedObjectHandle );
+
+        /* Lookup the first object we created */
+        CK_OBJECT_HANDLE xFoundObjectHandle = CK_INVALID_HANDLE;
+        CK_ULONG ulObjectCount = 0;
+        CK_ATTRIBUTE xFindObjectTemplate =
+        {
+            CKA_LABEL,
+            pxCertLabel1,
+            sizeof( pxCertLabel1 ) - 1
+        };
+
+        xResult = C_FindObjectsInit( xSession, &xFindObjectTemplate, 1 );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        xResult = C_FindObjects( xSession, &xFoundObjectHandle, 1, &ulObjectCount );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+        TEST_ASSERT_EQUAL( 1, ulObjectCount );
+        TEST_ASSERT_EQUAL( 1, xFoundObjectHandle );
+
+        xResult = C_FindObjectsFinal( xSession );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        /* Lookup the second object we created */
+        CK_ATTRIBUTE xFindObjectTemplate2 =
+        {
+            CKA_LABEL,
+            pxCertLabel2,
+            sizeof( pxCertLabel2 ) - 1
+        };
+
+        xResult = C_FindObjectsInit( xSession, &xFindObjectTemplate2, 1 );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        xResult = C_FindObjects( xSession, &xFoundObjectHandle, 1, &ulObjectCount );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+        TEST_ASSERT_EQUAL( 1, ulObjectCount );
+        TEST_ASSERT_EQUAL( 2, xFoundObjectHandle );
+
+        xResult = C_FindObjectsFinal( xSession );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        /* Replace the first object with a copy of the second object */
+        CK_ATTRIBUTE pCertificateTemplate3[ 6 ] =
+        {
+            {
+                CKA_CLASS,
+                &xCertificateClass,
+                sizeof( xCertificateClass )
+            },
+            {
+                CKA_SUBJECT,
+                pxSubject,
+                sizeof( pxSubject ) - 1
+            },
+            {
+                CKA_VALUE,
+                pxCertData,
+                ( CK_ULONG ) sizeof( pxCertData )
+            },
+            {
+                CKA_LABEL,
+                pxCertLabel2,
+                strlen( ( const char * ) pxCertLabel2 )
+            },
+            {
+                CKA_CERTIFICATE_TYPE,
+                &xCertificateType,
+                sizeof( CK_CERTIFICATE_TYPE )
+            },
+            {
+                CKA_TOKEN,
+                &xTokenStorage,
+                sizeof( xTokenStorage )
+            }
+        };
+
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( xObjectPalHandle1 );
+        xResult = C_CreateObject( xSession,
+                                  pCertificateTemplate3,
+                                  sizeof( pCertificateTemplate3 ) / sizeof( CK_ATTRIBUTE ),
+                                  &xCreatedObjectHandle );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        /* Check that the first object was replaced */
+        TEST_ASSERT_EQUAL( 1, xCreatedObjectHandle );
+
+        xResult = C_FindObjectsInit( xSession, &xFindObjectTemplate2, 1 );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        /* Find objects with pxCertLabel2 labels */
+        xFoundObjectHandle = CK_INVALID_HANDLE;
+
+        /* Object in first slot in list was found */
+        xResult = C_FindObjects( xSession, &xFoundObjectHandle, 1, &ulObjectCount );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+        TEST_ASSERT_EQUAL( 1, ulObjectCount );
+        TEST_ASSERT_EQUAL( 1, xFoundObjectHandle );
+
+        xResult = C_FindObjectsFinal( xSession );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
     }
 
     if( TEST_PROTECT() )
