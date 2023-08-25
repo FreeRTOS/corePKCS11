@@ -2194,7 +2194,7 @@ void test_pkcs11_C_CreateObjectCertificateTooLongLabel( void )
     CK_BBOOL xTokenStorage = CK_TRUE;
     CK_BYTE xSubject[] = "TestSubject";
     CK_BYTE xCert[] = "Empty Cert";
-    char * pucLabel = "TestTemporyaryCertificate123456789ABEF";
+    char * pucLabel = "TestTemporaryCertificate123456789ABEF";
 
     PKCS11_CertificateTemplate_t xCertificateTemplate = CERT_INITIALIZER;
 

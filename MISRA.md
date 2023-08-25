@@ -26,17 +26,17 @@ _Ref 10.5.1_
 _Ref 11.1.1_
 
 - MISRA C-2012 Rule 11.1 Doesn't allow conversions between function pointers and any other type
-    However, since we're just using this to supress the compiler warning, we're also fine with
-    supressing the MISRA violation related to this line as well.
+    However, since we're just using this to suppress the compiler warning, we're also fine with
+    suppressing the MISRA violation related to this line as well.
 
 
 #### Rule 12.1
 
 _Ref 12.1.1_
 
-- MISRA C-2012 Rule 12.1 Requires precendence of operators within an expression to be explicit.
+- MISRA C-2012 Rule 12.1 Requires precedence of operators within an expression to be explicit.
     The third party macro being used here throws a violation when used. Adding additional parens to the
-    call or to the decleration doesn't remove the violation, so we supress it.
+    call or to the decleration doesn't remove the violation, so we suppress it.
 
 #### Rule 11.5
 
