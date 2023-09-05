@@ -150,7 +150,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Check doxygen build
-        uses: FreeRTOS/CI-CD-Github-Actions/doxygen@v2
+        uses: FreeRTOS/CI-CD-Github-Actions/doxygen@main
         with:
           path: ./
 
@@ -160,7 +160,7 @@ jobs:
       - name: Clone This Repo
         uses: actions/checkout@v3
       - name: Run spellings check
-        uses: FreeRTOS/CI-CD-GitHub-Actions/spellings@v2
+        uses: FreeRTOS/CI-CD-Github-Actions/spellings@main
         with:
           path: ./
 
@@ -179,7 +179,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Check Links
-        uses: FreeRTOS/CI-CD-Github-Actions/link-verifier@v2
+        uses: FreeRTOS/CI-CD-Github-Actions/link-verifier@main
         with:
           path: ./
 
@@ -231,7 +231,7 @@ jobs:
         with:
           python-version: "3.11.0"
       - name: Measure sizes
-        uses: FreeRTOS/CI-CD-Github-Actions/memory_statistics@v2
+        uses: FreeRTOS/CI-CD-Github-Actions/memory_statistics@main
         with:
           config: .github/memory_statistics_config.json
           check_against: docs/doxygen/include/size_table.md
