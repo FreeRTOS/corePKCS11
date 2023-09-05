@@ -112,9 +112,9 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_verify.html'
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* If using SHA512 a larger buffer is needed for the call to mbedtls_md_hmac_finish */</span></div>
 <div class="line"><span class="preprocessor">    #if defined( MBEDTLS_SHA512_C )</span></div>
-<div class="line">        CK_BYTE pxHMACBuffer[ <a class="code hl_define" href="core__pkcs11_8h.html#ac1020688685b585cda7b9c4f2b78744f">pkcs11SHA256_DIGEST_LENGTH</a> * 2 ] = { 0 };</div>
+<div class="line">    CK_BYTE pxHMACBuffer[ <a class="code hl_define" href="core__pkcs11_8h.html#ac1020688685b585cda7b9c4f2b78744f">pkcs11SHA256_DIGEST_LENGTH</a> * 2 ] = { 0 };</div>
 <div class="line"><span class="preprocessor">    #else</span></div>
-<div class="line">        CK_BYTE pxHMACBuffer[ <a class="code hl_define" href="core__pkcs11_8h.html#ac1020688685b585cda7b9c4f2b78744f">pkcs11SHA256_DIGEST_LENGTH</a> ] = { 0 };</div>
+<div class="line">    CK_BYTE pxHMACBuffer[ <a class="code hl_define" href="core__pkcs11_8h.html#ac1020688685b585cda7b9c4f2b78744f">pkcs11SHA256_DIGEST_LENGTH</a> ] = { 0 };</div>
 <div class="line"><span class="preprocessor">    #endif</span></div>
 <div class="line">    CK_BYTE pxCMACBuffer[ MBEDTLS_AES_BLOCK_SIZE ] = { 0 };</div>
 <div class="line"> </div>
