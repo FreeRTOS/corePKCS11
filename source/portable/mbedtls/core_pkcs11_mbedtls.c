@@ -1103,7 +1103,7 @@ static void prvFindObjectInListByLabel( const CK_BYTE * pcLabel,
 /**
  * @brief Looks up a PKCS #11 object's label and PAL handle given an application handle.
  *
- * @param[in] xAppHandle         The handle of the object being lookedup for, used by the application.
+ * @param[in] xAppHandle         The handle of the object being looked up for, used by the application.
  * @param[out] pxPalHandle        Pointer to the handle corresponding to xPalHandle being used by the PAL.
  * @param[out] ppcLabel          Pointer to an array containing label.  NULL if object not found.
  * @param[out] pxLabelLength     Pointer to label length (includes a string null terminator).
@@ -1739,8 +1739,8 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetMechanismInfo )( CK_SLOT_ID slotID,
         { CKM_RSA_PKCS,        { 2048, 2048, CKF_SIGN              } },
         { CKM_RSA_X_509,       { 2048, 2048, CKF_VERIFY            } },
         #ifndef pkcs11configSUPPRESS_ECDSA_MECHANISM
-            { CKM_ECDSA,           { 256,  256,  CKF_SIGN | CKF_VERIFY } },
-            { CKM_EC_KEY_PAIR_GEN, { 256,  256,  CKF_GENERATE_KEY_PAIR } },
+        { CKM_ECDSA,           { 256,  256,  CKF_SIGN | CKF_VERIFY } },
+        { CKM_EC_KEY_PAIR_GEN, { 256,  256,  CKF_GENERATE_KEY_PAIR } },
         #endif
         { CKM_SHA256,          { 0,    0,    CKF_DIGEST            } }
     };
@@ -4956,9 +4956,9 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
 
     /* If using SHA512 a larger buffer is needed for the call to mbedtls_md_hmac_finish */
     #if defined( MBEDTLS_SHA512_C )
-        CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH * 2 ] = { 0 };
+    CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH * 2 ] = { 0 };
     #else
-        CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
+    CK_BYTE pxHMACBuffer[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
     #endif
     CK_BYTE pxCMACBuffer[ MBEDTLS_AES_BLOCK_SIZE ] = { 0 };
 
