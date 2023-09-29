@@ -1,16 +1,3 @@
-[submodule "source/dependency/3rdparty/mbedtls"]
-	path = source/dependency/3rdparty/mbedtls
-	url = https://github.com/ARMmbed/mbedtls.git
-	branch = v2.28.0
-	update = none
 [submodule "source/dependency/3rdparty/pkcs11"]
 	path = source/dependency/3rdparty/pkcs11
 	url = https://github.com/amazon-freertos/pkcs11.git
-[submodule "test/cbmc/aws-templates-for-cbmc-proofs"]
-	path = test/cbmc/aws-templates-for-cbmc-proofs
-	url = https://github.com/awslabs/aws-templates-for-cbmc-proofs
-	update = none
-[submodule "test/cbmc/litani"]
-	path = test/cbmc/litani
-	url = https://github.com/awslabs/aws-build-accumulator.git
-	update = none

@@ -1,6 +1,8 @@
 /*
- * corePKCS11 v3.4.0
+ * corePKCS11 v3.5.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -84,14 +86,6 @@ typedef struct RsaParams_t
  * prevent memory leaks in the case of TEST_PROTECT() actions being triggered. */
 CK_SESSION_HANDLE globalSession = 0;
 CK_FUNCTION_LIST_PTR globalFunctionList = NULL_PTR;
-CK_SLOT_ID globalSlotId = 0;
-CK_MECHANISM_TYPE globalMechanismType = 0;
-
-
-/* PKCS #11 Global Data Containers. */
-CK_BYTE rsaHashedMessage[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };
-CK_BYTE ecdsaSignature[ pkcs11RSA_2048_SIGNATURE_LENGTH ] = { 0x00 };
-CK_BYTE ecdsaHashedMessage[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xab };
 
 /*-----------------------------------------------------------*/
 
@@ -188,7 +182,7 @@ static int lWrapPkParseKey( mbedtls_pk_context * pxMbedContext,
  *
  * @param pcInput[in]        Pointer to PEM object
  * @param xLen[in]           Length of PEM object
- * @param pucOutput[out]     Pointer to buffer where DER oboject will be placed
+ * @param pucOutput[out]     Pointer to buffer where DER object will be placed
  * @param pxOlen[in/out]     Pointer to length of DER buffer.  This value is updated
  *                          to contain the actual length of the converted DER object.
  *
@@ -949,6 +943,7 @@ static void commonValidateCredentialStorageRSA( const char * pPrivateKeyLabel,
     /* Get the certificate value. */
     uint8_t expectedCertInDer[ sizeof( validRSACertificate ) ];
     size_t expectedCertLen = sizeof( expectedCertInDer );
+
     TEST_ASSERT_EQUAL( 0, convert_pem_to_der( validRSACertificate, strlen( validRSACertificate ), expectedCertInDer, &expectedCertLen ) );
     template.type = CKA_VALUE;
     template.pValue = dataBuffer;
@@ -985,7 +980,6 @@ static void commonVerifySign_RSA( const char * pPrivateKeyLabel,
 {
     CK_RV result;
     CK_OBJECT_HANDLE privateKeyHandle;
-    CK_OBJECT_HANDLE publicKeyHandle;
     CK_OBJECT_HANDLE certificateHandle;
     CK_MECHANISM mechanism;
     CK_BYTE hashedMessage[ pkcs11SHA256_DIGEST_LENGTH ] = { 0 };

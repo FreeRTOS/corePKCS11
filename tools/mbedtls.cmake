@@ -1,10 +1,12 @@
 include(FetchContent)
 
-set(MBEDTLS_2_VERSION 2.28.0)
+set(FETCHCONTENT_QUIET OFF)
+
+set(MBEDTLS_2_VERSION 2.28.3)
 
 FetchContent_Declare(
     mbedtls_2
-    GIT_REPOSITORY "https://github.com/ARMmbed/mbedtls"
+    GIT_REPOSITORY "https://github.com/Mbed-TLS/mbedtls"
     GIT_TAG v${MBEDTLS_2_VERSION}
     PATCH_COMMAND ${MODULE_ROOT_DIR}/tools/mbedtls_configure.sh <SOURCE_DIR> config.h
 )
@@ -50,13 +52,14 @@ if(NOT TARGET MbedTLS2_mbedtls)
     add_library(MbedTLS2::interface ALIAS MbedTLS2_interface)
 endif()
 
-set(MBEDTLS_3_VERSION 3.1.0)
+set(MBEDTLS_3_VERSION 3.4.0)
 
 FetchContent_Declare(
     mbedtls_3
-    GIT_REPOSITORY "https://github.com/ARMmbed/mbedtls"
+    GIT_REPOSITORY "https://github.com/Mbed-TLS/mbedtls"
     GIT_TAG v${MBEDTLS_3_VERSION}
-    PATCH_COMMAND ${MODULE_ROOT_DIR}/tools/mbedtls_configure.sh <SOURCE_DIR> mbedtls_config.h
+    PATCH_COMMAND
+        ${CMAKE_CURRENT_LIST_DIR}/mbedtls_configure.sh <SOURCE_DIR> mbedtls_config.h
 )
 
 FetchContent_GetProperties(

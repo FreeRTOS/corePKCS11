@@ -1,6 +1,8 @@
 /*
- * corePKCS11 v3.4.0
+ * corePKCS11 v3.5.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -140,48 +142,64 @@ CK_RV PAL_UTILS_HandleToFilename( CK_OBJECT_HANDLE xHandle,
         {
             case eAwsDeviceCertificate:
                 *pcFileName = pkcs11palFILE_NAME_CLIENT_CERTIFICATE;
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
                 break;
 
             case eAwsDevicePrivateKey:
                 *pcFileName = pkcs11palFILE_NAME_KEY;
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
                 break;
 
             case eAwsDevicePublicKey:
                 *pcFileName = pkcs11palFILE_NAME_PUBLIC_KEY;
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
                 break;
 
             case eAwsCodeSigningKey:
                 *pcFileName = pkcs11palFILE_CODE_SIGN_PUBLIC_KEY;
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
                 break;
 
             case eAwsHMACSecretKey:
                 *pcFileName = pkcs11palFILE_HMAC_SECRET_KEY;
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
                 break;
 
             case eAwsCMACSecretKey:
                 *pcFileName = pkcs11palFILE_CMAC_SECRET_KEY;
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
                 break;
 
             case eAwsClaimCertificate:
                 *pcFileName = pkcs11palFILE_NAME_CLAIM_CERTIFICATE;
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_FALSE;
                 break;
 
             case eAwsClaimPrivateKey:
                 *pcFileName = pkcs11palFILE_NAME_CLAIM_KEY;
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 *pIsPrivate = ( CK_BBOOL ) CK_TRUE;
                 break;

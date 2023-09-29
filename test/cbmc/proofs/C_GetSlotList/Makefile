@@ -1,5 +1,5 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: MIT-0
 
 HARNESS_ENTRY = harness
 HARNESS_FILE = C_GetSlotList_harness
@@ -9,7 +9,7 @@ HARNESS_FILE = C_GetSlotList_harness
 PROOF_UID = C_GetSlotList
 
 DEFINES +=
-INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 # This proof doesn't care about these stubs

@@ -1,5 +1,5 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: MIT-0
 
 HARNESS_ENTRY = harness
 HARNESS_FILE = C_CreateObject_harness
@@ -28,7 +28,7 @@ MAX_OBJECT_NUM=2
 DEFINES += -DTEMPLATE_SIZE=$(TEMPLATE_SIZE)
 DEFINES += -DTEMPLATE_ATTRIBUTE_MAX_SIZE=$(TEMPLATE_ATTRIBUTE_MAX_SIZE)
 
-INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls/include
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
 
 REMOVE_FUNCTION_BODY += C_Initialize
