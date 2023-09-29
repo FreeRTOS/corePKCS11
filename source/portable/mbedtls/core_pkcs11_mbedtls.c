@@ -4639,7 +4639,7 @@ static CK_RV prvVerifyInitEC_RSAKeys( P11Session_t * pxSession,
     {
         xKeyType = mbedtls_pk_get_type( &pxSession->xVerifyKey );
 
-        if( ( pMechanism->mechanism == CKM_RSA_X_509 ) && ( xKeyType == MBEDTLS_PK_RSA ) )
+        if( ( ( pMechanism->mechanism == CKM_RSA_PKCS ) || ( pMechanism->mechanism == CKM_RSA_X_509 ) ) && ( xKeyType == MBEDTLS_PK_RSA ) )
         {
             /* Mechanisms align with the port. */
         }
@@ -4754,6 +4754,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE hSession,
         {
             switch( pMechanism->mechanism )
             {
+                case CKM_RSA_PKCS:
                 case CKM_RSA_X_509:
                 case CKM_ECDSA:
 
@@ -4875,10 +4876,26 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
     {
         if( pxSessionObj->xOperationVerifyMechanism == CKM_RSA_X_509 )
         {
-            if( ulDataLen != pkcs11RSA_2048_SIGNATURE_LENGTH )
+            if( ulDataLen != pkcs11SHA256_DIGEST_LENGTH )
             {
                 LogError( ( "Failed verify operation. Data Length was too "
+                            "short for pkcs11SHA256_DIGEST_LENGTH." ) );
+                xResult = CKR_DATA_LEN_RANGE;
+            }
+
+            if( ulSignatureLen != pkcs11RSA_2048_SIGNATURE_LENGTH )
+            {
+                LogError( ( "Failed verify operation. Signature Length was too "
                             "short for pkcs11RSA_2048_SIGNATURE_LENGTH." ) );
+                xResult = CKR_SIGNATURE_LEN_RANGE;
+            }
+        }
+        else if( pxSessionObj->xOperationVerifyMechanism == CKM_RSA_PKCS )
+        {
+            if( ulDataLen != pkcs11SHA256_DIGEST_LENGTH )
+            {
+                LogError( ( "Failed verify operation. Data Length was too "
+                            "short for pkcs11SHA256_DIGEST_LENGTH." ) );
                 xResult = CKR_DATA_LEN_RANGE;
             }
 
