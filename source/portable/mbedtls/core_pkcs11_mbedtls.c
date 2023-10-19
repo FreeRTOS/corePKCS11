@@ -5676,6 +5676,42 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
                         mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
             xResult = CKR_FUNCTION_FAILED;
         }
+        else
+        {
+        #if defined( GENERATED_PRIVATE_KEY_WRITE_PATH )
+            #include <errno.h>
+            #define PRIV_KEY_BUFFER_LENGTH                         2048
+            char privatekey[ PRIV_KEY_BUFFER_LENGTH ];
+            lMbedTLSResult = mbedtls_pk_write_key_pem( &xCtx, privatekey, PRIV_KEY_BUFFER_LENGTH );
+            if( lMbedTLSResult == 0 )
+            {
+                size_t privatekeyLength = strlen( privatekey );
+                FILE* fp = fopen( GENERATED_PRIVATE_KEY_WRITE_PATH, "w" );
+
+                if( NULL != fp )
+                {
+                    const size_t writtenBytes = fwrite( privatekey, 1u, privatekeyLength, fp );
+
+                    if( writtenBytes == privatekeyLength )
+                    {
+                        LogInfo( ( "Written %s successfully.", GENERATED_PRIVATE_KEY_WRITE_PATH ) );
+                    }
+                    else
+                    {
+                        LogError( ( "Could not write to %s. Error: %s.", GENERATED_PRIVATE_KEY_WRITE_PATH, strerror( errno ) ) );
+                    }
+
+                    fclose( fp );
+                }
+                else
+                {
+                    LogError( ( "Could not open %s. Error: %s.", GENERATED_PRIVATE_KEY_WRITE_PATH, strerror( errno ) ) );
+                }
+            }
+        #else /* if defined( GENERATED_PRIVATE_KEY_WRITE_PATH ) */
+            LogInfo( ( "NOTE: define GENERATED_PRIVATE_KEY_WRITE_PATH in order to have the private key written to disk." ) );
+        #endif // GENERATED_PRIVATE_KEY_WRITE_PATH
+        }
     }
 
     if( xResult == CKR_OK )
