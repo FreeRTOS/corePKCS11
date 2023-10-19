@@ -55,6 +55,11 @@
 /* C runtime includes. */
 #include <string.h>
 
+#if defined( GENERATED_PRIVATE_KEY_WRITE_PATH )
+    #include <errno.h>
+    #define PRIV_KEY_BUFFER_LENGTH                         2048
+#endif // GENERATED_PRIVATE_KEY_WRITE_PATH
+
 /*-----------------------------------------------------------*/
 
 /**
@@ -5679,8 +5684,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
         else
         {
         #if defined( GENERATED_PRIVATE_KEY_WRITE_PATH )
-            #include <errno.h>
-            #define PRIV_KEY_BUFFER_LENGTH                         2048
             char privatekey[ PRIV_KEY_BUFFER_LENGTH ];
             lMbedTLSResult = mbedtls_pk_write_key_pem( &xCtx, privatekey, PRIV_KEY_BUFFER_LENGTH );
             if( lMbedTLSResult == 0 )
