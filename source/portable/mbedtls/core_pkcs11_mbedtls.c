@@ -56,6 +56,7 @@
 #include <string.h>
 
 #if defined( GENERATED_PRIVATE_KEY_WRITE_PATH )
+    #warning "GENERATED_PRIVATE_KEY_WRITE_PATH was defined. C_GenerateKeyPair will write generated private keys to that filepath"
     #include <errno.h>
     #define PRIV_KEY_BUFFER_LENGTH                         2048
 #endif /* defined( GENERATED_PRIVATE_KEY_WRITE_PATH ) */
