@@ -5697,7 +5697,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
 
                     if( writtenBytes == privatekeyLength )
                     {
-                        LogInfo( ( "Written %s successfully.", GENERATED_PRIVATE_KEY_WRITE_PATH ) );
+                        LogInfo( ( "Wrote the generated private key to %s successfully.", GENERATED_PRIVATE_KEY_WRITE_PATH ) );
                     }
                     else
                     {
