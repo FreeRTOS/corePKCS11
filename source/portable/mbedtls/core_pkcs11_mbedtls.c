@@ -58,7 +58,7 @@
 #if defined( GENERATED_PRIVATE_KEY_WRITE_PATH )
     #include <errno.h>
     #define PRIV_KEY_BUFFER_LENGTH                         2048
-#endif // GENERATED_PRIVATE_KEY_WRITE_PATH
+#endif /* defined( GENERATED_PRIVATE_KEY_WRITE_PATH ) */
 
 /*-----------------------------------------------------------*/
 
