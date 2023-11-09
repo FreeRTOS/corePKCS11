@@ -55,6 +55,12 @@
 /* C runtime includes. */
 #include <string.h>
 
+#if defined( GENERATED_PRIVATE_KEY_WRITE_PATH )
+    #warning "GENERATED_PRIVATE_KEY_WRITE_PATH was defined. C_GenerateKeyPair will write generated private keys to that filepath"
+    #include <errno.h>
+    #define PRIV_KEY_BUFFER_LENGTH    2048
+#endif /* defined( GENERATED_PRIVATE_KEY_WRITE_PATH ) */
+
 /*-----------------------------------------------------------*/
 
 /**
@@ -5675,6 +5681,41 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
                         mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
                         mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
             xResult = CKR_FUNCTION_FAILED;
+        }
+        else
+        {
+            #if defined( GENERATED_PRIVATE_KEY_WRITE_PATH )
+                char privatekey[ PRIV_KEY_BUFFER_LENGTH ];
+                lMbedTLSResult = mbedtls_pk_write_key_pem( &xCtx, privatekey, PRIV_KEY_BUFFER_LENGTH );
+
+                if( lMbedTLSResult == 0 )
+                {
+                    size_t privatekeyLength = strlen( privatekey );
+                    FILE * fp = fopen( GENERATED_PRIVATE_KEY_WRITE_PATH, "w" );
+
+                    if( NULL != fp )
+                    {
+                        const size_t writtenBytes = fwrite( privatekey, 1u, privatekeyLength, fp );
+
+                        if( writtenBytes == privatekeyLength )
+                        {
+                            LogInfo( ( "Wrote the generated private key to %s successfully.", GENERATED_PRIVATE_KEY_WRITE_PATH ) );
+                        }
+                        else
+                        {
+                            LogError( ( "Could not write to %s. Error: %s.", GENERATED_PRIVATE_KEY_WRITE_PATH, strerror( errno ) ) );
+                        }
+
+                        fclose( fp );
+                    }
+                    else
+                    {
+                        LogError( ( "Could not open %s. Error: %s.", GENERATED_PRIVATE_KEY_WRITE_PATH, strerror( errno ) ) );
+                    }
+                }
+            #else /* if defined( GENERATED_PRIVATE_KEY_WRITE_PATH ) */
+                LogInfo( ( "NOTE: define GENERATED_PRIVATE_KEY_WRITE_PATH in order to have the private key written to disk." ) );
+            #endif // GENERATED_PRIVATE_KEY_WRITE_PATH
         }
     }
 
