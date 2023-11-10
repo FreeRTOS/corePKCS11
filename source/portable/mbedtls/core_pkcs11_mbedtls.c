@@ -495,8 +495,8 @@ static CK_RV prvMbedTLS_Initialize( void )
             if( lMbedTLSResult != PSA_SUCCESS )
             {
                 LogError( ( "Could not initialize PKCS #11. Failed to initialize PSA: MBedTLS error = %s : %s.",
-                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                            mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                            mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
                 xResult = CKR_FUNCTION_FAILED;
             }
             else
