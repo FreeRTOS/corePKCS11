@@ -52,6 +52,11 @@
 #include "mbedtls/threading.h"
 #include "mbedtls/error.h"
 
+#ifdef MBEDTLS_PSA_CRYPTO_C
+    #include "psa/crypto.h"
+    #include "psa/crypto_values.h"
+#endif
+
 /* C runtime includes. */
 #include <string.h>
 
@@ -484,11 +489,25 @@ static CK_RV prvMbedTLS_Initialize( void )
     }
     else
     {
-        /* MISRA Ref 10.5.1 [Essential type casting] */
-        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
-        /* coverity[misra_c_2012_rule_10_5_violation] */
-        xP11Context.xIsInitialized = ( CK_BBOOL ) CK_TRUE;
-        LogDebug( ( "PKCS #11 module was successfully initialized." ) );
+        #ifdef MBEDTLS_USE_PSA_CRYPTO
+            lMbedTLSResult = psa_crypto_init();
+
+            if( lMbedTLSResult != PSA_SUCCESS )
+            {
+                LogError( ( "Could not initialize PKCS #11. Failed to initialize PSA: MBedTLS error = %s : %s.",
+                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                xResult = CKR_FUNCTION_FAILED;
+            }
+            else
+        #endif /* MBEDTLS_USE_PSA_CRYPTO */
+        {
+            /* MISRA Ref 10.5.1 [Essential type casting] */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
+            /* coverity[misra_c_2012_rule_10_5_violation] */
+            xP11Context.xIsInitialized = ( CK_BBOOL ) CK_TRUE;
+            LogDebug( ( "PKCS #11 module was successfully initialized." ) );
+        }
     }
 
     return xResult;
