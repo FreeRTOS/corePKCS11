@@ -35,6 +35,7 @@
 #include "core_pkcs11.h"
 #include "core_pkcs11_pal.h"
 #include "core_pki_utils.h"
+#include "pkcs11t.h"
 
 /**
  *  @brief Declaring MBEDTLS_ALLOW_PRIVATE_ACCESS allows access to mbedtls "private" fields.
@@ -5149,6 +5150,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                     }
                 }
 
+            #ifdef MBEDTLS_ECDSA_C
                 if( xResult == CKR_OK )
                 {
                     /* Verify the signature. If a public key is present, use it. */
@@ -5167,6 +5169,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                                     mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
                     }
                 }
+            #endif /* MBEDTLS_ECDSA_C */
 
                 mbedtls_mpi_free( &xR );
                 mbedtls_mpi_free( &xS );
