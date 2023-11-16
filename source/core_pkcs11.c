@@ -174,7 +174,8 @@ CK_RV xInitializePKCS11( void )
     {
         xResult = pxFunctionList->C_Initialize( &xInitArgs );
     }
-    else{
+    else
+    {
         xResult = CKR_DEVICE_ERROR;
     }
 

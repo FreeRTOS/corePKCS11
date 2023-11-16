@@ -5150,26 +5150,26 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                     }
                 }
 
-            #ifdef MBEDTLS_ECDSA_C
-                if( xResult == CKR_OK )
-                {
-                    /* Verify the signature. If a public key is present, use it. */
-                    if( NULL != pxSessionObj->xVerifyKey.pk_ctx )
+                #ifdef MBEDTLS_ECDSA_C
+                    if( xResult == CKR_OK )
                     {
-                        pxEcdsaContext = pxSessionObj->xVerifyKey.pk_ctx;
-                        lMbedTLSResult = mbedtls_ecdsa_verify( &pxEcdsaContext->grp, pData, ulDataLen, &pxEcdsaContext->Q, &xR, &xS );
-                    }
+                        /* Verify the signature. If a public key is present, use it. */
+                        if( NULL != pxSessionObj->xVerifyKey.pk_ctx )
+                        {
+                            pxEcdsaContext = pxSessionObj->xVerifyKey.pk_ctx;
+                            lMbedTLSResult = mbedtls_ecdsa_verify( &pxEcdsaContext->grp, pData, ulDataLen, &pxEcdsaContext->Q, &xR, &xS );
+                        }
 
-                    if( lMbedTLSResult != 0 )
-                    {
-                        xResult = CKR_SIGNATURE_INVALID;
-                        LogError( ( "Failed verify operation. "
-                                    "mbedtls_ecdsa_verify failed: mbed TLS error = %s : %s.",
-                                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                        if( lMbedTLSResult != 0 )
+                        {
+                            xResult = CKR_SIGNATURE_INVALID;
+                            LogError( ( "Failed verify operation. "
+                                        "mbedtls_ecdsa_verify failed: mbed TLS error = %s : %s.",
+                                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                        }
                     }
-                }
-            #endif /* MBEDTLS_ECDSA_C */
+                #endif /* MBEDTLS_ECDSA_C */
 
                 mbedtls_mpi_free( &xR );
                 mbedtls_mpi_free( &xS );
