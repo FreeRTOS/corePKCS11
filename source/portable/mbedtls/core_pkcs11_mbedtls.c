@@ -4531,7 +4531,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
                         }
                         else
                         {
-                            LogDebug( ( "Ready to sign: xSignatureLength=%ld *pulSignatureLen=%ld", xSignatureLength, *pulSignatureLen ) );
+                            LogDebug( ( "Ready to sign: xSignatureLength=%lu *pulSignatureLen=%lu", ( unsigned long int ) xSignatureLength, *pulSignatureLen ) );
 
                             /* Per mbed TLS documentation, if using RSA, md_alg should
                              * be MBEDTLS_MD_NONE. If ECDSA, md_alg should never be
