@@ -502,15 +502,16 @@ static CK_RV prvMbedTLS_Initialize( void )
             if( lMbedTLSResult != PSA_SUCCESS )
             {
                 LogError( ( "Could not initialize PKCS #11. Failed to initialize PSA: MBedTLS error = %s : %s.",
-                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                            mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                            mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
                 xResult = CKR_FUNCTION_FAILED;
                 /* MISRA Ref 10.5.1 [Essential type casting] */
                 /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                 /* coverity[misra_c_2012_rule_10_5_violation] */
                 xP11Context.xIsInitialized = ( CK_BBOOL ) CK_FALSE;
             }
-            else{
+            else
+            {
                 LogDebug( ( "MbedTLS PSA module was successfully initialized." ) );
             }
         #endif /* MBEDTLS_USE_PSA_CRYPTO */
@@ -5161,26 +5162,24 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                     }
                 }
 
-                #ifdef MBEDTLS_ECDSA_C
-                    if( xResult == CKR_OK )
+                if( xResult == CKR_OK )
+                {
+                    /* Verify the signature. If a public key is present, use it. */
+                    if( NULL != pxSessionObj->xVerifyKey.pk_ctx )
                     {
-                        /* Verify the signature. If a public key is present, use it. */
-                        if( NULL != pxSessionObj->xVerifyKey.pk_ctx )
-                        {
-                            pxEcdsaContext = pxSessionObj->xVerifyKey.pk_ctx;
-                            lMbedTLSResult = mbedtls_ecdsa_verify( &pxEcdsaContext->grp, pData, ulDataLen, &pxEcdsaContext->Q, &xR, &xS );
-                        }
-
-                        if( lMbedTLSResult != 0 )
-                        {
-                            xResult = CKR_SIGNATURE_INVALID;
-                            LogError( ( "Failed verify operation. "
-                                        "mbedtls_ecdsa_verify failed: mbed TLS error = %s : %s.",
-                                        mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                                        mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-                        }
+                        pxEcdsaContext = pxSessionObj->xVerifyKey.pk_ctx;
+                        lMbedTLSResult = mbedtls_ecdsa_verify( &pxEcdsaContext->grp, pData, ulDataLen, &pxEcdsaContext->Q, &xR, &xS );
                     }
-                #endif /* MBEDTLS_ECDSA_C */
+
+                    if( lMbedTLSResult != 0 )
+                    {
+                        xResult = CKR_SIGNATURE_INVALID;
+                        LogError( ( "Failed verify operation. "
+                                    "mbedtls_ecdsa_verify failed: mbed TLS error = %s : %s.",
+                                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                    }
+                }
 
                 mbedtls_mpi_free( &xR );
                 mbedtls_mpi_free( &xS );
