@@ -32,26 +32,25 @@
 
 /*-----------------------------------------------------------*/
 
-#ifdef WIN32
-    #ifndef WIN32_LEAN_AND_MEAN
-        #define WIN32_LEAN_AND_MEAN
-    #endif /* WIN32_LEAN_AND_MEAN */
-
-    #include <winsock2.h>
-    #include <windows.h>
-#endif
-
-
-#include "FreeRTOS.h"
-#include "core_pkcs11.h"
-#include "core_pkcs11_config.h"
-#include "core_pkcs11_config_defaults.h"
-
-
-/* C runtime includes. */
+/* System Includes */
 #include <stdio.h>
 #include <string.h>
 
+#ifdef WIN32
+    #ifdef WIN32_LEAN_AND_MEAN
+        #include <winsock2.h>
+    #else
+        #include <winsock.h>
+    #endif /* WIN32_LEAN_AND_MEAN */
+#endif /* WIN32 */
+
+/* FreeRTOS Includes */
+#include "FreeRTOS.h"
+
+/* corePKCS11 Includes */
+#include "core_pkcs11.h"
+#include "core_pkcs11_config.h"
+#include "core_pkcs11_config_defaults.h"
 #include "core_pkcs11_pal_utils.h"
 
 /*-----------------------------------------------------------*/

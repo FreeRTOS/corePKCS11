@@ -42,7 +42,13 @@
  */
 #define MBEDTLS_ALLOW_PRIVATE_ACCESS
 
-/* mbedTLS includes. */
+/* MbedTLS includes. */
+#if defined( MBEDTLS_CONFIG_FILE )
+    #include MBEDTLS_CONFIG_FILE
+#else
+    #include "mbedtls/mbedtls_config.h"
+#endif
+
 #include "mbedtls/pk.h"
 #include "mbedtls/x509_crt.h"
 #include "mbedtls/ctr_drbg.h"
@@ -496,19 +502,24 @@ static CK_RV prvMbedTLS_Initialize( void )
             if( lMbedTLSResult != PSA_SUCCESS )
             {
                 LogError( ( "Could not initialize PKCS #11. Failed to initialize PSA: MBedTLS error = %s : %s.",
-                            mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                            mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
                 xResult = CKR_FUNCTION_FAILED;
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                xP11Context.xIsInitialized = ( CK_BBOOL ) CK_FALSE;
             }
-            else
+            else{
+                LogDebug( ( "MbedTLS PSA module was successfully initialized." ) );
+            }
         #endif /* MBEDTLS_USE_PSA_CRYPTO */
-        {
-            /* MISRA Ref 10.5.1 [Essential type casting] */
-            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
-            /* coverity[misra_c_2012_rule_10_5_violation] */
-            xP11Context.xIsInitialized = ( CK_BBOOL ) CK_TRUE;
-            LogDebug( ( "PKCS #11 module was successfully initialized." ) );
-        }
+
+        /* MISRA Ref 10.5.1 [Essential type casting] */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
+        /* coverity[misra_c_2012_rule_10_5_violation] */
+        xP11Context.xIsInitialized = ( CK_BBOOL ) CK_TRUE;
+        LogDebug( ( "PKCS #11 module was successfully initialized." ) );
     }
 
     return xResult;

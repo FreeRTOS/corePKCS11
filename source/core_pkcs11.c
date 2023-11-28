@@ -32,7 +32,6 @@
 #include <stdint.h>
 #include <string.h>
 
-
 /**
  * @file core_pkcs11.c
  * @brief corePKCS11 Interface.
