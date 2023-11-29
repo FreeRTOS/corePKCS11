@@ -43,12 +43,6 @@
 #define MBEDTLS_ALLOW_PRIVATE_ACCESS
 
 /* MbedTLS includes. */
-#if defined( MBEDTLS_CONFIG_FILE )
-    #include MBEDTLS_CONFIG_FILE
-#else
-    #include "mbedtls/mbedtls_config.h"
-#endif
-
 #include "mbedtls/pk.h"
 #include "mbedtls/x509_crt.h"
 #include "mbedtls/ctr_drbg.h"
