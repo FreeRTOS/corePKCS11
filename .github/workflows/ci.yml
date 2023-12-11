@@ -32,7 +32,7 @@ jobs:
           make -C build/ all
 
       - name: Integration Tests
-        run:  ctest --test-dir build --output-on-failure | tee -a $GITHUB_STEP_SUMMARY
+        run:  ctest --test-dir build --output-on-failure
 
       - name: Archive Test Results
         if: success() || failure()
@@ -63,12 +63,12 @@ jobs:
           -DSYSTEM_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
-          echo "::endgroup::"
 
+          echo "::endgroup::"
           echo -e "${{ env.bashPass }} ${{env.stepName}} ${{ env.bashEnd }}"
 
       - name: Run Unit Tests
-        run: ctest --test-dir build --output-on-failure | tee -a $GITHUB_STEP_SUMMARY
+        run: ctest --test-dir build --output-on-failure
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -78,6 +78,8 @@ jobs:
 
       - env:
           stepName: Build corePKCS11 Unit Tests
+        id: build-unit-tests
+        shell: bash
         run: |
           # ${{ env.stepName }}
           echo -e "::group::${{ env.bashInfo }} ${{ env.stepName }} ${{ env.bashEnd }}"
@@ -91,15 +93,20 @@ jobs:
           -DSYSTEM_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
-          echo "::endgroup::"
 
+          echo "::endgroup::"
           echo -e "${{ env.bashPass }} ${{env.stepName}} ${{ env.bashEnd }}"
 
       - name: Run Unit Tests
-        run: ctest --test-dir build --output-on-failure | tee -a $GITHUB_STEP_SUMMARY
+        id: run-unit-tests
+        shell: bash
+        run: ctest --test-dir build --output-on-failure
 
       - env:
           stepName: Line and Branch Coverage Build
+        if: steps.build-unit-tests.outcome == 'success'
+        id: line-and-branch-coverage
+        shell: bash
         run: |
           # ${{ env.stepName }}
           echo -e "::group::${{ env.bashInfo }} Build Coverage Target ${{ env.bashEnd }}"
@@ -111,11 +118,21 @@ jobs:
           lcov --rc lcov_branch_coverage=1 -r build/coverage.info -o build/coverage.info '*test*' '*CMakeCCompilerId*' '*mocks*'
           echo "::endgroup::"
 
-          lcov --list build/coverage.info
+          lcov --rc lcov_branch_coverage=1 --list build/coverage.info
           echo -e "${{ env.bashPass }} ${{env.stepName}} ${{ env.bashEnd }}"
 
+
+      - env:
+          stepName: Check Coverage
+        uses: FreeRTOS/CI-CD-Github-Actions/coverage-cop@main
+        if: steps.build-unit-tests.outcome == 'success'
+        with:
+          coverage-file: ./build/coverage.info
+          line-coverage-min: 99
+          branch-coverage-min: 90
+
       - name: Archive Test Results
-        if: success() || failure()
+        if: steps.build-unit-tests.outcome == 'success'
         uses: actions/upload-artifact@v3
         with:
           name: unit_test_results
@@ -127,7 +144,7 @@ jobs:
             build/Testing/Temporary/LastTest.log
 
       - name: Upload coverage data to Codecov
-        if: success()
+        if: steps.build-unit-tests.outcome == 'success'
         uses: codecov/codecov-action@v3
         with:
           files: build/coverage.info

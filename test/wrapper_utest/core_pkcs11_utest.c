@@ -343,7 +343,7 @@ void test_IotPkcs11_xInitializePkcs11BadFunctionList( void )
     C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
     xResult = xInitializePKCS11();
 
-    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    TEST_ASSERT_EQUAL( CKR_DEVICE_ERROR, xResult );
 }
 
 /*!

@@ -25,6 +25,7 @@
 #include "core_pkcs11_config.h"
 #include "core_pkcs11_config_defaults.h"
 #include "core_pkcs11.h"
+#include "pkcs11t.h"
 
 /* C runtime includes. */
 #include <stdio.h>
@@ -171,6 +172,10 @@ CK_RV xInitializePKCS11( void )
     if( ( xResult == CKR_OK ) && ( pxFunctionList != NULL ) && ( pxFunctionList->C_Initialize != NULL ) )
     {
         xResult = pxFunctionList->C_Initialize( &xInitArgs );
+    }
+    else
+    {
+        xResult = CKR_DEVICE_ERROR;
     }
 
     return xResult;

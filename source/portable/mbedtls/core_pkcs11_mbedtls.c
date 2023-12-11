@@ -35,13 +35,14 @@
 #include "core_pkcs11.h"
 #include "core_pkcs11_pal.h"
 #include "core_pki_utils.h"
+#include "pkcs11t.h"
 
 /**
  *  @brief Declaring MBEDTLS_ALLOW_PRIVATE_ACCESS allows access to mbedtls "private" fields.
  */
 #define MBEDTLS_ALLOW_PRIVATE_ACCESS
 
-/* mbedTLS includes. */
+/* MbedTLS includes. */
 #include "mbedtls/pk.h"
 #include "mbedtls/x509_crt.h"
 #include "mbedtls/ctr_drbg.h"
@@ -51,6 +52,11 @@
 #include "mbedtls/platform.h"
 #include "mbedtls/threading.h"
 #include "mbedtls/error.h"
+
+#ifdef MBEDTLS_PSA_CRYPTO_C
+    #include "psa/crypto.h"
+    #include "psa/crypto_values.h"
+#endif /* MBEDTLS_PSA_CRYPTO_C */
 
 /* C runtime includes. */
 #include <string.h>
@@ -484,6 +490,26 @@ static CK_RV prvMbedTLS_Initialize( void )
     }
     else
     {
+        #ifdef MBEDTLS_PSA_CRYPTO_C
+            lMbedTLSResult = psa_crypto_init();
+
+            if( lMbedTLSResult != PSA_SUCCESS )
+            {
+                LogError( ( "Could not initialize PKCS #11. Failed to initialize PSA: MBedTLS error = %s : %s.",
+                            mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                            mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                xResult = CKR_FUNCTION_FAILED;
+                /* MISRA Ref 10.5.1 [Essential type casting] */
+                /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
+                /* coverity[misra_c_2012_rule_10_5_violation] */
+                xP11Context.xIsInitialized = ( CK_BBOOL ) CK_FALSE;
+            }
+            else
+            {
+                LogDebug( ( "MbedTLS PSA module was successfully initialized." ) );
+            }
+        #endif /* MBEDTLS_PSA_CRYPTO_C */
+
         /* MISRA Ref 10.5.1 [Essential type casting] */
         /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
         /* coverity[misra_c_2012_rule_10_5_violation] */
