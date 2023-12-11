@@ -56,7 +56,7 @@
 #ifdef MBEDTLS_PSA_CRYPTO_C
     #include "psa/crypto.h"
     #include "psa/crypto_values.h"
-#endif
+#endif /* MBEDTLS_PSA_CRYPTO_C */
 
 /* C runtime includes. */
 #include <string.h>
@@ -490,7 +490,7 @@ static CK_RV prvMbedTLS_Initialize( void )
     }
     else
     {
-        #ifdef MBEDTLS_USE_PSA_CRYPTO
+        #ifdef MBEDTLS_PSA_CRYPTO_C
             lMbedTLSResult = psa_crypto_init();
 
             if( lMbedTLSResult != PSA_SUCCESS )
@@ -508,7 +508,7 @@ static CK_RV prvMbedTLS_Initialize( void )
             {
                 LogDebug( ( "MbedTLS PSA module was successfully initialized." ) );
             }
-        #endif /* MBEDTLS_USE_PSA_CRYPTO */
+        #endif /* MBEDTLS_PSA_CRYPTO_C */
 
         /* MISRA Ref 10.5.1 [Essential type casting] */
         /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
