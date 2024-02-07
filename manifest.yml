@@ -5,9 +5,9 @@ license: "MIT"
 
 dependencies:
   - name: "pkcs11"
-    version: "v2.40_errata01"
+    version: "2-40-errata-1"
     license: "OASIS-IPR"
     repository:
       type: "git"
-      url: "https://github.com/amazon-freertos/pkcs11.git"
+      url: "https://github.com/oasis-tcs/pkcs11.git"
       path: "source/dependency/3rdparty/pkcs11"
