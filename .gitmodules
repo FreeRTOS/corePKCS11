@@ -1,3 +1,3 @@
 [submodule "source/dependency/3rdparty/pkcs11"]
 	path = source/dependency/3rdparty/pkcs11
-	url = https://github.com/amazon-freertos/pkcs11.git
+	url = https://github.com/oasis-tcs/pkcs11.git

@@ -14,7 +14,7 @@ set( PKCS_SOURCES
 
 # corePKCS11 library public include directories.
 set( PKCS_INCLUDE_PUBLIC_DIRS
-     "${CMAKE_CURRENT_LIST_DIR}/source/dependency/3rdparty/pkcs11"
+     "${CMAKE_CURRENT_LIST_DIR}/source/dependency/3rdparty/pkcs11/published/2-40-errata-1"
      "${CMAKE_CURRENT_LIST_DIR}/source/include"
      )
 

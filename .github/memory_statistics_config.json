@@ -7,7 +7,7 @@
     ],
     "include": [
         "source/include",
-        "source/dependency/3rdparty/pkcs11",
+        "source/dependency/3rdparty/pkcs11/published/2-40-errata-1",
         "build/_deps/mbedtls_2-src/include",
         "source/dependency/3rdparty/mbedtls_utils",
         "test/include"
