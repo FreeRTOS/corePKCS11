@@ -170,18 +170,18 @@ int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
             pucSig[ 3 ] = 0x21;                          /* Increment the length of the R value to account for the 0x00 pad. */
             pucSig[ 4 ] = 0x0;                           /* Write the 0x00 pad. */
             ( void ) memcpy( &pucSig[ 5 ], ucTemp, 32 ); /* Copy the 32-byte R value. */
-            pucSigPtr = pucSig + 33;                     /* Increment the pointer to compensate for padded R length.    */
+            pucSigPtr = &pucSig[ 33 ];                   /* Increment the pointer to compensate for padded R length.    */
         }
         else
         {
             pucSig[ 3 ] = 0x20;                          /* R length with be 32 bytes. */
             ( void ) memcpy( &pucSig[ 4 ], ucTemp, 32 ); /* Copy 32 bytes of R into the signature buffer. */
-            pucSigPtr = pucSig + 32;                     /* Increment the pointer for 32 byte R length. */
+            pucSigPtr = &pucSig[ 32 ];                   /* Increment the pointer for 32 byte R length. */
         }
 
-        pucSigPtr += 4;        /* Increment the pointer to offset the SEQUENCE, LENGTH, R-INTEGER, LENGTH. */
-        pucSigPtr[ 0 ] = 0x02; /* INTEGER tag for S. */
-        pucSigPtr += 1;        /* Increment over S INTEGER tag. */
+        pucSigPtr = &pucSigPtr[ 4 ]; /* Increment the pointer to offset the SEQUENCE, LENGTH, R-INTEGER, LENGTH. */
+        pucSigPtr[ 0 ] = 0x02;       /* INTEGER tag for S. */
+        pucSigPtr = &pucSigPtr[ 1 ]; /* Increment over S INTEGER tag. */
 
         /******************* S Component. ****************/
 
@@ -192,7 +192,7 @@ int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
             pucSig[ 1 ]++;                                   /* Increment the length of the structure to account for the 0x00 pad. */
             pucSigPtr[ 0 ] = 0x21;                           /* Increment the length of the S value to account for the 0x00 pad. */
             pucSigPtr[ 1 ] = 0x00;                           /* Write the 0x00 pad. */
-            pucSigPtr += 2;                                  /* pucSigPtr was pointing at the S-length.  Increment by 2 to hop over length and 0 padding. */
+            pucSigPtr = &pucSigPtr[ 2 ];                     /* pucSigPtr was pointing at the S-length.  Increment by 2 to hop over length and 0 padding. */
 
             ( void ) memcpy( pucSigPtr, &ucTemp[ 32 ], 32 ); /* Copy the S value. */
         }
