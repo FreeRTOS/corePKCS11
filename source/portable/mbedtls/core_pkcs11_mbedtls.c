@@ -398,7 +398,7 @@ static P11Session_t * prvSessionPointerFromHandle( CK_SESSION_HANDLE xSession )
     if( ( xSession >= 1UL ) && ( xSession <= pkcs11configMAX_SESSIONS ) )
     {
         /* Decrement by 1, invalid handles in PKCS #11 are defined to be 0. */
-        pxSession = &pxP11Sessions[ xSession - 1UL ];
+        pxSession = &( pxP11Sessions[ xSession - 1UL ] );
     }
     else
     {
@@ -1309,7 +1309,7 @@ static CK_RV prvAppendEmptyECDerKey( uint8_t * pusECPrivateKey,
      * array will be appended to the valid private key.
      * It must be removed so that we can read the private
      * key back at a later time. */
-    lCompare = memcmp( &pusECPrivateKey[ ulDerBufSize - 6UL ], emptyPubKey, sizeof( emptyPubKey ) );
+    lCompare = memcmp( &( pusECPrivateKey[ ulDerBufSize - 6UL ] ), emptyPubKey, sizeof( emptyPubKey ) );
 
     if( ( lCompare == 0 ) && ( *pulActualKeyLength >= 6UL ) )
     {
@@ -1912,7 +1912,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID slotID,
                 if( pxP11Sessions[ ulSessionCount ].xOpened == ( CK_BBOOL ) CK_FALSE )
                 {
                     xResult = CKR_OK;
-                    pxSessionObj = &pxP11Sessions[ ulSessionCount ];
+                    pxSessionObj = &( pxP11Sessions[ ulSessionCount ] );
                     /* MISRA Ref 10.5.1 [Essential type casting] */
                     /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */
                     /* coverity[misra_c_2012_rule_10_5_violation] */
@@ -2096,7 +2096,7 @@ static CK_RV prvCreateCertificate( CK_ATTRIBUTE * pxTemplate,
     /* Search for the pointer to the certificate VALUE. */
     for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
     {
-        xResult = prvCertAttParse( &pxTemplate[ ulIndex ], &xCertificateType,
+        xResult = prvCertAttParse( &( pxTemplate[ ulIndex ] ), &xCertificateType,
                                    &pxCertificateValue, &xCertificateLength,
                                    &pxLabel );
 
@@ -2186,7 +2186,7 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
         if( xAttribute.type == CKA_LABEL )
         {
             LogDebug( ( "Successfully found the label in the template." ) );
-            *ppxLabel = &pxTemplate[ ulIndex ];
+            *ppxLabel = &( pxTemplate[ ulIndex ] );
             break;
         }
     }
@@ -2388,7 +2388,7 @@ static void prvGetLabel( CK_ATTRIBUTE ** ppxLabel,
         {
             for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
             {
-                xResult = prvEcKeyAttParse( &pxTemplate[ ulIndex ], &xMbedContext, xIsPrivate );
+                xResult = prvEcKeyAttParse( &( pxTemplate[ ulIndex ] ), &xMbedContext, xIsPrivate );
 
                 if( xResult != CKR_OK )
                 {
@@ -2466,7 +2466,7 @@ static CK_RV prvCreateRsaKey( CK_ATTRIBUTE * pxTemplate,
         /* Parse template and collect the relevant parts. */
         for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
         {
-            xResult = prvRsaKeyAttParse( &pxTemplate[ ulIndex ], xMbedContext.pk_ctx, xIsPrivate );
+            xResult = prvRsaKeyAttParse( &( pxTemplate[ ulIndex ] ), xMbedContext.pk_ctx, xIsPrivate );
 
             if( xResult != CKR_OK )
             {
@@ -2585,7 +2585,7 @@ static CK_RV prvCreateSHA256HMAC( CK_ATTRIBUTE * pxTemplate,
     {
         for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
         {
-            xResult = prvHMACKeyAttParse( &pxTemplate[ ulIndex ], &pxSecretKeyValue, &ulSecretKeyValueLen );
+            xResult = prvHMACKeyAttParse( &( pxTemplate[ ulIndex ] ), &pxSecretKeyValue, &ulSecretKeyValueLen );
 
             if( xResult != CKR_OK )
             {
@@ -2710,7 +2710,7 @@ static CK_RV prvCreateAESCMAC( CK_ATTRIBUTE * pxTemplate,
     {
         for( ulIndex = 0; ulIndex < ulCount; ulIndex++ )
         {
-            xResult = prvCMACKeyAttParse( &pxTemplate[ ulIndex ], &pxSecretKeyValue, &ulSecretKeyValueLen );
+            xResult = prvCMACKeyAttParse( &( pxTemplate[ ulIndex ] ), &pxSecretKeyValue, &ulSecretKeyValueLen );
 
             if( xResult != CKR_OK )
             {
@@ -5132,7 +5132,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                 mbedtls_mpi_init( &xR );
                 mbedtls_mpi_init( &xS );
 
-                lMbedTLSResult = mbedtls_mpi_read_binary( &xR, &pSignature[ 0 ], 32 );
+                lMbedTLSResult = mbedtls_mpi_read_binary( &xR, &( pSignature[ 0 ] ), 32 );
 
                 if( lMbedTLSResult != 0 )
                 {
@@ -5144,7 +5144,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE hSession,
                 }
                 else
                 {
-                    lMbedTLSResult = mbedtls_mpi_read_binary( &xS, &pSignature[ 32 ], 32 );
+                    lMbedTLSResult = mbedtls_mpi_read_binary( &xS, &( pSignature[ 32 ] ), 32 );
 
                     if( lMbedTLSResult != 0 )
                     {
@@ -5633,7 +5633,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
         for( ulIndex = 0; ulIndex < ulPrivateKeyAttributeCount; ++ulIndex )
         {
             xResult = prvCheckGenerateKeyPairPrivateTemplate( &pxPrivateLabel,
-                                                              &pPrivateKeyTemplate[ ulIndex ],
+                                                              &( pPrivateKeyTemplate[ ulIndex ] ),
                                                               &xAttributeMap );
 
             if( xResult != CKR_OK )
@@ -5657,7 +5657,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE hSession,
         for( ulIndex = 0; ulIndex < ulPublicKeyAttributeCount; ++ulIndex )
         {
             xResult = prvCheckGenerateKeyPairPublicTemplate( &pxPublicLabel,
-                                                             &pPublicKeyTemplate[ ulIndex ],
+                                                             &( pPublicKeyTemplate[ ulIndex ] ),
                                                              &xAttributeMap );
 
             if( xResult != CKR_OK )
