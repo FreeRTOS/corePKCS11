@@ -172,7 +172,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_generatekeyp
 <div class="line">        <span class="keywordflow">for</span>( ulIndex = 0; ulIndex &lt; ulPrivateKeyAttributeCount; ++ulIndex )</div>
 <div class="line">        {</div>
 <div class="line">            xResult = <a class="code hl_function" href="core__pkcs11__mbedtls_8c.html#af6ce5a8dfa0d3de7a17807a079f6bf88">prvCheckGenerateKeyPairPrivateTemplate</a>( &amp;pxPrivateLabel,</div>
-<div class="line">                                                              &amp;pPrivateKeyTemplate[ ulIndex ],</div>
+<div class="line">                                                              &amp;( pPrivateKeyTemplate[ ulIndex ] ),</div>
 <div class="line">                                                              &amp;xAttributeMap );</div>
 <div class="line"> </div>
 <div class="line">            <span class="keywordflow">if</span>( xResult != CKR_OK )</div>
@@ -196,7 +196,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_generatekeyp
 <div class="line">        <span class="keywordflow">for</span>( ulIndex = 0; ulIndex &lt; ulPublicKeyAttributeCount; ++ulIndex )</div>
 <div class="line">        {</div>
 <div class="line">            xResult = <a class="code hl_function" href="core__pkcs11__mbedtls_8c.html#ab49218b2f2a55fe7a50f8f472d42058f">prvCheckGenerateKeyPairPublicTemplate</a>( &amp;pxPublicLabel,</div>
-<div class="line">                                                             &amp;pPublicKeyTemplate[ ulIndex ],</div>
+<div class="line">                                                             &amp;( pPublicKeyTemplate[ ulIndex ] ),</div>
 <div class="line">                                                             &amp;xAttributeMap );</div>
 <div class="line"> </div>
 <div class="line">            <span class="keywordflow">if</span>( xResult != CKR_OK )</div>

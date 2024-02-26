@@ -161,7 +161,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_opensession.
 <div class="line">                <span class="keywordflow">if</span>( <a class="code hl_variable" href="core__pkcs11__mbedtls_8c.html#a97e74ce80ee33111b27c11c3644c9cc7">pxP11Sessions</a>[ ulSessionCount ].xOpened == ( CK_BBOOL ) CK_FALSE )</div>
 <div class="line">                {</div>
 <div class="line">                    xResult = CKR_OK;</div>
-<div class="line">                    pxSessionObj = &amp;<a class="code hl_variable" href="core__pkcs11__mbedtls_8c.html#a97e74ce80ee33111b27c11c3644c9cc7">pxP11Sessions</a>[ ulSessionCount ];</div>
+<div class="line">                    pxSessionObj = &amp;( <a class="code hl_variable" href="core__pkcs11__mbedtls_8c.html#a97e74ce80ee33111b27c11c3644c9cc7">pxP11Sessions</a>[ ulSessionCount ] );</div>
 <div class="line">                    <span class="comment">/* MISRA Ref 10.5.1 [Essential type casting] */</span></div>
 <div class="line">                    <span class="comment">/* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-105 */</span></div>
 <div class="line">                    <span class="comment">/* coverity[misra_c_2012_rule_10_5_violation] */</span></div>

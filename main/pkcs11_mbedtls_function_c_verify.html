@@ -255,7 +255,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_verify.html'
 <div class="line">                mbedtls_mpi_init( &amp;xR );</div>
 <div class="line">                mbedtls_mpi_init( &amp;xS );</div>
 <div class="line"> </div>
-<div class="line">                lMbedTLSResult = mbedtls_mpi_read_binary( &amp;xR, &amp;pSignature[ 0 ], 32 );</div>
+<div class="line">                lMbedTLSResult = mbedtls_mpi_read_binary( &amp;xR, &amp;( pSignature[ 0 ] ), 32 );</div>
 <div class="line"> </div>
 <div class="line">                <span class="keywordflow">if</span>( lMbedTLSResult != 0 )</div>
 <div class="line">                {</div>
@@ -267,7 +267,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_verify.html'
 <div class="line">                }</div>
 <div class="line">                <span class="keywordflow">else</span></div>
 <div class="line">                {</div>
-<div class="line">                    lMbedTLSResult = mbedtls_mpi_read_binary( &amp;xS, &amp;pSignature[ 32 ], 32 );</div>
+<div class="line">                    lMbedTLSResult = mbedtls_mpi_read_binary( &amp;xS, &amp;( pSignature[ 32 ] ), 32 );</div>
 <div class="line"> </div>
 <div class="line">                    <span class="keywordflow">if</span>( lMbedTLSResult != 0 )</div>
 <div class="line">                    {</div>
