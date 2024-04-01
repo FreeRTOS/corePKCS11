@@ -24,6 +24,7 @@ CSDK
 CSRS
 ctest
 DCMOCK
+DCOV
 decihours
 Decihours
 DECIHOURS
@@ -32,6 +33,7 @@ DNDEBUG
 Drbg
 DSYSTEM
 DUNIT
+DUNITTEST
 DUNITY
 ecdh
 ecjpake
