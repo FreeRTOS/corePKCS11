@@ -27,7 +27,7 @@ jobs:
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
           -DSYSTEM_TESTS=1 \
-          -DUNIT_TESTS=0 \
+          -DUNITTEST=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
 
@@ -59,7 +59,7 @@ jobs:
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DUNIT_TESTS=1 \
+          -DUNITTEST=1 \
           -DSYSTEM_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
@@ -89,7 +89,7 @@ jobs:
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DUNIT_TESTS=1 \
+          -DUNITTEST=1 \
           -DSYSTEM_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
           make -C build/ all
@@ -240,7 +240,7 @@ jobs:
         run: |
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
-          -DUNIT_TESTS=0 \
+          -DUNITTEST=0 \
           -DSYSTEM_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
       - name: Install Python3

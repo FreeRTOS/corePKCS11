@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.13.0)
-project("corePKCS11 tests" LANGUAGES C)
+project( "corePKCS11 tests"
+         VERSION 3.5.0
+         LANGUAGES C)
 
 # Allow the project to be organized into folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -18,8 +20,8 @@ get_filename_component(__MODULE_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE
 set(MODULE_ROOT_DIR ${__MODULE_ROOT_DIR} CACHE INTERNAL "corePKCS11 repository root.")
 
 option(SYSTEM_TESTS "Set this to ON to build system tests" ON)
-option(UNIT_TESTS "Set this to ON to build unit tests" ON)
-option(COVERITY "Set this to ON to build coverity_analysis target" ON)
+option(UNITTEST "Set this to ON to build unit tests" ON)
+option(COV_ANALYSIS "Set this to ON to build coverity_analysis target" ON)
 
 # Set output directories.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -28,7 +30,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 include(${MODULE_ROOT_DIR}/tools/mbedtls.cmake)
 
-if(UNIT_TESTS OR SYSTEM_TESTS)
+if(UNITTEST OR SYSTEM_TESTS)
     include(${MODULE_ROOT_DIR}/tools/unity.cmake)
     include(${MODULE_ROOT_DIR}/tools/cmock.cmake)
 endif()
@@ -49,7 +51,7 @@ set(
 # add_test()
 enable_testing()
 
-if(UNIT_TESTS)
+if(UNITTEST)
     add_subdirectory(pkcs11_mbedtls_utest)
     add_subdirectory(pkcs11_utils_utest)
     add_subdirectory(wrapper_utest)
@@ -59,7 +61,7 @@ if(SYSTEM_TESTS)
     add_subdirectory(mbedtls_integration)
 endif()
 
-if(COVERITY)
+if(COV_ANALYSIS)
     add_subdirectory(coverity_analysis)
 endif()
 
@@ -67,7 +69,7 @@ endif()
 # Coverage Analysis configuration
 # ========================================
 
-if(UNIT_TESTS OR SYSTEM_TESTS)
+if(UNITTEST OR SYSTEM_TESTS)
     # Add a target for running coverage on tests.
     add_custom_target(
         coverage

@@ -137,7 +137,7 @@ Coverage builds are validated on recent versions of Ubuntu Linux.
 
    - You may specify your preferred build tool by appending `-G'Unix Makefiles'`
      or `-GNinja` to the command above.
-   - You may append `-DUNIT_TESTS=0` or `-DSYSTEM_TESTS=0` to disable Unit Tests
+   - You may append `-DUNITTEST=0` or `-DSYSTEM_TESTS=0` to disable Unit Tests
      or Integration Tests respectively.
 
 1. Build the test binaries: `cmake --build ./build --target all`
