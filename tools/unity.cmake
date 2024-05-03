@@ -1,7 +1,7 @@
 include(FetchContent)
 
 FetchContent_Declare(
-    unity GIT_REPOSITORY https://github.com/ThrowTheSwitch/unity.git GIT_TAG v2.5.1
+    unity GIT_REPOSITORY https://github.com/ThrowTheSwitch/unity.git GIT_TAG v2.6.0
 )
 
 FetchContent_GetProperties(

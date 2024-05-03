@@ -7,7 +7,7 @@ endif()
 
 FetchContent_Declare(
     cmock GIT_REPOSITORY https://github.com/ThrowTheSwitch/CMock.git
-    GIT_TAG afa294982e8a28bc06f341cc77fd4276641b42bd
+    GIT_TAG v2.5.3
 )
 
 FetchContent_GetProperties(
