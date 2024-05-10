@@ -3254,6 +3254,237 @@ void test_pkcs11_C_GetAttributeValueAttParsing( void )
 }
 
 /*!
+ * @brief C_GetAttributeValue test multiple attribute parsing of PKCS #11 templates.
+ *
+ * CKR_ATTRIBUTE_SENSITIVE, CKR_ATTRIBUTE_TYPE_INVALID, and CKR_BUFFER_TOO_SMALL do not
+ * denote true errors for C_GetAttributeValue. The second attribute should still be processed
+ * in the call. CKR_FUNCTION_FAILED is not listed in the error above and should stop processing
+ * the second attribute.
+ *
+ * Testing the following combinations of return value of attributes[ 2 ]:
+ * { CKR_OK, CKR_ATTRIBUTE_TYPE_INVALID } : Return value is CKR_ATTRIBUTE_TYPE_INVALID.
+ * { CKR_ATTRIBUTE_TYPE_INVALID, CKR_OK } : Return value is CKR_ATTRIBUTE_TYPE_INVALID.
+ * { CKR_OK, CKR_BUFFER_TOO_SMALL } : Return value is CKR_BUFFER_TOO_SMALL.
+ * { CKR_BUFFER_TOO_SMALL, CKR_OK } : Return value is CKR_BUFFER_TOO_SMALL.
+ * { CKR_OK, CKR_ATTRIBUTE_SENSITIVE } : Return value is CKR_ATTRIBUTE_SENSITIVE.
+ * { CKR_ATTRIBUTE_SENSITIVE, CKR_OK } : Return value is CKR_ATTRIBUTE_SENSITIVE.
+ * { CKR_OK, CKR_FUNCTION_FAILED } : Return value is CKR_FUNCTION_FAILED.
+ * { CKR_FUNCTION_FAILED, CKR_OK } : Return value is CKR_FUNCTION_FAILED and the
+ * second attribute is not returned in the implementation.
+ * { CKR_FUNCTION_FAILED, CKR_ATTRIBUTE_TYPE_INVALID } : Return value is CKR_FUNCTION_FAILED
+ * { CKR_ATTRIBUTE_TYPE_INVALID, CKR_FUNCTION_FAILED } : Return value is CKR_FUNCTION_FAILED
+ */
+void test_pkcs11_C_GetAttributeValueMultipleAttParsing( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_ULONG ulCount = 2;
+    CK_ULONG ulLength = 1;
+    CK_BYTE pulKnownBuf[] = pkcs11DER_ENCODED_OID_P256;
+    CK_BYTE pulBuf[ sizeof( pulKnownBuf ) ] = { 0 };
+    CK_BYTE ulPoint[ pkcs11EC_POINT_LENGTH ] = { 0 };
+    CK_BYTE ulKnownPoint = 0x04;
+    CK_BBOOL xIsPrivate = CK_FALSE;
+    CK_OBJECT_CLASS xPrivateKeyClass = { 0 };
+    CK_OBJECT_CLASS xKnownPrivateKeyClass = CKO_PRIVATE_KEY;
+    CK_ATTRIBUTE xTemplates[ 2 ] = { 0 };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateEcPriv( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_pk_init_CMockIgnore();
+        mbedtls_x509_crt_init_CMockIgnore();
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        mbedtls_pk_free_CMockIgnore();
+        mbedtls_x509_crt_free_CMockIgnore();
+
+        /* EC Point Case and unknown attribute case. */
+        /* CKR_OK should be returned for EC point length. */
+        xTemplates[ 0 ].type = CKA_EC_POINT;
+        xTemplates[ 0 ].pValue = NULL;
+        xTemplates[ 0 ].ulValueLen = 0;
+
+        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned for unknow attribute CKA_MODULUS. */
+        xTemplates[ 1 ].type = CKA_MODULUS;
+        xTemplates[ 1 ].pValue = NULL;
+        xTemplates[ 1 ].ulValueLen = 0;
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned. */
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_TYPE_INVALID, xResult );
+        TEST_ASSERT_EQUAL( pkcs11EC_POINT_LENGTH, xTemplates[ 0 ].ulValueLen );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 1 ].ulValueLen );
+
+        /* Swap the sequence EC Point Case and unknown attribute case. */
+        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned for unknow attribute CKA_MODULUS. */
+        xTemplates[ 0 ].type = CKA_MODULUS;
+        xTemplates[ 0 ].pValue = NULL;
+        xTemplates[ 0 ].ulValueLen = 0;
+
+        /* CKR_OK should be returned for EC point length. */
+        xTemplates[ 1 ].type = CKA_EC_POINT;
+        xTemplates[ 1 ].pValue = NULL;
+        xTemplates[ 1 ].ulValueLen = 0;
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned. */
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_TYPE_INVALID, xResult );
+        TEST_ASSERT_EQUAL( pkcs11EC_POINT_LENGTH, xTemplates[ 1 ].ulValueLen );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 0 ].ulValueLen );
+
+        /* CKR_BUFFER_TOO_SMALL should be returned when mbedtls return buffer too small. */
+        xTemplates[ 0 ].type = CKA_EC_POINT;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = 0;
+
+        /* CKR_OK should be returned for EC point length. */
+        xTemplates[ 1 ].type = CKA_EC_POINT;
+        xTemplates[ 1 ].pValue = NULL;
+        xTemplates[ 1 ].ulValueLen = 0;
+
+        /* CKR_BUFFER_TOO_SMALL should be returned. */
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+        TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 0 ].ulValueLen );
+        TEST_ASSERT_EQUAL( pkcs11EC_POINT_LENGTH, xTemplates[ 1 ].ulValueLen );
+
+        /* Swap the attributes order for CKR_BUFFER_TOO_SMALL and CKR_OK. */
+        /* CKR_OK should be returned for EC point length. */
+        xTemplates[ 0 ].type = CKA_EC_POINT;
+        xTemplates[ 0 ].pValue = NULL;
+        xTemplates[ 0 ].ulValueLen = 0;
+
+        /* CKR_BUFFER_TOO_SMALL should be returned when mbedtls return buffer too small. */
+        xTemplates[ 1 ].type = CKA_EC_POINT;
+        xTemplates[ 1 ].pValue = &ulPoint;
+        xTemplates[ 1 ].ulValueLen = 0;
+
+        /* CKR_BUFFER_TOO_SMALL should be returned. */
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+        TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
+        TEST_ASSERT_EQUAL( pkcs11EC_POINT_LENGTH, xTemplates[ 0 ].ulValueLen );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 1 ].ulValueLen );
+
+        /* CKR_ATTRIBUTE_SENSITIVE should be returned when getting CKA_PRIVATE_EXPONENT type. */
+        mbedtls_pk_parse_key_ExpectAnyArgsAndReturn( 0 );
+        xTemplates[ 0 ].type = CKA_PRIVATE_EXPONENT;
+        xTemplates[ 0 ].pValue = NULL;
+        xTemplates[ 0 ].ulValueLen = 0;
+
+        /* CKR_OK should be returned for EC point length. */
+        xTemplates[ 1 ].type = CKA_EC_POINT;
+        xTemplates[ 1 ].pValue = NULL;
+        xTemplates[ 1 ].ulValueLen = 0;
+
+        /* CKA_PRIVATE_EXPONENT should be returned. */
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_SENSITIVE, xResult );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 0 ].ulValueLen );
+        TEST_ASSERT_EQUAL( pkcs11EC_POINT_LENGTH, xTemplates[ 1 ].ulValueLen );
+
+        /* CKR_OK should be returned for EC point length. */
+        xTemplates[ 0 ].type = CKA_EC_POINT;
+        xTemplates[ 0 ].pValue = NULL;
+        xTemplates[ 0 ].ulValueLen = 0;
+
+        /* CKR_ATTRIBUTE_SENSITIVE should be returned when getting CKA_PRIVATE_EXPONENT type. */
+        mbedtls_pk_parse_key_ExpectAnyArgsAndReturn( 0 );
+        xTemplates[ 1 ].type = CKA_PRIVATE_EXPONENT;
+        xTemplates[ 1 ].pValue = NULL;
+        xTemplates[ 1 ].ulValueLen = 0;
+
+        /* CKA_PRIVATE_EXPONENT should be returned. */
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+        TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_SENSITIVE, xResult );
+        TEST_ASSERT_EQUAL( pkcs11EC_POINT_LENGTH, xTemplates[ 0 ].ulValueLen );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 1 ].ulValueLen );
+
+        /* CKR_FUNCTION_FAILED should be returned when mbedtls_ecp_tls_write_point returns -1.  */
+        mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
+        mbedtls_ecp_tls_write_point_IgnoreAndReturn( -1 );
+        xTemplates[ 0 ].type = CKA_EC_POINT;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = sizeof( ulPoint );
+
+        /* CKR_OK should be returned for EC point length. */
+        xTemplates[ 1 ].type = CKA_EC_POINT;
+        xTemplates[ 1 ].pValue = NULL;
+        xTemplates[ 1 ].ulValueLen = 0;
+
+        /* CKR_FUNCTION_FAILED should be returned. */
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 0 ].ulValueLen );
+        TEST_ASSERT_EQUAL( 0, xTemplates[ 1 ].ulValueLen );
+
+        /* Swap the order of attributes. */
+        /* CKR_OK should be returned for EC point length. */
+        xTemplates[ 0 ].type = CKA_EC_POINT;
+        xTemplates[ 0 ].pValue = NULL;
+        xTemplates[ 0 ].ulValueLen = 0;
+
+        /* CKR_FUNCTION_FAILED should be returned when mbedtls_ecp_tls_write_point returns -1.  */
+        mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
+        mbedtls_ecp_tls_write_point_IgnoreAndReturn( -1 );
+        xTemplates[ 1 ].type = CKA_EC_POINT;
+        xTemplates[ 1 ].pValue = &ulPoint;
+        xTemplates[ 1 ].ulValueLen = sizeof( ulPoint );
+
+        /* CKR_FUNCTION_FAILED should be returned. */
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+        TEST_ASSERT_EQUAL( pkcs11EC_POINT_LENGTH, xTemplates[ 0 ].ulValueLen );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 1 ].ulValueLen );
+
+        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned for unknow attribute CKA_MODULUS. */
+        xTemplates[ 0 ].type = CKA_MODULUS;
+        xTemplates[ 0 ].pValue = NULL;
+        xTemplates[ 0 ].ulValueLen = 0;
+
+        /* CKR_FUNCTION_FAILED should be returned when mbedtls_ecp_tls_write_point returns -1.  */
+        mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
+        mbedtls_ecp_tls_write_point_IgnoreAndReturn( -1 );
+        xTemplates[ 1 ].type = CKA_EC_POINT;
+        xTemplates[ 1 ].pValue = &ulPoint;
+        xTemplates[ 1 ].ulValueLen = sizeof( ulPoint );
+
+        /* CKR_FUNCTION_FAILED should be returned. */
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 0 ].ulValueLen );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 1 ].ulValueLen );
+
+        /* CKR_FUNCTION_FAILED should be returned when mbedtls_ecp_tls_write_point returns -1.  */
+        mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
+        mbedtls_ecp_tls_write_point_IgnoreAndReturn( -1 );
+        xTemplates[ 0 ].type = CKA_EC_POINT;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = sizeof( ulPoint );
+
+        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned for unknow attribute CKA_MODULUS. */
+        xTemplates[ 1 ].type = CKA_MODULUS;
+        xTemplates[ 1 ].pValue = NULL;
+        xTemplates[ 1 ].ulValueLen = 0;
+
+        /* CKR_FUNCTION_FAILED should be returned. */
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 0 ].ulValueLen );
+        TEST_ASSERT_EQUAL( 0, xTemplates[ 1 ].ulValueLen );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
  * @brief C_GetAttributeValue paths.
  *
  */
