@@ -3355,6 +3355,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                                                                           ( uint8_t * ) pTemplate[ iAttrib ].pValue + 1,
                                                                           pTemplate[ iAttrib ].ulValueLen - 1UL );
                             xSize = xMbedSize;
+
                             if( lMbedTLSResult < 0 )
                             {
                                 if( lMbedTLSResult == MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL )
@@ -5905,4 +5906,3 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateRandom )( CK_SESSION_HANDLE hSession,
     return xResult;
 }
 /* @[declare_pkcs11_mbedtls_c_generate_random] */
-
