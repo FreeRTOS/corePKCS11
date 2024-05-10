@@ -3185,7 +3185,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
     {
         for( iAttrib = 0; iAttrib < ulCount; iAttrib++ )
         {
-            if( xResult != CKR_OK )
+            if( ( xResult != CKR_ATTRIBUTE_SENSITIVE ) && ( xResult != CKR_ATTRIBUTE_TYPE_INVALID ) && ( xResult != CKR_BUFFER_TOO_SMALL ) && ( xResult != CKR_OK ) )
             {
                 break;
             }
@@ -3209,6 +3209,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                             LogError( ( "Failed to parse attribute template. "
                                         "Received a buffer smaller than CK_OBJECT_CLASS." ) );
                             xResult = CKR_BUFFER_TOO_SMALL;
+                            pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
                         }
                     }
 
@@ -3226,6 +3227,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                         LogError( ( "Failed to parse attribute. This data is "
                                     "sensitive and the value will not be returned." ) );
                         xResult = CKR_ATTRIBUTE_SENSITIVE;
+                        pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
                     }
                     else
                     {
@@ -3241,6 +3243,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                                         ( unsigned long int ) ulLength,
                                         ( unsigned long int ) pTemplate[ iAttrib ].ulValueLen ) );
                             xResult = CKR_BUFFER_TOO_SMALL;
+                            pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
                         }
                         else
                         {
@@ -3261,6 +3264,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                         LogError( ( "Failed to parse attribute. Expected buffer "
                                     "of size CK_KEY_TYPE." ) );
                         xResult = CKR_BUFFER_TOO_SMALL;
+                        pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
                     }
                     else
                     {
@@ -3287,6 +3291,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                                 LogError( ( "Failed to parse attribute. "
                                             "Could not parse key type." ) );
                                 xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+                                pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
                                 break;
                         }
 
@@ -3300,6 +3305,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                     LogError( ( "Failed to parse attribute. "
                                 "CKA_PRIVATE_EXPONENT is private data." ) );
                     xResult = CKR_ATTRIBUTE_SENSITIVE;
+                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
 
                     break;
 
@@ -3316,6 +3322,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                             LogError( ( "Failed to parse attribute. "
                                         "CKA_EC_PARAMS buffer too small." ) );
                             xResult = CKR_BUFFER_TOO_SMALL;
+                            pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
                         }
                         else
                         {
@@ -3348,33 +3355,35 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                                                                           ( uint8_t * ) pTemplate[ iAttrib ].pValue + 1,
                                                                           pTemplate[ iAttrib ].ulValueLen - 1UL );
                             xSize = xMbedSize;
+                            if( lMbedTLSResult < 0 )
+                            {
+                                if( lMbedTLSResult == MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL )
+                                {
+                                    LogError( ( "Failed to extract EC point. "
+                                                "CKA_EC_POINT buffer was too small." ) );
+                                    xResult = CKR_BUFFER_TOO_SMALL;
+                                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
+                                }
+                                else
+                                {
+                                    LogError( ( "Failed to extract EC point. "
+                                                "mbedtls_ecp_tls_write_point failed: "
+                                                "mbed TLS error = %s : %s.",
+                                                mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                                                mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+                                    xResult = CKR_FUNCTION_FAILED;
+                                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
+                                }
+                            }
+                            else
+                            {
+                                pTemplate[ iAttrib ].ulValueLen = xSize + 1UL;
+                            }
                         }
                         else
                         {
                             xResult = CKR_BUFFER_TOO_SMALL;
-                        }
-
-                        if( ( xResult == CKR_OK ) && ( lMbedTLSResult < 0 ) )
-                        {
-                            if( lMbedTLSResult == MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL )
-                            {
-                                LogError( ( "Failed to extract EC point. "
-                                            "CKA_EC_POINT buffer was too small." ) );
-                                xResult = CKR_BUFFER_TOO_SMALL;
-                            }
-                            else
-                            {
-                                LogError( ( "Failed to extract EC point. "
-                                            "mbedtls_ecp_tls_write_point failed: "
-                                            "mbed TLS error = %s : %s.",
-                                            mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
-                                            mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
-                                xResult = CKR_FUNCTION_FAILED;
-                            }
-                        }
-                        else
-                        {
-                            pTemplate[ iAttrib ].ulValueLen = xSize + 1UL;
+                            pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
                         }
                     }
 
@@ -3384,6 +3393,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                     LogError( ( "Failed to parse attribute. Received unknown "
                                 "attribute type." ) );
                     xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
                     break;
             }
         }
@@ -5895,3 +5905,4 @@ CK_DECLARE_FUNCTION( CK_RV, C_GenerateRandom )( CK_SESSION_HANDLE hSession,
     return xResult;
 }
 /* @[declare_pkcs11_mbedtls_c_generate_random] */
+
