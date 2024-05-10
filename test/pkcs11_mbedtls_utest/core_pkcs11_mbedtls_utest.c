@@ -3271,8 +3271,9 @@ void test_pkcs11_C_GetAttributeValueAttParsing( void )
  * { CKR_OK, CKR_FUNCTION_FAILED } : Return value is CKR_FUNCTION_FAILED.
  * { CKR_FUNCTION_FAILED, CKR_OK } : Return value is CKR_FUNCTION_FAILED and the
  * second attribute is not returned in the implementation.
- * { CKR_FUNCTION_FAILED, CKR_ATTRIBUTE_TYPE_INVALID } : Return value is CKR_FUNCTION_FAILED
- * { CKR_ATTRIBUTE_TYPE_INVALID, CKR_FUNCTION_FAILED } : Return value is CKR_FUNCTION_FAILED
+ * { CKR_FUNCTION_FAILED, CKR_ATTRIBUTE_TYPE_INVALID } : Return value is CKR_FUNCTION_FAILED and the
+ * second attribute is not returned in the implementation.
+ * { CKR_ATTRIBUTE_TYPE_INVALID, CKR_FUNCTION_FAILED } : Return value is CKR_FUNCTION_FAILED.
  */
 void test_pkcs11_C_GetAttributeValueMultipleAttParsing( void )
 {
