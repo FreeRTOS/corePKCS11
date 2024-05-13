@@ -2,7 +2,7 @@ include(FetchContent)
 
 set(FETCHCONTENT_QUIET OFF)
 
-set(MBEDTLS_2_VERSION 2.28.3)
+set(MBEDTLS_2_VERSION 2.28.8)
 
 FetchContent_Declare(
     mbedtls_2
@@ -52,7 +52,7 @@ if(NOT TARGET MbedTLS2_mbedtls)
     add_library(MbedTLS2::interface ALIAS MbedTLS2_interface)
 endif()
 
-set(MBEDTLS_3_VERSION 3.5.1)
+set(MBEDTLS_3_VERSION 3.6.0)
 
 FetchContent_Declare(
     mbedtls_3
