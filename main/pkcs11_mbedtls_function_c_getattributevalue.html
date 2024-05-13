@@ -217,7 +217,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_getattribute
 <div class="line">    {</div>
 <div class="line">        <span class="keywordflow">for</span>( iAttrib = 0; iAttrib &lt; ulCount; iAttrib++ )</div>
 <div class="line">        {</div>
-<div class="line">            <span class="keywordflow">if</span>( xResult != CKR_OK )</div>
+<div class="line">            <span class="keywordflow">if</span>( ( xResult != CKR_ATTRIBUTE_SENSITIVE ) &amp;&amp; ( xResult != CKR_ATTRIBUTE_TYPE_INVALID ) &amp;&amp; ( xResult != CKR_BUFFER_TOO_SMALL ) &amp;&amp; ( xResult != CKR_OK ) )</div>
 <div class="line">            {</div>
 <div class="line">                <span class="keywordflow">break</span>;</div>
 <div class="line">            }</div>
@@ -241,6 +241,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_getattribute
 <div class="line">                            <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to parse attribute template. &quot;</span></div>
 <div class="line">                                        <span class="stringliteral">&quot;Received a buffer smaller than CK_OBJECT_CLASS.&quot;</span> ) );</div>
 <div class="line">                            xResult = CKR_BUFFER_TOO_SMALL;</div>
+<div class="line">                            pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
 <div class="line">                        }</div>
 <div class="line">                    }</div>
 <div class="line"> </div>
@@ -258,6 +259,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_getattribute
 <div class="line">                        <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to parse attribute. This data is &quot;</span></div>
 <div class="line">                                    <span class="stringliteral">&quot;sensitive and the value will not be returned.&quot;</span> ) );</div>
 <div class="line">                        xResult = CKR_ATTRIBUTE_SENSITIVE;</div>
+<div class="line">                        pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
 <div class="line">                    }</div>
 <div class="line">                    <span class="keywordflow">else</span></div>
 <div class="line">                    {</div>
@@ -273,6 +275,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_getattribute
 <div class="line">                                        ( <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">int</span> ) ulLength,</div>
 <div class="line">                                        ( <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">int</span> ) pTemplate[ iAttrib ].ulValueLen ) );</div>
 <div class="line">                            xResult = CKR_BUFFER_TOO_SMALL;</div>
+<div class="line">                            pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
 <div class="line">                        }</div>
 <div class="line">                        <span class="keywordflow">else</span></div>
 <div class="line">                        {</div>
@@ -293,6 +296,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_getattribute
 <div class="line">                        <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to parse attribute. Expected buffer &quot;</span></div>
 <div class="line">                                    <span class="stringliteral">&quot;of size CK_KEY_TYPE.&quot;</span> ) );</div>
 <div class="line">                        xResult = CKR_BUFFER_TOO_SMALL;</div>
+<div class="line">                        pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
 <div class="line">                    }</div>
 <div class="line">                    <span class="keywordflow">else</span></div>
 <div class="line">                    {</div>
@@ -319,6 +323,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_getattribute
 <div class="line">                                <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to parse attribute. &quot;</span></div>
 <div class="line">                                            <span class="stringliteral">&quot;Could not parse key type.&quot;</span> ) );</div>
 <div class="line">                                xResult = CKR_ATTRIBUTE_VALUE_INVALID;</div>
+<div class="line">                                pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
 <div class="line">                                <span class="keywordflow">break</span>;</div>
 <div class="line">                        }</div>
 <div class="line"> </div>
@@ -332,6 +337,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_getattribute
 <div class="line">                    <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to parse attribute. &quot;</span></div>
 <div class="line">                                <span class="stringliteral">&quot;CKA_PRIVATE_EXPONENT is private data.&quot;</span> ) );</div>
 <div class="line">                    xResult = CKR_ATTRIBUTE_SENSITIVE;</div>
+<div class="line">                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
 <div class="line"> </div>
 <div class="line">                    <span class="keywordflow">break</span>;</div>
 <div class="line"> </div>
@@ -348,6 +354,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_getattribute
 <div class="line">                            <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to parse attribute. &quot;</span></div>
 <div class="line">                                        <span class="stringliteral">&quot;CKA_EC_PARAMS buffer too small.&quot;</span> ) );</div>
 <div class="line">                            xResult = CKR_BUFFER_TOO_SMALL;</div>
+<div class="line">                            pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
 <div class="line">                        }</div>
 <div class="line">                        <span class="keywordflow">else</span></div>
 <div class="line">                        {</div>
@@ -380,33 +387,36 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_getattribute
 <div class="line">                                                                          ( uint8_t * ) pTemplate[ iAttrib ].pValue + 1,</div>
 <div class="line">                                                                          pTemplate[ iAttrib ].ulValueLen - 1UL );</div>
 <div class="line">                            xSize = xMbedSize;</div>
+<div class="line"> </div>
+<div class="line">                            <span class="keywordflow">if</span>( lMbedTLSResult &lt; 0 )</div>
+<div class="line">                            {</div>
+<div class="line">                                <span class="keywordflow">if</span>( lMbedTLSResult == MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL )</div>
+<div class="line">                                {</div>
+<div class="line">                                    <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to extract EC point. &quot;</span></div>
+<div class="line">                                                <span class="stringliteral">&quot;CKA_EC_POINT buffer was too small.&quot;</span> ) );</div>
+<div class="line">                                    xResult = CKR_BUFFER_TOO_SMALL;</div>
+<div class="line">                                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
+<div class="line">                                }</div>
+<div class="line">                                <span class="keywordflow">else</span></div>
+<div class="line">                                {</div>
+<div class="line">                                    <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to extract EC point. &quot;</span></div>
+<div class="line">                                                <span class="stringliteral">&quot;mbedtls_ecp_tls_write_point failed: &quot;</span></div>
+<div class="line">                                                <span class="stringliteral">&quot;mbed TLS error = %s : %s.&quot;</span>,</div>
+<div class="line">                                                <a class="code hl_define" href="core__pkcs11__mbedtls_8c.html#a92427274c3174ef89fbf82a0ad25a252">mbedtlsHighLevelCodeOrDefault</a>( lMbedTLSResult ),</div>
+<div class="line">                                                <a class="code hl_define" href="core__pkcs11__mbedtls_8c.html#a1936e3a07702240561149805e8f0bfbb">mbedtlsLowLevelCodeOrDefault</a>( lMbedTLSResult ) ) );</div>
+<div class="line">                                    xResult = CKR_FUNCTION_FAILED;</div>
+<div class="line">                                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
+<div class="line">                                }</div>
+<div class="line">                            }</div>
+<div class="line">                            <span class="keywordflow">else</span></div>
+<div class="line">                            {</div>
+<div class="line">                                pTemplate[ iAttrib ].ulValueLen = xSize + 1UL;</div>
+<div class="line">                            }</div>
 <div class="line">                        }</div>
 <div class="line">                        <span class="keywordflow">else</span></div>
 <div class="line">                        {</div>
 <div class="line">                            xResult = CKR_BUFFER_TOO_SMALL;</div>
-<div class="line">                        }</div>
-<div class="line"> </div>
-<div class="line">                        <span class="keywordflow">if</span>( ( xResult == CKR_OK ) &amp;&amp; ( lMbedTLSResult &lt; 0 ) )</div>
-<div class="line">                        {</div>
-<div class="line">                            <span class="keywordflow">if</span>( lMbedTLSResult == MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL )</div>
-<div class="line">                            {</div>
-<div class="line">                                <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to extract EC point. &quot;</span></div>
-<div class="line">                                            <span class="stringliteral">&quot;CKA_EC_POINT buffer was too small.&quot;</span> ) );</div>
-<div class="line">                                xResult = CKR_BUFFER_TOO_SMALL;</div>
-<div class="line">                            }</div>
-<div class="line">                            <span class="keywordflow">else</span></div>
-<div class="line">                            {</div>
-<div class="line">                                <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to extract EC point. &quot;</span></div>
-<div class="line">                                            <span class="stringliteral">&quot;mbedtls_ecp_tls_write_point failed: &quot;</span></div>
-<div class="line">                                            <span class="stringliteral">&quot;mbed TLS error = %s : %s.&quot;</span>,</div>
-<div class="line">                                            <a class="code hl_define" href="core__pkcs11__mbedtls_8c.html#a92427274c3174ef89fbf82a0ad25a252">mbedtlsHighLevelCodeOrDefault</a>( lMbedTLSResult ),</div>
-<div class="line">                                            <a class="code hl_define" href="core__pkcs11__mbedtls_8c.html#a1936e3a07702240561149805e8f0bfbb">mbedtlsLowLevelCodeOrDefault</a>( lMbedTLSResult ) ) );</div>
-<div class="line">                                xResult = CKR_FUNCTION_FAILED;</div>
-<div class="line">                            }</div>
-<div class="line">                        }</div>
-<div class="line">                        <span class="keywordflow">else</span></div>
-<div class="line">                        {</div>
-<div class="line">                            pTemplate[ iAttrib ].ulValueLen = xSize + 1UL;</div>
+<div class="line">                            pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
 <div class="line">                        }</div>
 <div class="line">                    }</div>
 <div class="line"> </div>
@@ -416,6 +426,7 @@ $(document).ready(function(){initNavTree('pkcs11_mbedtls_function_c_getattribute
 <div class="line">                    <a class="code hl_define" href="core__pkcs11__config__defaults_8h.html#a8d9dbaaa88129137a4c68ba0456a18b1">LogError</a>( ( <span class="stringliteral">&quot;Failed to parse attribute. Received unknown &quot;</span></div>
 <div class="line">                                <span class="stringliteral">&quot;attribute type.&quot;</span> ) );</div>
 <div class="line">                    xResult = CKR_ATTRIBUTE_TYPE_INVALID;</div>
+<div class="line">                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;</div>
 <div class="line">                    <span class="keywordflow">break</span>;</div>
 <div class="line">            }</div>
 <div class="line">        }</div>
