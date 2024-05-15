@@ -1,5 +1,14 @@
 # Change Log for corePKCS11 Library
 
+## v3.6.0 (May 2024)
+* [#193](https://github.com/FreeRTOS/corePKCS11/pull/193) Fix C_GetAttributeValue mbedtls port implementatioon 
+* [#190](https://github.com/FreeRTOS/corePKCS11/pull/190) Fix MISRA C 2012 deviations
+* [#184](https://github.com/FreeRTOS/corePKCS11/pull/184) Support MBedTLS 3.5.1
+* [#183](https://github.com/FreeRTOS/corePKCS11/pull/183) Support optional write generated private key and certificate to dis for fleet provisioning
+* [#182](https://github.com/FreeRTOS/corePKCS11/pull/182) Fix incorrect RSA verify data length check
+* [#178](https://github.com/FreeRTOS/corePKCS11/pull/178) Adjust prvAddObjectToList so that it adds or updates as necessary
+* [#163](https://github.com/FreeRTOS/corePKCS11/pull/163) Update doxygen to 1.9.6
+
 ## v3.5.0 (October 2022)
 * [#156](https://github.com/FreeRTOS/corePKCS11/pull/156) MISRA C:2012 compliance updates
 * [#155](https://github.com/FreeRTOS/corePKCS11/pull/155) Update CBMC Starter kit
