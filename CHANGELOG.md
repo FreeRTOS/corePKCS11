@@ -1,7 +1,7 @@
 # Change Log for corePKCS11 Library
 
 ## v3.6.0 (May 2024)
-* [#193](https://github.com/FreeRTOS/corePKCS11/pull/193) Fix C_GetAttributeValue mbedtls port implementation 
+* [#193](https://github.com/FreeRTOS/corePKCS11/pull/193) Fix C_GetAttributeValue mbedtls port implementation
 * [#190](https://github.com/FreeRTOS/corePKCS11/pull/190) Fix MISRA C 2012 deviations
 * [#184](https://github.com/FreeRTOS/corePKCS11/pull/184) Support MBedTLS 3.5.1
 * [#183](https://github.com/FreeRTOS/corePKCS11/pull/183) Support optional write generated private key and certificate to dis for fleet provisioning
