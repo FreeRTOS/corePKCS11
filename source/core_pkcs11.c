@@ -164,21 +164,24 @@ CK_RV xInitializePkcs11Token( void )
     CK_FLAGS xTokenFlags = 0;
     CK_TOKEN_INFO_PTR pxTokenInfo = NULL;
 
-    xResult = C_GetFunctionList( &pxFunctionList );
-
-    if( ( pxFunctionList == NULL ) || ( pxFunctionList->C_GetTokenInfo == NULL ) || ( pxFunctionList->C_InitToken == NULL ) )
-    {
-        xResult = CKR_FUNCTION_FAILED;
-    }
-
-    if( xResult == CKR_OK )
-    {
-        xResult = xInitializePKCS11();
-    }
+    xResult = xInitializePKCS11();
 
     if( ( xResult == CKR_OK ) || ( xResult == CKR_CRYPTOKI_ALREADY_INITIALIZED ) )
     {
         xResult = xGetSlotList( &pxSlotId, &xSlotCount );
+    }
+
+    if( xResult == CKR_OK )
+    {
+        xResult = C_GetFunctionList( &pxFunctionList );
+
+        if( xResult == CKR_OK )
+        {
+            if( ( pxFunctionList == NULL ) || ( pxFunctionList->C_GetTokenInfo == NULL ) || ( pxFunctionList->C_InitToken == NULL ) )
+            {
+                xResult = CKR_FUNCTION_FAILED;
+            }
+        }
     }
 
     if( xResult == CKR_OK )

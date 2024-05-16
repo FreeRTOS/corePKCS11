@@ -177,6 +177,58 @@ static CK_RV prvSetFunctionList( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
 }
 
 /*!
+ * @brief Create a stub for the PKCS #11 function list.
+ *
+ * Fails on the fourth call in order to create coverage for a nested branch.
+ *
+ */
+static CK_RV prvSetFunctionList2( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
+{
+    static uint32_t ulCalls = 0;
+    CK_RV xResult = CKR_OK;
+
+    ulCalls++;
+
+    if( ulCalls == 3 )
+    {
+        xResult = CKR_ARGUMENTS_BAD;
+        *ppxPtr = NULL;
+    }
+    else
+    {
+        *ppxPtr = &prvP11FunctionList;
+    }
+
+    return xResult;
+}
+
+/*!
+ * @brief Create a stub for the PKCS #11 function list.
+ *
+ * Fails on the fourth call in order to create coverage for a nested branch.
+ *
+ */
+static CK_RV prvSetFunctionList3( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
+{
+    static uint32_t ulCalls = 0;
+    CK_RV xResult = CKR_OK;
+
+    ulCalls++;
+
+    if( ulCalls == 3 )
+    {
+        xResult = CKR_OK;
+        *ppxPtr = NULL;
+    }
+    else
+    {
+        *ppxPtr = &prvP11FunctionList;
+    }
+
+    return xResult;
+}
+
+/*!
  * @brief Return empty function list
  *
  */
@@ -553,6 +605,23 @@ void test_IotPkcs11_xInitializePkcs11TokenAlreadyInit( void )
 }
 
 /*!
+ * @brief xInitializePkcs11Token xInitializePKCS11 return error.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11TokenInitFailed( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList );
+    C_Initialize_IgnoreAndReturn( CKR_GENERAL_ERROR );
+
+    xResult = xInitializePkcs11Token();
+
+    TEST_ASSERT_EQUAL( CKR_GENERAL_ERROR, xResult );
+}
+
+/*!
  * @brief xInitializePkcs11Token C_GetTokenInfo failure due to memory constraint.
  *
  */
@@ -617,7 +686,33 @@ void test_IotPkcs11_xInitializePkcs11TokenBadFunctionList( void )
 {
     CK_RV xResult = CKR_OK;
 
-    C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList2 );
+    C_Initialize_IgnoreAndReturn( CKR_OK );
+    pvPkcs11Malloc_Stub( pvPkcs11MallocCb );
+    vPkcs11Free_Stub( vPkcs11FreeCb );
+    C_GetSlotList_Stub( ( void * ) xGet1Item );
+
+    xResult = xInitializePkcs11Token();
+
+    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+}
+
+/*!
+ * @brief xInitializePkcs11Token failure due to bad C_GetFunctionList.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11TokenEmptyFunctionList( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList3 );
+    C_Initialize_IgnoreAndReturn( CKR_OK );
+    pvPkcs11Malloc_Stub( pvPkcs11MallocCb );
+    vPkcs11Free_Stub( vPkcs11FreeCb );
+    C_GetSlotList_Stub( ( void * ) xGet1Item );
+
     xResult = xInitializePkcs11Token();
 
     TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
