@@ -762,15 +762,9 @@ static CK_RV prvRsaContextParse( const CK_ATTRIBUTE * pxAttribute,
             lMbedTLSResult = mbedtls_mpi_read_binary( &pxRsaContext->DQ, pxAttribute->pValue, pxAttribute->ulValueLen );
             break;
 
-        case ( CKA_COEFFICIENT ):
-            lMbedTLSResult = mbedtls_mpi_read_binary( &pxRsaContext->QP, pxAttribute->pValue, pxAttribute->ulValueLen );
-            break;
-
         default:
-
-            /* This should never be reached, as the above types are what gets this function called.
-             * Nevertheless this is an error case, and MISRA requires a default statement. */
-            xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+            /* This is the CKA_COEFFICIENT case. The type is ckecked in prvRsaKeyAttParse. */
+            lMbedTLSResult = mbedtls_mpi_read_binary( &pxRsaContext->QP, pxAttribute->pValue, pxAttribute->ulValueLen );
             break;
     }
 
@@ -3449,7 +3443,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE hSession,
         xResult = CKR_ARGUMENTS_BAD;
     }
 
-    if( ( ulCount != 1UL ) && ( ulCount != 2UL ) )
+    if( ( ulCount < 1UL ) || ( ulCount > 2UL ) )
     {
         xResult = CKR_ARGUMENTS_BAD;
         LogError( ( "Failed to initialize find object operation. Find objects "

@@ -1266,6 +1266,72 @@ void test_pkcs11_C_CreateObjectECPrivKey( void )
 }
 
 /*!
+ * @brief C_CreateObject Creating an EC private key with label length greater than pkcs11configMAX_LABEL_LENGTH.
+ *
+ */
+void test_pkcs11_C_CreateObjectECPrivKeyLabelTooLong( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_KEY_TYPE xPrivateKeyType = CKK_EC;
+    CK_OBJECT_CLASS xPrivateKeyClass = CKO_PRIVATE_KEY;
+    CK_BBOOL xTrue = CK_TRUE;
+    mbedtls_ecp_keypair xKeyContext = { 0 };
+    char * pucPrivLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
+    /* DER-encoding of an ANSI X9.62 Parameters value */
+    CK_BYTE * pxEcPrivParams = ( CK_BYTE * ) ( "\x06\x08" MBEDTLS_OID_EC_GRP_SECP256R1 );
+    CK_OBJECT_HANDLE xObject = 0;
+    const uint8_t pusEmptyPubKey[ 6 ] = { 0xa1, 0x04, 0x03, 0x02, 0x00, 0x00 };
+    uint8_t pusFakePrivateKey[ pkcs11_PRIVATE_EC_PRIME_256_DER_SIZE ] = { 0 };
+
+    ( void ) memcpy( &pusFakePrivateKey[ pkcs11_PRIVATE_EC_PRIME_256_DER_SIZE - sizeof( pusEmptyPubKey ) ], pusEmptyPubKey, sizeof( pusEmptyPubKey ) );
+
+
+    /* Private value D. */
+    CK_BYTE pxD[ EC_D_LENGTH ] = { 0 };
+
+    CK_ATTRIBUTE xPrivateKeyTemplate[] = EC_PRIV_KEY_INITIALIZER;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        mbedtls_pk_init_CMockIgnore();
+        mbedtls_calloc_Stub( pvPkcs11CallocCb );
+        PKCS11_PAL_FindObject_IgnoreAndReturn( 1 );
+        PKCS11_PAL_GetObjectValue_IgnoreAndReturn( CKR_OK );
+        mbedtls_pk_parse_key_IgnoreAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        mbedtls_calloc_IgnoreAndReturn( &xKeyContext );
+        mbedtls_ecp_keypair_init_CMockIgnore();
+        mbedtls_ecp_group_init_CMockIgnore();
+        mbedtls_ecp_group_load_IgnoreAndReturn( 0 );
+        mbedtls_calloc_Stub( pvPkcs11CallocCb );
+        mbedtls_mpi_read_binary_IgnoreAndReturn( 0 );
+        mbedtls_pk_write_key_der_ExpectAnyArgsAndReturn( 6 );
+        mbedtls_pk_write_key_der_ReturnArrayThruPtr_buf( pusFakePrivateKey, sizeof( pusFakePrivateKey ) );
+        mbedtls_pk_free_CMockIgnore();
+        PKCS11_PAL_SaveObject_IgnoreAndReturn( 1 );
+        mock_osal_mutex_lock_IgnoreAndReturn( 0 );
+        mock_osal_mutex_unlock_IgnoreAndReturn( 0 );
+        mbedtls_free_Stub( vPkcs11FreeCb );
+
+        xPrivateKeyTemplate[ 2 ].ulValueLen = pkcs11configMAX_LABEL_LENGTH + 1;
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
+                                  sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  &xObject );
+
+        TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
  * @brief C_CreateObject fail to malloc memory when loading EC curve.
  *
  */
@@ -3065,6 +3131,35 @@ void test_pkcs11_C_CreateObjectAESCMACKeyInvalidKeyType( void )
     }
 }
 
+
+/*!
+ * @brief C_CreateObject NULL phObject
+ *
+ */
+void test_pkcs11_C_CreateObjectNullObject( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_ATTRIBUTE xPrivateKeyTemplate[] = { 0 };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = C_CreateObject( xSession,
+                                  ( CK_ATTRIBUTE_PTR ) &xPrivateKeyTemplate,
+                                  sizeof( xPrivateKeyTemplate ) / sizeof( CK_ATTRIBUTE ),
+                                  NULL );
+
+        TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
 /* ======================  TESTING C_GetAttributeValue  ============================ */
 
 /*!
@@ -3795,6 +3890,8 @@ void test_pkcs11_C_FindObjectsInitBadArgs( void )
         xResult = C_FindObjectsInit( xSession, ( CK_ATTRIBUTE_PTR ) &xFindTemplate, -1 );
         TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 
+        xResult = C_FindObjectsInit( xSession, ( CK_ATTRIBUTE_PTR ) &xFindTemplate, 0 );
+        TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
 
         mbedtls_calloc_Stub( NULL );
         mbedtls_calloc_ExpectAnyArgsAndReturn( NULL );
@@ -5659,6 +5756,60 @@ void test_pkcs11_C_VerifyRSA( void )
 }
 
 /*!
+ * @brief C_Verify public key not exist in session context.
+ *
+ */
+void test_pkcs11_C_VerifyRSANoPublicKey( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_MECHANISM xMechanism = { 0 };
+    CK_BYTE pxDummyData[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
+    CK_BYTE pxDummySignature[ pkcs11RSA_2048_SIGNATURE_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
+    mbedtls_pk_context xMbedContext = { 0 };
+    mbedtls_pk_info_t xPkInfo = { 0 };
+
+    /* These just have to be not NULL so we can hit the proper path. */
+    xMbedContext.pk_ctx = NULL;
+    xMbedContext.pk_info = &xPkInfo;
+
+    xMechanism.mechanism = CKM_RSA_X_509;
+    CK_BBOOL xIsPrivate = CK_FALSE;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateRSAPub( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
+        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
+        mbedtls_pk_init_StopIgnore();
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xMbedContext );
+        mbedtls_pk_parse_public_key_IgnoreAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xPkType = MBEDTLS_PK_RSA;
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_pk_verify_IgnoreAndReturn( 0 );
+        mbedtls_pk_free_CMockIgnore();
+        xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
+        TEST_ASSERT_EQUAL( CKR_SIGNATURE_INVALID, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
  * @brief C_Verify RSA happy path with CKM_RSA_PKCS.
  *
  */
@@ -5910,6 +6061,53 @@ void test_pkcs11_C_VerifySHA256HMAC( void )
 }
 
 /*!
+ * @brief C_Verify SHA256-HMAC invalid signature length.
+ *
+ */
+void test_pkcs11_C_VerifySHA256HMACInvalidSigLen( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_MECHANISM xMechanism = { 0 };
+    CK_BYTE pxDummyData[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
+    CK_BYTE pxDummySignature[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
+    CK_BBOOL xIsPrivate = CK_FALSE;
+    mbedtls_md_info_t xMdInfo = { 0 };
+
+    xMechanism.mechanism = CKM_SHA256_HMAC;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateSHA256HMAC( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
+        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
+        mbedtls_md_init_CMockIgnore();
+        mbedtls_md_info_from_type_ExpectAnyArgsAndReturn( &xMdInfo );
+        mbedtls_md_setup_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_md_hmac_starts_ExpectAnyArgsAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        /* Add 1 to signature length. */
+        xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen + 1 );
+        TEST_ASSERT_EQUAL( CKR_SIGNATURE_LEN_RANGE, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
  * @brief C_Verify SHA256-HMAC mbedtls_md_update fail.
  *
  */
@@ -6099,6 +6297,52 @@ void test_pkcs11_C_VerifyAESCMAC( void )
         mbedtls_cipher_free_CMockIgnore();
         xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen );
         TEST_ASSERT_EQUAL( CKR_OK, xResult );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_Verify AES-CMAC invalid signature length.
+ *
+ */
+void test_pkcs11_C_VerifyAESCMACInvalidSigLength( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
+    CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
+    CK_MECHANISM xMechanism = { 0 };
+    CK_BYTE pxDummyData[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
+    CK_BYTE pxDummySignature[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0xAA };
+    CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
+    CK_BBOOL xIsPrivate = CK_FALSE;
+    mbedtls_cipher_info_t xCipherInfo = { 0 };
+
+    xMechanism.mechanism = CKM_AES_CMAC;
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateAESCMAC( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        PKCS11_PAL_GetObjectValue_ExpectAnyArgsAndReturn( CKR_OK );
+        PKCS11_PAL_GetObjectValue_ReturnThruPtr_pIsPrivate( &xIsPrivate );
+        mbedtls_cipher_init_CMockIgnore();
+        mbedtls_cipher_info_from_type_ExpectAnyArgsAndReturn( &xCipherInfo );
+        mbedtls_cipher_setup_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_cipher_cmac_starts_ExpectAnyArgsAndReturn( 0 );
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        xResult = C_VerifyInit( xSession, &xMechanism, xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        xResult = C_Verify( xSession, pxDummyData, ulDummyDataLen, pxDummySignature, ulDummySignatureLen + 1 );
+        TEST_ASSERT_EQUAL( CKR_SIGNATURE_LEN_RANGE, xResult );
     }
 
     if( TEST_PROTECT() )
