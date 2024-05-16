@@ -179,7 +179,7 @@ static CK_RV prvSetFunctionList( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
 /*!
  * @brief Create a stub for the PKCS #11 function list.
  *
- * Fails on the fourth call in order to create coverage for a nested branch.
+ * Fails on the thrid call in order to create coverage for a nested branch.
  *
  */
 static CK_RV prvSetFunctionList2( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
@@ -205,7 +205,7 @@ static CK_RV prvSetFunctionList2( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
 /*!
  * @brief Create a stub for the PKCS #11 function list.
  *
- * Fails on the fourth call in order to create coverage for a nested branch.
+ * Fails on the third call in order to create coverage for a nested branch.
  *
  */
 static CK_RV prvSetFunctionList3( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
@@ -217,7 +217,7 @@ static CK_RV prvSetFunctionList3( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
 
     if( ulCalls == 3 )
     {
-        xResult = CKR_OK;
+        /* Return CKR_OK but with NULL function list pointer here. */
         *ppxPtr = NULL;
     }
     else

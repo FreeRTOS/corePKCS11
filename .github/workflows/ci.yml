@@ -128,7 +128,7 @@ jobs:
         if: steps.build-unit-tests.outcome == 'success'
         with:
           coverage-file: ./build/coverage.info
-          line-coverage-min: 99
+          line-coverage-min: 100
           branch-coverage-min: 90
 
       - name: Archive Test Results
