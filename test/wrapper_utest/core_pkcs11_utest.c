@@ -947,3 +947,63 @@ void test_IotPkcs11_xFindObjectWithLabelAndClassBadFunctionList( void )
 
     TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }
+
+/*!
+ * @brief xFindObjectWithLabelAndClass no C_FindObjectsInit.
+ *
+ */
+void test_IotPkcs11_xFindObjectWithLabelAndClassNoC_FindObjectsInit( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xHandle = { 0 };
+    CK_OBJECT_HANDLE xPrivateKeyHandle = { 0 };
+
+    vCommonStubs();
+    prvP11FunctionList.C_FindObjectsInit = NULL;
+    xResult = xFindObjectWithLabelAndClass( xHandle,
+                                            pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
+                                            strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
+                                            CKO_PRIVATE_KEY, &xPrivateKeyHandle );
+    prvP11FunctionList.C_FindObjectsInit = C_FindObjectsInit;
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+}
+
+/*!
+ * @brief xFindObjectWithLabelAndClass no C_FindObjects.
+ *
+ */
+void test_IotPkcs11_xFindObjectWithLabelAndClassNoC_FindObjects( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xHandle = { 0 };
+    CK_OBJECT_HANDLE xPrivateKeyHandle = { 0 };
+
+    vCommonStubs();
+    prvP11FunctionList.C_FindObjects = NULL;
+    xResult = xFindObjectWithLabelAndClass( xHandle,
+                                            pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
+                                            strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
+                                            CKO_PRIVATE_KEY, &xPrivateKeyHandle );
+    prvP11FunctionList.C_FindObjects = C_FindObjects;
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+}
+
+/*!
+ * @brief xFindObjectWithLabelAndClass no C_FindObjectsFinal.
+ *
+ */
+void test_IotPkcs11_xFindObjectWithLabelAndClassNoC_FindObjectsFinal( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xHandle = { 0 };
+    CK_OBJECT_HANDLE xPrivateKeyHandle = { 0 };
+
+    vCommonStubs();
+    prvP11FunctionList.C_FindObjectsFinal = NULL;
+    xResult = xFindObjectWithLabelAndClass( xHandle,
+                                            pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
+                                            strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
+                                            CKO_PRIVATE_KEY, &xPrivateKeyHandle );
+    prvP11FunctionList.C_FindObjectsFinal = C_FindObjectsFinal;
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+}
