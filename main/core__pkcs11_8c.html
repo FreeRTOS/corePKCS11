@@ -131,9 +131,6 @@ Include dependency graph for core_pkcs11.c:</div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a823383b0a2c3c3a7f7fad292307a3317"><td class="memItemLeft" align="right" valign="top">static CK_RV&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core__pkcs11_8c.html#a823383b0a2c3c3a7f7fad292307a3317">prvOpenSession</a> (CK_SESSION_HANDLE *pxSession, CK_SLOT_ID xSlotId)</td></tr>
-<tr class="memdesc:a823383b0a2c3c3a7f7fad292307a3317"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open a PKCS #11 Session.  <br /></td></tr>
-<tr class="separator:a823383b0a2c3c3a7f7fad292307a3317"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46c41cd94b0ad5eed22d17a59aef73da"><td class="memItemLeft" align="right" valign="top">CK_RV&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core__pkcs11_8c.html#a46c41cd94b0ad5eed22d17a59aef73da">xGetSlotList</a> (CK_SLOT_ID **ppxSlotId, CK_ULONG *pxSlotCount)</td></tr>
 <tr class="memdesc:a46c41cd94b0ad5eed22d17a59aef73da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a list of available PKCS #11 slots.  <br /></td></tr>
 <tr class="separator:a46c41cd94b0ad5eed22d17a59aef73da"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -157,52 +154,6 @@ Functions</h2></td></tr>
 <div class="textblock"><p>corePKCS11 Interface. </p>
 <p>This file contains wrapper functions for common PKCS #11 operations. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a823383b0a2c3c3a7f7fad292307a3317" name="a823383b0a2c3c3a7f7fad292307a3317"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a823383b0a2c3c3a7f7fad292307a3317">&#9670;&#160;</a></span>prvOpenSession()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static CK_RV prvOpenSession </td>
-          <td>(</td>
-          <td class="paramtype">CK_SESSION_HANDLE *&#160;</td>
-          <td class="paramname"><em>pxSession</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">CK_SLOT_ID&#160;</td>
-          <td class="paramname"><em>xSlotId</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Open a PKCS #11 Session. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">pxSession</td><td>Pointer to the session handle to be created. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">xSlotId</td><td>Slot ID to be used for the session.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>CKR_OK or PKCS #11 error code. (PKCS #11 error codes are positive). </dd></dl>
-
-</div>
-</div>
 <a id="a46c41cd94b0ad5eed22d17a59aef73da" name="a46c41cd94b0ad5eed22d17a59aef73da"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a46c41cd94b0ad5eed22d17a59aef73da">&#9670;&#160;</a></span>xGetSlotList()</h2>
 
