@@ -189,10 +189,7 @@ static CK_RV prvSetFunctionList2( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
 
     ulCalls++;
 
-    /* This case is specifically for the scenario in which prvOpenSession
-     * receives a failure when accessing C_GetFunctionList, which would be
-     * the 4th call to C_GetFunctionList in the call stack. */
-    if( ulCalls == 4 )
+    if( ulCalls == 3 )
     {
         xResult = CKR_ARGUMENTS_BAD;
         *ppxPtr = NULL;
@@ -203,6 +200,42 @@ static CK_RV prvSetFunctionList2( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
     }
 
     return xResult;
+}
+
+/*!
+ * @brief Create a stub for the PKCS #11 function list.
+ *
+ * Fails on the fourth call in order to create coverage for a nested branch.
+ *
+ */
+static CK_RV prvSetFunctionList3( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
+{
+    static uint32_t ulCalls = 0;
+    CK_RV xResult = CKR_OK;
+
+    ulCalls++;
+
+    if( ulCalls == 3 )
+    {
+        xResult = CKR_OK;
+        *ppxPtr = NULL;
+    }
+    else
+    {
+        *ppxPtr = &prvP11FunctionList;
+    }
+
+    return xResult;
+}
+
+/*!
+ * @brief Return empty function list
+ *
+ */
+static CK_RV prvSetFunctionListEmpty( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
+{
+    *ppxPtr = NULL;
+    return CKR_OK;
 }
 
 /*!
@@ -347,6 +380,37 @@ void test_IotPkcs11_xInitializePkcs11BadFunctionList( void )
 }
 
 /*!
+ * @brief xInitializePKCS11 failed due to empty function list.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11EmptyFunctionList( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionListEmpty );
+    xResult = xInitializePKCS11();
+
+    TEST_ASSERT_EQUAL( CKR_DEVICE_ERROR, xResult );
+}
+
+/*!
+ * @brief xInitializePKCS11 failed due to no C_Initialize.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11NoC_Initialize( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    vCommonStubs();
+    prvP11FunctionList.C_Initialize = NULL;
+    xResult = xInitializePKCS11();
+    prvP11FunctionList.C_Initialize = C_Initialize;
+
+    TEST_ASSERT_EQUAL( CKR_DEVICE_ERROR, xResult );
+}
+
+/*!
  * @brief xGetSlotList happy path.
  *
  */
@@ -368,6 +432,25 @@ void test_IotPkcs11_xGetSlotList( void )
     TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
     vPkcs11FreeCb( pxSlotId, 1 );
+}
+
+/*!
+ * @brief xGetSlotList host memory error.
+ *
+ */
+void test_IotPkcs11_xGetSlotListHostMemoryError( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SLOT_ID_PTR pxSlotId = NULL;
+    CK_ULONG xSlotCount = 0;
+    CK_ULONG xExpectedSlotCount = SIZE_MAX;
+
+    vCommonStubs();
+    C_GetSlotList_ExpectAnyArgsAndReturn( CKR_OK );
+    C_GetSlotList_ReturnThruPtr_pulCount( &xExpectedSlotCount );
+
+    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
+    TEST_ASSERT_EQUAL( CKR_HOST_MEMORY, xResult );
 }
 
 /*!
@@ -522,6 +605,23 @@ void test_IotPkcs11_xInitializePkcs11TokenAlreadyInit( void )
 }
 
 /*!
+ * @brief xInitializePkcs11Token xInitializePKCS11 return error.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11TokenInitFailed( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList );
+    C_Initialize_IgnoreAndReturn( CKR_GENERAL_ERROR );
+
+    xResult = xInitializePkcs11Token();
+
+    TEST_ASSERT_EQUAL( CKR_GENERAL_ERROR, xResult );
+}
+
+/*!
  * @brief xInitializePkcs11Token C_GetTokenInfo failure due to memory constraint.
  *
  */
@@ -586,7 +686,33 @@ void test_IotPkcs11_xInitializePkcs11TokenBadFunctionList( void )
 {
     CK_RV xResult = CKR_OK;
 
-    C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList2 );
+    C_Initialize_IgnoreAndReturn( CKR_OK );
+    pvPkcs11Malloc_Stub( pvPkcs11MallocCb );
+    vPkcs11Free_Stub( vPkcs11FreeCb );
+    C_GetSlotList_Stub( ( void * ) xGet1Item );
+
+    xResult = xInitializePkcs11Token();
+
+    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+}
+
+/*!
+ * @brief xInitializePkcs11Token failure due to bad C_GetFunctionList.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11TokenEmptyFunctionList( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList3 );
+    C_Initialize_IgnoreAndReturn( CKR_OK );
+    pvPkcs11Malloc_Stub( pvPkcs11MallocCb );
+    vPkcs11Free_Stub( vPkcs11FreeCb );
+    C_GetSlotList_Stub( ( void * ) xGet1Item );
+
     xResult = xInitializePkcs11Token();
 
     TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
@@ -722,6 +848,27 @@ void test_IotPkcs11_xInitializePkcs11Session( void )
 }
 
 /*!
+ * @brief xInitializePkcs11Session C_OpenSession is not supported in the function list.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11SessionNoC_OpenSession( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xHandle = { 0 };
+
+    vCommonStubs();
+    C_GetSlotList_Stub( ( void * ) xGet1Item );
+    pvPkcs11Malloc_Stub( pvPkcs11MallocCb );
+    vPkcs11Free_Stub( vPkcs11FreeCb );
+
+    prvP11FunctionList.C_OpenSession = NULL;
+    xResult = xInitializePkcs11Session( &xHandle );
+    prvP11FunctionList.C_OpenSession = C_OpenSession;
+
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+}
+
+/*!
  * @brief xInitializePkcs11Session C_Login is a NULL function path.
  *
  */
@@ -753,7 +900,6 @@ void test_IotPkcs11_xInitializePkcs11SessionBadArgs( void )
 {
     CK_RV xResult = CKR_OK;
 
-    vCommonStubs();
     xResult = xInitializePkcs11Session( NULL );
 
     TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
@@ -775,23 +921,21 @@ void test_IotPkcs11_xInitializePkcs11SessionBadFunctionList( void )
 }
 
 /*!
- * @brief xInitializePkcs11Session C_GetFunctionList failure path.
+ * @brief xInitializePkcs11Session C_GetFunctionList returns empty function list.
  *
- * Fails on the second call to C_GetFunctionList.
  */
-void test_IotPkcs11_xInitializePkcs11SessionBadFunctionList2( void )
+
+void test_IotPkcs11_xInitializePkcs11SessionEmptyFunctionList( void )
 {
     CK_RV xResult = CKR_OK;
     CK_SESSION_HANDLE xHandle = { 0 };
 
-    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList2 );
-    C_Initialize_IgnoreAndReturn( CKR_OK );
-    C_GetSlotList_Stub( ( void * ) xGet1Item );
-    pvPkcs11Malloc_Stub( pvPkcs11MallocCb );
-    vPkcs11Free_Stub( vPkcs11FreeCb );
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionListEmpty );
+
     xResult = xInitializePkcs11Session( &xHandle );
 
-    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }
 
 /*!
@@ -896,5 +1040,65 @@ void test_IotPkcs11_xFindObjectWithLabelAndClassBadFunctionList( void )
     C_GetFunctionList_IgnoreAndReturn( CKR_ARGUMENTS_BAD );
     xResult = xFindObjectWithLabelAndClass( xHandle, pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS, strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ), CKO_PRIVATE_KEY, &xPrivateKeyHandle );
 
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+}
+
+/*!
+ * @brief xFindObjectWithLabelAndClass no C_FindObjectsInit.
+ *
+ */
+void test_IotPkcs11_xFindObjectWithLabelAndClassNoC_FindObjectsInit( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xHandle = { 0 };
+    CK_OBJECT_HANDLE xPrivateKeyHandle = { 0 };
+
+    vCommonStubs();
+    prvP11FunctionList.C_FindObjectsInit = NULL;
+    xResult = xFindObjectWithLabelAndClass( xHandle,
+                                            pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
+                                            strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
+                                            CKO_PRIVATE_KEY, &xPrivateKeyHandle );
+    prvP11FunctionList.C_FindObjectsInit = C_FindObjectsInit;
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+}
+
+/*!
+ * @brief xFindObjectWithLabelAndClass no C_FindObjects.
+ *
+ */
+void test_IotPkcs11_xFindObjectWithLabelAndClassNoC_FindObjects( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xHandle = { 0 };
+    CK_OBJECT_HANDLE xPrivateKeyHandle = { 0 };
+
+    vCommonStubs();
+    prvP11FunctionList.C_FindObjects = NULL;
+    xResult = xFindObjectWithLabelAndClass( xHandle,
+                                            pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
+                                            strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
+                                            CKO_PRIVATE_KEY, &xPrivateKeyHandle );
+    prvP11FunctionList.C_FindObjects = C_FindObjects;
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+}
+
+/*!
+ * @brief xFindObjectWithLabelAndClass no C_FindObjectsFinal.
+ *
+ */
+void test_IotPkcs11_xFindObjectWithLabelAndClassNoC_FindObjectsFinal( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xHandle = { 0 };
+    CK_OBJECT_HANDLE xPrivateKeyHandle = { 0 };
+
+    vCommonStubs();
+    prvP11FunctionList.C_FindObjectsFinal = NULL;
+    xResult = xFindObjectWithLabelAndClass( xHandle,
+                                            pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
+                                            strlen( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ),
+                                            CKO_PRIVATE_KEY, &xPrivateKeyHandle );
+    prvP11FunctionList.C_FindObjectsFinal = C_FindObjectsFinal;
     TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }

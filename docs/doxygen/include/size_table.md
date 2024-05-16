@@ -10,7 +10,7 @@
     <tr>
         <td>core_pkcs11.c</td>
         <td><center>0.8K</center></td>
-        <td><center>0.8K</center></td>
+        <td><center>0.7K</center></td>
     </tr>
     <tr>
         <td>core_pki_utils.c</td>
