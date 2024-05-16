@@ -763,7 +763,7 @@ static CK_RV prvRsaContextParse( const CK_ATTRIBUTE * pxAttribute,
             break;
 
         default:
-            /* This is the CKA_COEFFICIENT case. The type is ckecked in prvRsaKeyAttParse. */
+            /* This is the CKA_COEFFICIENT case. The type is checked in prvRsaKeyAttParse. */
             lMbedTLSResult = mbedtls_mpi_read_binary( &pxRsaContext->QP, pxAttribute->pValue, pxAttribute->ulValueLen );
             break;
     }
