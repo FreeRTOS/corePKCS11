@@ -177,32 +177,13 @@ static CK_RV prvSetFunctionList( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
 }
 
 /*!
- * @brief Create a stub for the PKCS #11 function list.
- *
- * Fails on the fourth call in order to create coverage for a nested branch.
+ * @brief Return empty function list
  *
  */
-static CK_RV prvSetFunctionList2( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
+static CK_RV prvSetFunctionListEmpty( CK_FUNCTION_LIST_PTR_PTR ppxPtr )
 {
-    static uint32_t ulCalls = 0;
-    CK_RV xResult = CKR_OK;
-
-    ulCalls++;
-
-    /* This case is specifically for the scenario in which prvOpenSession
-     * receives a failure when accessing C_GetFunctionList, which would be
-     * the 4th call to C_GetFunctionList in the call stack. */
-    if( ulCalls == 4 )
-    {
-        xResult = CKR_ARGUMENTS_BAD;
-        *ppxPtr = NULL;
-    }
-    else
-    {
-        *ppxPtr = &prvP11FunctionList;
-    }
-
-    return xResult;
+    *ppxPtr = NULL;
+    return CKR_OK;
 }
 
 /*!
@@ -347,6 +328,37 @@ void test_IotPkcs11_xInitializePkcs11BadFunctionList( void )
 }
 
 /*!
+ * @brief xInitializePKCS11 failed due to empty function list.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11EmptyFunctionList( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionListEmpty );
+    xResult = xInitializePKCS11();
+
+    TEST_ASSERT_EQUAL( CKR_DEVICE_ERROR, xResult );
+}
+
+/*!
+ * @brief xInitializePKCS11 failed due to no C_Initialize.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11NoC_Initialize( void )
+{
+    CK_RV xResult = CKR_OK;
+
+    vCommonStubs();
+    prvP11FunctionList.C_Initialize = NULL;
+    xResult = xInitializePKCS11();
+    prvP11FunctionList.C_Initialize = C_Initialize;
+
+    TEST_ASSERT_EQUAL( CKR_DEVICE_ERROR, xResult );
+}
+
+/*!
  * @brief xGetSlotList happy path.
  *
  */
@@ -368,6 +380,25 @@ void test_IotPkcs11_xGetSlotList( void )
     TEST_ASSERT_EQUAL( CKR_OK, xResult );
 
     vPkcs11FreeCb( pxSlotId, 1 );
+}
+
+/*!
+ * @brief xGetSlotList host memory error.
+ *
+ */
+void test_IotPkcs11_xGetSlotListHostMemoryError( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SLOT_ID_PTR pxSlotId = NULL;
+    CK_ULONG xSlotCount = 0;
+    CK_ULONG xExpectedSlotCount = SIZE_MAX;
+
+    vCommonStubs();
+    C_GetSlotList_ExpectAnyArgsAndReturn( CKR_OK );
+    C_GetSlotList_ReturnThruPtr_pulCount( &xExpectedSlotCount );
+
+    xResult = xGetSlotList( &pxSlotId, &xSlotCount );
+    TEST_ASSERT_EQUAL( CKR_HOST_MEMORY, xResult );
 }
 
 /*!
@@ -722,6 +753,27 @@ void test_IotPkcs11_xInitializePkcs11Session( void )
 }
 
 /*!
+ * @brief xInitializePkcs11Session C_OpenSession is not supported in the function list.
+ *
+ */
+void test_IotPkcs11_xInitializePkcs11SessionNoC_OpenSession( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xHandle = { 0 };
+
+    vCommonStubs();
+    C_GetSlotList_Stub( ( void * ) xGet1Item );
+    pvPkcs11Malloc_Stub( pvPkcs11MallocCb );
+    vPkcs11Free_Stub( vPkcs11FreeCb );
+
+    prvP11FunctionList.C_OpenSession = NULL;
+    xResult = xInitializePkcs11Session( &xHandle );
+    prvP11FunctionList.C_OpenSession = C_OpenSession;
+
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+}
+
+/*!
  * @brief xInitializePkcs11Session C_Login is a NULL function path.
  *
  */
@@ -753,7 +805,6 @@ void test_IotPkcs11_xInitializePkcs11SessionBadArgs( void )
 {
     CK_RV xResult = CKR_OK;
 
-    vCommonStubs();
     xResult = xInitializePkcs11Session( NULL );
 
     TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
@@ -775,23 +826,21 @@ void test_IotPkcs11_xInitializePkcs11SessionBadFunctionList( void )
 }
 
 /*!
- * @brief xInitializePkcs11Session C_GetFunctionList failure path.
+ * @brief xInitializePkcs11Session C_GetFunctionList returns empty function list.
  *
- * Fails on the second call to C_GetFunctionList.
  */
-void test_IotPkcs11_xInitializePkcs11SessionBadFunctionList2( void )
+
+void test_IotPkcs11_xInitializePkcs11SessionEmptyFunctionList( void )
 {
     CK_RV xResult = CKR_OK;
     CK_SESSION_HANDLE xHandle = { 0 };
 
-    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionList2 );
-    C_Initialize_IgnoreAndReturn( CKR_OK );
-    C_GetSlotList_Stub( ( void * ) xGet1Item );
-    pvPkcs11Malloc_Stub( pvPkcs11MallocCb );
-    vPkcs11Free_Stub( vPkcs11FreeCb );
+    C_GetFunctionList_IgnoreAndReturn( CKR_OK );
+    C_GetFunctionList_Stub( ( void * ) &prvSetFunctionListEmpty );
+
     xResult = xInitializePkcs11Session( &xHandle );
 
-    TEST_ASSERT_EQUAL( CKR_ARGUMENTS_BAD, xResult );
+    TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
 }
 
 /*!
