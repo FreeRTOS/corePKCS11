@@ -85,7 +85,8 @@ jobs:
           echo -e "::group::${{ env.bashInfo }} ${{ env.stepName }} ${{ env.bashEnd }}"
 
           sudo apt-get install -y lcov
-          CFLAGS="--coverage -Wall -Wextra -DNDEBUG"
+          # target_enable_gcov is added in each unit test already, --coverage option is not required
+          CFLAGS="-Wall -Wextra -DNDEBUG"
           cmake -S test -B build/ \
           -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE=Debug \
@@ -128,7 +129,7 @@ jobs:
         if: steps.build-unit-tests.outcome == 'success'
         with:
           coverage-file: ./build/coverage.info
-          line-coverage-min: 99
+          line-coverage-min: 100
           branch-coverage-min: 90
 
       - name: Archive Test Results

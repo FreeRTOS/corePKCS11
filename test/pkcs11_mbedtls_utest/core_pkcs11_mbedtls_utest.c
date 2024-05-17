@@ -197,6 +197,7 @@ static void * pvPkcs11CallocCb( size_t nitems,
                                 size_t size,
                                 int numCalls )
 {
+    ( void ) numCalls;
     usMallocFreeCalls++;
     return ( void * ) calloc( nitems, size );
 }
@@ -204,6 +205,8 @@ static void * pvPkcs11CallocCb( size_t nitems,
 static void vPkcs11FreeCb( void * pvPtr,
                            int numCalls )
 {
+    ( void ) numCalls;
+
     if( pvPtr != NULL )
     {
         usMallocFreeCalls--;
@@ -1342,7 +1345,6 @@ void test_pkcs11_C_CreateObjectECCurveLoadFail( void )
     CK_KEY_TYPE xPrivateKeyType = CKK_EC;
     CK_OBJECT_CLASS xPrivateKeyClass = CKO_PRIVATE_KEY;
     CK_BBOOL xTrue = CK_TRUE;
-    mbedtls_ecp_keypair xKeyContext = { 0 };
     char * pucPrivLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
     /* DER-encoding of an ANSI X9.62 Parameters value */
     CK_BYTE * pxEcPrivParams = ( CK_BYTE * ) ( "\x06\x08" MBEDTLS_OID_EC_GRP_SECP256R1 );
@@ -2216,11 +2218,6 @@ void test_pkcs11_C_CreateObjectCertificateIncomplete( void )
     CK_SESSION_HANDLE xSession = 0;
     CK_OBJECT_HANDLE xObject = 0;
     CK_OBJECT_CLASS xCertificateClass = CKO_CERTIFICATE;
-    CK_CERTIFICATE_TYPE xCertificateType = CKC_X_509;
-    CK_BBOOL xTokenStorage = CK_TRUE;
-    CK_BYTE xSubject[] = "TestSubject";
-    CK_BYTE xCert[] = "Empty Cert";
-    char * pucLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
 
     CK_ATTRIBUTE xCertificateTemplate[] =
     {
@@ -2549,7 +2546,6 @@ void test_pkcs11_C_CreateObjectSHA256HMACKeyMissingLabel( void )
     CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
     CK_BBOOL xTrue = CK_TRUE;
     CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
-    CK_BYTE pcLabel[] = pkcs11configLABEL_HMAC_KEY;
 
     CK_BYTE pxKeyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
 
@@ -2915,7 +2911,6 @@ void test_pkcs11_C_CreateObjectAESCMACKeyMissingLabel( void )
     CK_OBJECT_CLASS xKeyClass = CKO_SECRET_KEY;
     CK_BBOOL xTrue = CK_TRUE;
     CK_OBJECT_HANDLE xObject = CK_INVALID_HANDLE;
-    CK_BYTE pcLabel[] = pkcs11configLABEL_CMAC_KEY;
 
     CK_BYTE pxKeyValue[] = "abcdabcdabcdabcdabcdabcdabcdabcd";
 
@@ -3376,14 +3371,7 @@ void test_pkcs11_C_GetAttributeValueMultipleAttParsing( void )
     CK_SESSION_HANDLE xSession = 0;
     CK_OBJECT_HANDLE xObject = 0;
     CK_ULONG ulCount = 2;
-    CK_ULONG ulLength = 1;
-    CK_BYTE pulKnownBuf[] = pkcs11DER_ENCODED_OID_P256;
-    CK_BYTE pulBuf[ sizeof( pulKnownBuf ) ] = { 0 };
     CK_BYTE ulPoint[ pkcs11EC_POINT_LENGTH ] = { 0 };
-    CK_BYTE ulKnownPoint = 0x04;
-    CK_BBOOL xIsPrivate = CK_FALSE;
-    CK_OBJECT_CLASS xPrivateKeyClass = { 0 };
-    CK_OBJECT_CLASS xKnownPrivateKeyClass = CKO_PRIVATE_KEY;
     CK_ATTRIBUTE xTemplates[ 2 ] = { 0 };
 
     prvCommonInitStubs( &xSession );
@@ -3924,9 +3912,6 @@ void test_pkcs11_C_FindObjects( void )
     CK_ULONG ulCount = 1;
     CK_ULONG ulFoundCount = 0;
     CK_OBJECT_HANDLE xObject = 0;
-    CK_BYTE pucBuf[] = { 1, 1, 1, 1 };
-    CK_BYTE_PTR * ppucBufPtr = ( CK_BYTE_PTR * ) &pucBuf;
-    CK_ULONG ulObjectLength = sizeof( pucBuf );
     char * pucLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
 
     CK_ATTRIBUTE xFindTemplate = { CKA_LABEL, pucLabel, strlen( ( const char * ) pucLabel ) };
@@ -4012,9 +3997,6 @@ void test_pkcs11_C_FindObjectsBadArgs( void )
     CK_ULONG ulFoundCount = 0;
     CK_OBJECT_HANDLE xObject = 0;
     char * pucLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
-    CK_BYTE pucBuf[] = { 0, 0, 0, 0 };
-    CK_BYTE ** ppucBufPtr = ( CK_BYTE ** ) &pucBuf;
-    CK_ULONG ulObjectLength = sizeof( pucBuf );
 
     CK_ATTRIBUTE xFindTemplate = { CKA_LABEL, pucLabel, strlen( ( const char * ) pucLabel ) };
 
@@ -4063,9 +4045,12 @@ void test_pkcs11_C_FindObjectsFinal( void )
     CK_OBJECT_HANDLE xObject = 0;
     char * pucLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
 
-    PKCS11_CertificateTemplate_t xCertificateTemplate = { { CKA_LABEL,
-                                                            pucLabel,
-                                                            strlen( ( const char * ) pucLabel ) } };
+    CK_ATTRIBUTE xCertificateTemplate =
+    {
+        CKA_LABEL,
+        pucLabel,
+        strlen( ( const char * ) pucLabel )
+    };
 
     prvCommonInitStubs( &xSession );
 
@@ -4733,14 +4718,12 @@ void test_pkcs11_C_SignSHA256HMAC( void )
     CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
     CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
     CK_MECHANISM xMechanism = { 0 };
-    mbedtls_pk_context xSignAndVerifyKey;
     CK_BYTE pxDummyData[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
     CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
     CK_BYTE pxDummySignature[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
     CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
     mbedtls_md_info_t xMdInfo = { 0 };
 
-    xSignAndVerifyKey.pk_ctx = &xResult;
     xMechanism.mechanism = CKM_SHA256_HMAC;
 
     prvCommonInitStubs( &xSession );
@@ -4782,14 +4765,12 @@ void test_pkcs11_C_SignSHA256HMACUpdateFail( void )
     CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
     CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
     CK_MECHANISM xMechanism = { 0 };
-    mbedtls_pk_context xSignAndVerifyKey;
     CK_BYTE pxDummyData[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
     CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
     CK_BYTE pxDummySignature[ pkcs11SHA256_DIGEST_LENGTH ] = { 0xAA };
     CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
     mbedtls_md_info_t xMdInfo = { 0 };
 
-    xSignAndVerifyKey.pk_ctx = &xResult;
     xMechanism.mechanism = CKM_SHA256_HMAC;
 
     prvCommonInitStubs( &xSession );
@@ -4830,15 +4811,12 @@ void test_pkcs11_C_SignAESCMAC( void )
     CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
     CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
     CK_MECHANISM xMechanism = { 0 };
-    mbedtls_pk_context xSignAndVerifyKey;
-
     CK_BYTE pxDummyData[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0xAA };
     CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
     CK_BYTE pxDummySignature[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0xAA };
     CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
     mbedtls_cipher_info_t xCipherInfo = { 0 };
 
-    xSignAndVerifyKey.pk_ctx = &xResult;
     xMechanism.mechanism = CKM_AES_CMAC;
 
     prvCommonInitStubs( &xSession );
@@ -4880,15 +4858,12 @@ void test_pkcs11_C_SignAESCMACUpdateFail( void )
     CK_SESSION_HANDLE xSession = CK_INVALID_HANDLE;
     CK_OBJECT_HANDLE xKey = CK_INVALID_HANDLE;
     CK_MECHANISM xMechanism = { 0 };
-    mbedtls_pk_context xSignAndVerifyKey;
-
     CK_BYTE pxDummyData[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0xAA };
     CK_ULONG ulDummyDataLen = sizeof( pxDummyData );
     CK_BYTE pxDummySignature[ pkcs11AES_CMAC_SIGNATURE_LENGTH ] = { 0xAA };
     CK_ULONG ulDummySignatureLen = sizeof( pxDummySignature );
     mbedtls_cipher_info_t xCipherInfo = { 0 };
 
-    xSignAndVerifyKey.pk_ctx = &xResult;
     xMechanism.mechanism = CKM_AES_CMAC;
 
     prvCommonInitStubs( &xSession );
@@ -5235,7 +5210,6 @@ void test_pkcs11_C_VerifyInitSHA256HMACMDLockFail( void )
     CK_SESSION_HANDLE xSession = 0;
     CK_OBJECT_HANDLE xObject = 0;
     CK_MECHANISM xMechanism = { 0 };
-    CK_BBOOL xIsPrivate = CK_FALSE;
     mbedtls_md_info_t xMdInfo = { 0 };
 
     xMechanism.mechanism = CKM_SHA256_HMAC;
@@ -5428,7 +5402,6 @@ void test_pkcs11_C_VerifyInitAESCMACCipherLockFail( void )
     CK_SESSION_HANDLE xSession = 0;
     CK_OBJECT_HANDLE xObject = 0;
     CK_MECHANISM xMechanism = { 0 };
-    CK_BBOOL xIsPrivate = CK_FALSE;
     mbedtls_cipher_info_t xCipherInfo = { 0 };
 
     xMechanism.mechanism = CKM_AES_CMAC;
@@ -6883,7 +6856,6 @@ void test_pkcs11_C_GenerateKeyPairRSAGen( void )
         {
             CKM_RSA_PKCS_KEY_PAIR_GEN, NULL_PTR, 0
         };
-        CK_BYTE xEcParams[] = pkcs11DER_ENCODED_OID_P256; /* prime256v1 */
         CK_KEY_TYPE xKeyType = CKK_RSA;
 
         CK_BBOOL xTrue = CK_TRUE;
