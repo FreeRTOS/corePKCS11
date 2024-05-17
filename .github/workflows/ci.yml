@@ -244,7 +244,7 @@ jobs:
           -DSYSTEM_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
       - name: Install Python3
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11.0"
       - name: Measure sizes
