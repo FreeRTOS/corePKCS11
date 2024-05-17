@@ -1,6 +1,7 @@
 # Change Log for corePKCS11 Library
 
 ## v3.6.0 (May 2024)
+* [#195](https://github.com/FreeRTOS/corePKCS11/pull/195)[#196](https://github.com/FreeRTOS/corePKCS11/pull/196) Add more unit test to increase code coverage rate
 * [#193](https://github.com/FreeRTOS/corePKCS11/pull/193) Fix C_GetAttributeValue mbedtls port implementation
 * [#190](https://github.com/FreeRTOS/corePKCS11/pull/190) Fix MISRA C 2012 deviations
 * [#184](https://github.com/FreeRTOS/corePKCS11/pull/184) Support MBedTLS 3.5.1
