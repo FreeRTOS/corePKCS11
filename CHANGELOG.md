@@ -2,7 +2,7 @@
 
 ## v3.6.0 (May 2024)
 * [#195](https://github.com/FreeRTOS/corePKCS11/pull/195),[#196](https://github.com/FreeRTOS/corePKCS11/pull/196) Add more unit test to increase code coverage rate
-* [#193](https://github.com/FreeRTOS/corePKCS11/pull/193) Fix C_GetAttributeValue to return CK_UNAVAILABLE_INFORMATION in mbedtls port implementation
+* [#193](https://github.com/FreeRTOS/corePKCS11/pull/193) Fix the C_GetAttributeValue implementation in the mbedtls port to return CK_UNAVAILABLE_INFORMATION
 * [#192](https://github.com/FreeRTOS/corePKCS11/pull/192) Use MBedTLS v3.6.0 LTS and v2.28.8 in mbedtls integration test
 * [#190](https://github.com/FreeRTOS/corePKCS11/pull/190) Fix MISRA C 2012 deviations
 * [#184](https://github.com/FreeRTOS/corePKCS11/pull/184) Support MBedTLS 3.5.1
