@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Build
         run: |
           CFLAGS="-Wall -Wextra -DNDEBUG -DLIBRARY_LOG_LEVEL=LOG_DEBUG"
@@ -36,7 +36,7 @@ jobs:
 
       - name: Archive Test Results
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: system_test_results
           path: |
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - env:
           stepName: Build corePKCS11 Sanitizer Unit Tests
@@ -74,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - env:
           stepName: Build corePKCS11 Unit Tests
@@ -134,7 +134,7 @@ jobs:
 
       - name: Archive Test Results
         if: steps.build-unit-tests.outcome == 'success'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: unit_test_results
           path: |
@@ -146,7 +146,7 @@ jobs:
 
       - name: Upload coverage data to Codecov
         if: steps.build-unit-tests.outcome == 'success'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: build/coverage.info
           flags: unit_tests
@@ -156,7 +156,7 @@ jobs:
   complexity:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Check complexity
         uses: FreeRTOS/CI-CD-Github-Actions/complexity@main
         with:
@@ -166,7 +166,7 @@ jobs:
   doxygen:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Check doxygen build
         uses: FreeRTOS/CI-CD-Github-Actions/doxygen@main
         with:
@@ -176,7 +176,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone This Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run spellings check
         uses: FreeRTOS/CI-CD-Github-Actions/spellings@main
         with:
@@ -185,7 +185,7 @@ jobs:
   formatting:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Check formatting
         uses: FreeRTOS/CI-CD-Github-Actions/formatting@main
         with:
@@ -195,7 +195,7 @@ jobs:
   link-verifier:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Check Links
         uses: FreeRTOS/CI-CD-Github-Actions/link-verifier@main
         with:
@@ -204,7 +204,7 @@ jobs:
   verify-manifest:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
@@ -218,9 +218,9 @@ jobs:
   git-secrets:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Checkout awslabs/git-secrets
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: awslabs/git-secrets
           ref: master
@@ -235,7 +235,7 @@ jobs:
   memory_statistics:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: git submodule update --init --recursive --checkout
       - name: Fetch dependencies (mbedtls)
         run: |
@@ -245,7 +245,7 @@ jobs:
           -DSYSTEM_TESTS=0 \
           -DCMAKE_C_FLAGS="${CFLAGS}"
       - name: Install Python3
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11.0"
       - name: Measure sizes
