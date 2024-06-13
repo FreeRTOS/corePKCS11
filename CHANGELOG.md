@@ -1,4 +1,6 @@
 # Change Log for corePKCS11 Library
+## v3.7.0 (June 2024)
+* [#198](https://github.com/FreeRTOS/corePKCS11/pull/198) Fix doxygen documents upload to github-pages
 
 ## v3.6.0 (May 2024)
 * [#195](https://github.com/FreeRTOS/corePKCS11/pull/195),[#196](https://github.com/FreeRTOS/corePKCS11/pull/196) Add more unit test to increase code coverage rate
