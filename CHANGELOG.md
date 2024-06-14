@@ -1,4 +1,5 @@
 # Change Log for corePKCS11 Library
+
 ## v3.7.0 (June 2024)
 Fix doxygen deployment on Github.
 
