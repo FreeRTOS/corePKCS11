@@ -1,7 +1,7 @@
 # Change Log for corePKCS11 Library
 
 ## v3.6.1 (June 2024)
-Fix doxygen deployment on Github.
+* Fix doxygen deployment on Github.
 
 ## v3.6.0 (May 2024)
 * [#195](https://github.com/FreeRTOS/corePKCS11/pull/195),[#196](https://github.com/FreeRTOS/corePKCS11/pull/196) Add more unit test to increase code coverage rate
