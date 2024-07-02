@@ -197,8 +197,8 @@
 
 /* Bring in the public header. */
 
-/* Undefine the macro for Keil Compiler to avoid conflict */
-#if defined( __PASTE ) && defined( __CC_ARM )
+/* Undefine the macro for Keil and ARMClang Compilers to avoid conflict */
+#if defined( __PASTE ) && ( defined( __CC_ARM ) || defined( __ARMCC_VERSION ) )
     /* ARM RCVT stdint.h has a duplicate definition with PKCS #11. */
     #undef __PASTE
 #endif
