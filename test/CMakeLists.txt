@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13.0)
 project( "corePKCS11 tests"
-         VERSION 3.5.0
+         VERSION 3.6.1
          LANGUAGES C)
 
 # Allow the project to be organized into folders.
