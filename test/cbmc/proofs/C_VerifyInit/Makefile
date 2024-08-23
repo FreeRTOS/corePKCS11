@@ -13,8 +13,9 @@ PROOF_UID = C_VerifyInit
 MAX_OBJECT_NUM=2
 
 DEFINES += -DMAX_OBJECT_NUM=$(MAX_OBJECT_NUM)
-INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
+INCLUDES += -I$(SRCDIR)/source/portable/os
 
 REMOVE_FUNCTION_BODY += C_Initialize
 REMOVE_FUNCTION_BODY += C_OpenSession
@@ -34,5 +35,6 @@ PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/mbedtls_stubs.c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/core_pkcs11_pal_stubs.c
 PROJECT_SOURCES += $(SRCDIR)/source/portable/mbedtls/core_pkcs11_mbedtls.c
+PROJECT_SOURCES += $(SRCDIR)/source/portable/os/posix/core_pkcs11_pal.c
 
 include ../Makefile.common

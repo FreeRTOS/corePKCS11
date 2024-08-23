@@ -9,14 +9,16 @@ HARNESS_FILE = C_FindObjects_harness
 PROOF_UID = C_FindObjects
 
 DEFINES +=
-INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
+INCLUDES += -I$(SRCDIR)/source/portable/os
 
 REMOVE_FUNCTION_BODY += C_Finalize
 REMOVE_FUNCTION_BODY += C_GetFunctionList
 
 # This should be similar to the dummy data length in "core_pkcs11_pal_stubs.c" PKCS11_PAL_GetObjectValue
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvFindObjectInListByLabel.0:13
+UNWINDSET += strncmp.0:20
 # This should align with the max object count configured in core_pkcs11_config.h
 UNWINDSET += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvAddObjectToList.0:2
 
@@ -24,5 +26,7 @@ PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/core_pkcs11_pal_stubs.c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/mbedtls_stubs.c
 PROJECT_SOURCES += $(SRCDIR)/source/portable/mbedtls/core_pkcs11_mbedtls.c
+PROJECT_SOURCES += $(SRCDIR)/source/portable/os/posix/core_pkcs11_pal.c
+PROJECT_SOURCES += $(SRCDIR)/source/portable/os/core_pkcs11_pal_utils.c
 
 include ../Makefile.common
