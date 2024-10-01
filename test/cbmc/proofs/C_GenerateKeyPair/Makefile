@@ -12,8 +12,9 @@ TEMPLATE_SIZE=10
 
 DEFINES += -DTEMPLATE_SIZE=$(TEMPLATE_SIZE)
 
-INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
+INCLUDES += -I$(SRCDIR)/source/portable/os
 
 REMOVE_FUNCTION_BODY += C_Initialize
 REMOVE_FUNCTION_BODY += C_Finalize
@@ -29,6 +30,7 @@ UNWINDSET += harness.0:10
 UNWINDSET += harness.1:10
 UNWINDSET += memcmp.0:32
 UNWINDSET += memcpy.0:32
+UNWINDSET += strncmp.0:20
 
 # The nested memcmp in this loop will exponentially increase the CBMC bounds checking.
 # Be very careful increasing this. At the time of writing this, the PKCS stack was
@@ -42,5 +44,7 @@ PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/mbedtls_stubs.c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/core_pkcs11_pal_stubs.c
 PROJECT_SOURCES += $(SRCDIR)/source/portable/mbedtls/core_pkcs11_mbedtls.c
+PROJECT_SOURCES += $(SRCDIR)/source/portable/os/posix/core_pkcs11_pal.c
+PROJECT_SOURCES += $(SRCDIR)/source/portable/os/core_pkcs11_pal_utils.c
 
 include ../Makefile.common

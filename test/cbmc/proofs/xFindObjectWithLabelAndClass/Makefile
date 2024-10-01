@@ -12,7 +12,8 @@ PROOF_UID = xFindObjectWithLabelAndClass
 MAX_LABEL_SIZE=32
 
 DEFINES += -DMAX_LABEL_SIZE=$(MAX_LABEL_SIZE)
-INCLUDES +=
+
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 
 REMOVE_FUNCTION_BODY += C_Initialize
 REMOVE_FUNCTION_BODY += C_Login
@@ -22,5 +23,6 @@ UNWINDSET += strlen.0:$(MAX_LABEL_SIZE)
 PROOF_SOURCES += $(PROOFDIR)/$(HARNESS_FILE).c
 PROOF_SOURCES += $(SRCDIR)/test/cbmc/stubs/pkcs11_interface_stubs.c
 PROJECT_SOURCES += $(SRCDIR)/source/core_pkcs11.c
+PROJECT_SOURCES += $(SRCDIR)/source/portable/mbedtls/core_pkcs11_mbedtls.c
 
 include ../Makefile.common

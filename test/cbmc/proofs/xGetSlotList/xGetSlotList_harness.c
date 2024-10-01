@@ -27,6 +27,7 @@
  * @brief Implements the proof harness for xGetSlotList function.
  */
 #include <stddef.h>
+#include <stdlib.h>
 #include "core_pkcs11.h"
 
 void harness()
