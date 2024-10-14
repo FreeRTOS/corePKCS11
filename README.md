@@ -192,7 +192,7 @@ locations below:
 |                                                       Location                                                       |
 | :------------------------------------------------------------------------------------------------------------------: |
 | [AWS IoT Device SDK for Embedded C](https://github.com/aws/aws-iot-device-sdk-embedded-C#releases-and-documentation) |
-|      [FreeRTOS.org](https://freertos.org/Documentation/api-ref/corePKCS11/docs/doxygen/output/html/index.html)       |
+|      [FreeRTOS.org](https://freertos.github.io/corePKCS11/v3.6.1/)                                                   |
 
 Note that the latest included version of corePKCS11 may differ across
 repositories.

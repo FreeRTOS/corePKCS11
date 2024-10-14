@@ -796,95 +796,109 @@ static CK_RV prvGetAttributesFromRsaContext( CK_ATTRIBUTE * pxAttribute,
         case ( CKA_MODULUS ):
 
             lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->N.n );
+
             if( lMbedTLSResult == 0 )
             {
                 lMbedTLSResult = mbedtls_rsa_export( pxRsaContext,
-                                                     pxMpi,     /* N */
-                                                     NULL,      /* P */
-                                                     NULL,      /* Q */
-                                                     NULL,      /* D */
-                                                     NULL );    /* E */
+                                                     pxMpi,  /* N */
+                                                     NULL,   /* P */
+                                                     NULL,   /* Q */
+                                                     NULL,   /* D */
+                                                     NULL ); /* E */
             }
+
             break;
 
         case ( CKA_PUBLIC_EXPONENT ):
 
             lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->E.n );
+
             if( lMbedTLSResult == 0 )
             {
                 lMbedTLSResult = mbedtls_rsa_export( pxRsaContext,
-                                                     NULL,      /* N */
-                                                     NULL,      /* P */
-                                                     NULL,      /* Q */
-                                                     NULL,      /* D */
-                                                     pxMpi );   /* E */
+                                                     NULL,    /* N */
+                                                     NULL,    /* P */
+                                                     NULL,    /* Q */
+                                                     NULL,    /* D */
+                                                     pxMpi ); /* E */
             }
+
             break;
 
         case ( CKA_PRIME_1 ):
 
             lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->P.n );
+
             if( lMbedTLSResult == 0 )
             {
                 lMbedTLSResult = mbedtls_rsa_export( pxRsaContext,
-                                                     NULL,      /* N */
-                                                     pxMpi,     /* P */
-                                                     NULL,      /* Q */
-                                                     NULL,      /* D */
-                                                     NULL );    /* E */
+                                                     NULL,   /* N */
+                                                     pxMpi,  /* P */
+                                                     NULL,   /* Q */
+                                                     NULL,   /* D */
+                                                     NULL ); /* E */
             }
+
             break;
 
         case ( CKA_PRIME_2 ):
 
             lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->Q.n );
+
             if( lMbedTLSResult == 0 )
             {
                 lMbedTLSResult = mbedtls_rsa_export( pxRsaContext,
-                                                     NULL,      /* N */
-                                                     NULL,      /* P */
-                                                     pxMpi,     /* Q */
-                                                     NULL,      /* D */
-                                                     NULL );    /* E */
+                                                     NULL,   /* N */
+                                                     NULL,   /* P */
+                                                     pxMpi,  /* Q */
+                                                     NULL,   /* D */
+                                                     NULL ); /* E */
             }
+
             break;
 
         case ( CKA_PRIVATE_EXPONENT ):
 
             lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->D.n );
+
             if( lMbedTLSResult == 0 )
             {
                 lMbedTLSResult = mbedtls_rsa_export( pxRsaContext,
-                                                     NULL,      /* N */
-                                                     NULL,      /* P */
-                                                     NULL,      /* Q */
-                                                     pxMpi,     /* D */
-                                                     NULL );    /* E */
+                                                     NULL,   /* N */
+                                                     NULL,   /* P */
+                                                     NULL,   /* Q */
+                                                     pxMpi,  /* D */
+                                                     NULL ); /* E */
             }
+
             break;
 
         case ( CKA_EXPONENT_1 ):
 
             lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->DP.n );
+
             if( lMbedTLSResult == 0 )
             {
                 lMbedTLSResult = mbedtls_rsa_export_crt( pxRsaContext,
-                                                         pxMpi,      /* DP */
-                                                         NULL,       /* DQ */
-                                                         NULL );     /* QP */
+                                                         pxMpi,  /* DP */
+                                                         NULL,   /* DQ */
+                                                         NULL ); /* QP */
             }
+
             break;
 
         case ( CKA_EXPONENT_2 ):
 
             lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->DQ.n );
+
             if( lMbedTLSResult == 0 )
             {
                 lMbedTLSResult = mbedtls_rsa_export_crt( pxRsaContext,
-                                                         NULL,       /* DP */
-                                                         pxMpi,      /* DQ */
-                                                         NULL );     /* QP */
+                                                         NULL,   /* DP */
+                                                         pxMpi,  /* DQ */
+                                                         NULL ); /* QP */
             }
+
             break;
 
         default:
@@ -892,13 +906,15 @@ static CK_RV prvGetAttributesFromRsaContext( CK_ATTRIBUTE * pxAttribute,
             /* This is the CKA_COEFFICIENT case. The type is checked in
              * C_GetAttributeValue. */
             lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->QP.n );
+
             if( lMbedTLSResult == 0 )
             {
                 lMbedTLSResult = mbedtls_rsa_export_crt( pxRsaContext,
-                                                         NULL,       /* DP */
-                                                         NULL,       /* DQ */
-                                                         pxMpi );    /* QP */
+                                                         NULL,    /* DP */
+                                                         NULL,    /* DQ */
+                                                         pxMpi ); /* QP */
             }
+
             break;
     }
 
@@ -3517,26 +3533,28 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                 case CKA_EXPONENT_1:
                 case CKA_EXPONENT_2:
                 case CKA_COEFFICIENT:
+                   {
+                       mbedtls_rsa_context * pxRsaContext = ( mbedtls_rsa_context * ) xKeyContext.pk_ctx;
 
-                    mbedtls_rsa_context * pxRsaContext = ( mbedtls_rsa_context * ) xKeyContext.pk_ctx;
+                       if( pTemplate[ iAttrib ].pValue == NULL )
+                       {
+                           pTemplate[ iAttrib ].ulValueLen = sizeof( mbedtls_mpi );
+                       }
+                       else
+                       {
+                           if( pTemplate[ iAttrib ].ulValueLen == sizeof( mbedtls_mpi ) )
+                           {
+                               xResult = prvGetAttributesFromRsaContext( &( pTemplate[ iAttrib ] ),
+                                                                         pxRsaContext );
+                           }
+                           else
+                           {
+                               xResult = CKR_BUFFER_TOO_SMALL;
+                           }
+                       }
 
-                    if( pTemplate[ iAttrib ].pValue == NULL )
-                    {
-                        pTemplate[ iAttrib ].ulValueLen = sizeof( mbedtls_mpi );
-                    }
-                    else
-                    {
-                        if( pTemplate[ iAttrib ].ulValueLen == sizeof( mbedtls_mpi ) )
-                        {
-                            xResult = prvGetAttributesFromRsaContext( &( pTemplate[ iAttrib ] ),
-                                                                      pxRsaContext );
-                        }
-                        else
-                        {
-                            xResult = CKR_BUFFER_TOO_SMALL;
-                        }
-                    }
-                    break;
+                       break;
+                   }
 
                 default:
                     LogError( ( "Failed to parse attribute. Received unknown "
