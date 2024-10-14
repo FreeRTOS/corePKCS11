@@ -3275,7 +3275,7 @@ void test_pkcs11_C_GetAttributeValueAttParsing( void )
         mbedtls_ecp_tls_write_point_IgnoreAndReturn( 1 );
 
         /* Unknown attribute. */
-        xTemplate.type = CKA_MODULUS;
+        xTemplate.type = CKA_SUBPRIME;
 
         xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_TYPE_INVALID, xResult );
@@ -3393,8 +3393,8 @@ void test_pkcs11_C_GetAttributeValueMultipleAttParsing( void )
         xTemplates[ 0 ].pValue = NULL;
         xTemplates[ 0 ].ulValueLen = 0;
 
-        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned for unknow attribute CKA_MODULUS. */
-        xTemplates[ 1 ].type = CKA_MODULUS;
+        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned for unknow attribute CKA_SUBPRIME. */
+        xTemplates[ 1 ].type = CKA_SUBPRIME;
         xTemplates[ 1 ].pValue = NULL;
         xTemplates[ 1 ].ulValueLen = 0;
         xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
@@ -3405,8 +3405,8 @@ void test_pkcs11_C_GetAttributeValueMultipleAttParsing( void )
         TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 1 ].ulValueLen );
 
         /* Swap the sequence EC Point Case and unknown attribute case. */
-        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned for unknow attribute CKA_MODULUS. */
-        xTemplates[ 0 ].type = CKA_MODULUS;
+        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned for unknow attribute CKA_SUBPRIME. */
+        xTemplates[ 0 ].type = CKA_SUBPRIME;
         xTemplates[ 0 ].pValue = NULL;
         xTemplates[ 0 ].ulValueLen = 0;
 
@@ -3454,9 +3454,9 @@ void test_pkcs11_C_GetAttributeValueMultipleAttParsing( void )
         TEST_ASSERT_EQUAL( pkcs11EC_POINT_LENGTH, xTemplates[ 0 ].ulValueLen );
         TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 1 ].ulValueLen );
 
-        /* CKR_ATTRIBUTE_SENSITIVE should be returned when getting CKA_PRIVATE_EXPONENT type. */
+        /* CKR_ATTRIBUTE_SENSITIVE should be returned when getting CKA_VALUE type. */
         mbedtls_pk_parse_key_ExpectAnyArgsAndReturn( 0 );
-        xTemplates[ 0 ].type = CKA_PRIVATE_EXPONENT;
+        xTemplates[ 0 ].type = CKA_VALUE;
         xTemplates[ 0 ].pValue = NULL;
         xTemplates[ 0 ].ulValueLen = 0;
 
@@ -3476,9 +3476,9 @@ void test_pkcs11_C_GetAttributeValueMultipleAttParsing( void )
         xTemplates[ 0 ].pValue = NULL;
         xTemplates[ 0 ].ulValueLen = 0;
 
-        /* CKR_ATTRIBUTE_SENSITIVE should be returned when getting CKA_PRIVATE_EXPONENT type. */
+        /* CKR_ATTRIBUTE_SENSITIVE should be returned when getting CKA_VALUE type. */
         mbedtls_pk_parse_key_ExpectAnyArgsAndReturn( 0 );
-        xTemplates[ 1 ].type = CKA_PRIVATE_EXPONENT;
+        xTemplates[ 1 ].type = CKA_VALUE;
         xTemplates[ 1 ].pValue = NULL;
         xTemplates[ 1 ].ulValueLen = 0;
 
@@ -3525,8 +3525,8 @@ void test_pkcs11_C_GetAttributeValueMultipleAttParsing( void )
         TEST_ASSERT_EQUAL( pkcs11EC_POINT_LENGTH, xTemplates[ 0 ].ulValueLen );
         TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 1 ].ulValueLen );
 
-        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned for unknow attribute CKA_MODULUS. */
-        xTemplates[ 0 ].type = CKA_MODULUS;
+        /* CKR_ATTRIBUTE_TYPE_INVALID should be returned for unknow attribute CKA_SUBPRIME. */
+        xTemplates[ 0 ].type = CKA_SUBPRIME;
         xTemplates[ 0 ].pValue = NULL;
         xTemplates[ 0 ].ulValueLen = 0;
 
@@ -3688,7 +3688,7 @@ void test_pkcs11_C_GetAttributeValuePrivKey( void )
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_VALUE_INVALID, xResult );
         TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplate.ulValueLen );
 
-        xTemplate.type = CKA_PRIVATE_EXPONENT;
+        xTemplate.type = CKA_VALUE;
         mbedtls_pk_parse_key_ExpectAnyArgsAndReturn( 0 );
         xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplate, ulCount );
         TEST_ASSERT_EQUAL( CKR_ATTRIBUTE_SENSITIVE, xResult );
