@@ -3226,6 +3226,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
     mbedtls_x509_crt xMbedX509Context = { 0 };
     mbedtls_pk_type_t xKeyType;
     const mbedtls_ecp_keypair * pxKeyPair;
+    const mbedtls_rsa_context * pxRsaContext;
     CK_KEY_TYPE xPkcsKeyType = ( CK_KEY_TYPE ) ~0UL;
     CK_OBJECT_CLASS xClass = ~0UL;
     CK_BYTE_PTR pxObjectValue = NULL;
@@ -3534,8 +3535,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                 case CKA_EXPONENT_2:
                 case CKA_COEFFICIENT:
                    {
-                       mbedtls_rsa_context * pxRsaContext = ( mbedtls_rsa_context * ) xKeyContext.pk_ctx;
-
                        if( pTemplate[ iAttrib ].pValue == NULL )
                        {
                            pTemplate[ iAttrib ].ulValueLen = sizeof( mbedtls_mpi );
@@ -3544,8 +3543,18 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                        {
                            if( pTemplate[ iAttrib ].ulValueLen == sizeof( mbedtls_mpi ) )
                            {
-                               xResult = prvGetAttributesFromRsaContext( &( pTemplate[ iAttrib ] ),
-                                                                         pxRsaContext );
+                                pxRsaContext = ( mbedtls_rsa_context * ) xKeyContext.pk_ctx;
+
+                                if( pxRsaContext != NULL )
+                                {
+                                    xResult = prvGetAttributesFromRsaContext( &( pTemplate[ iAttrib ] ),
+                                                                              pxRsaContext );
+                                }
+                                else
+                                {
+                                    xResult = CKR_FUNCTION_FAILED;
+                                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
+                                }
                            }
                            else
                            {
