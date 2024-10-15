@@ -3534,36 +3534,35 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                 case CKA_EXPONENT_1:
                 case CKA_EXPONENT_2:
                 case CKA_COEFFICIENT:
-                   {
-                       if( pTemplate[ iAttrib ].pValue == NULL )
-                       {
-                           pTemplate[ iAttrib ].ulValueLen = sizeof( mbedtls_mpi );
-                       }
-                       else
-                       {
-                           if( pTemplate[ iAttrib ].ulValueLen == sizeof( mbedtls_mpi ) )
-                           {
-                                pxRsaContext = ( mbedtls_rsa_context * ) xKeyContext.pk_ctx;
 
-                                if( pxRsaContext != NULL )
-                                {
-                                    xResult = prvGetAttributesFromRsaContext( &( pTemplate[ iAttrib ] ),
-                                                                              pxRsaContext );
-                                }
-                                else
-                                {
-                                    xResult = CKR_FUNCTION_FAILED;
-                                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
-                                }
-                           }
-                           else
-                           {
-                               xResult = CKR_BUFFER_TOO_SMALL;
-                           }
-                       }
+                    if( pTemplate[ iAttrib ].pValue == NULL )
+                    {
+                        pTemplate[ iAttrib ].ulValueLen = sizeof( mbedtls_mpi );
+                    }
+                    else
+                    {
+                        if( pTemplate[ iAttrib ].ulValueLen == sizeof( mbedtls_mpi ) )
+                        {
+                            pxRsaContext = ( mbedtls_rsa_context * ) xKeyContext.pk_ctx;
 
-                       break;
-                   }
+                            if( pxRsaContext != NULL )
+                            {
+                                xResult = prvGetAttributesFromRsaContext( &( pTemplate[ iAttrib ] ),
+                                                                          pxRsaContext );
+                            }
+                            else
+                            {
+                                xResult = CKR_FUNCTION_FAILED;
+                                pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
+                            }
+                        }
+                        else
+                        {
+                            xResult = CKR_BUFFER_TOO_SMALL;
+                        }
+                    }
+
+                    break;
 
                 default:
                     LogError( ( "Failed to parse attribute. Received unknown "
