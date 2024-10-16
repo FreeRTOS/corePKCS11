@@ -3572,6 +3572,409 @@ void test_pkcs11_C_GetAttributeValueMultipleAttParsing( void )
  * @brief C_GetAttributeValue paths.
  *
  */
+void test_pkcs11_C_GetAttributeValueValidRsaContext( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_ULONG ulCount = 1;
+    CK_ATTRIBUTE xTemplates[ 1 ] = { 0 };
+    mbedtls_pk_context xKeyContext = { NULL, &xResult };
+    CK_BYTE ulPoint[ pkcs11EC_POINT_LENGTH ] = { 0 };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateEcPriv( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_mpi_init_Ignore();
+        mbedtls_x509_crt_init_CMockIgnore();
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        mbedtls_pk_free_CMockIgnore();
+        mbedtls_x509_crt_free_CMockIgnore();
+
+        /* CKA_MODULUS case */
+        /* Failure path */
+        xTemplates[ 0 ].type = CKA_MODULUS;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );        
+
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 1 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+
+        /* CKA_MODULUS case */
+        /* Success path */
+        xTemplates[ 0 ].type = CKA_MODULUS;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );
+        
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_rsa_export_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+/* -------------------------------------------------------------------------------------------------------------------- */   
+
+        /* CKA_PUBLIC_EXPONENT case */
+        /* Failure path */
+        xTemplates[ 0 ].type = CKA_PUBLIC_EXPONENT ;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );        
+
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 1 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+
+        /* CKA_PUBLIC_EXPONENT case */
+        /* Success path */
+        xTemplates[ 0 ].type = CKA_PUBLIC_EXPONENT ;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );
+        
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_rsa_export_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+/* -------------------------------------------------------------------------------------------------------------------- */   
+
+        /* CKA_PRIME_1 case */
+        /* Failure path */
+        xTemplates[ 0 ].type = CKA_PRIME_1;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );        
+
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 1 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+
+        /* CKA_PRIME_1 case */
+        /* Success path */
+        xTemplates[ 0 ].type = CKA_PRIME_1;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );
+        
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_rsa_export_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+/* -------------------------------------------------------------------------------------------------------------------- */   
+
+        /* CKA_PRIME_2 case */
+        /* Failure path */
+        xTemplates[ 0 ].type = CKA_PRIME_2;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );        
+
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 1 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+
+        /* CKA_PRIME_2 case */
+        /* Success path */
+        xTemplates[ 0 ].type = CKA_PRIME_2;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );
+        
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_rsa_export_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+/* -------------------------------------------------------------------------------------------------------------------- */   
+
+        /* CKA_PRIVATE_EXPONENT case */
+        /* Failure path */
+        xTemplates[ 0 ].type = CKA_PRIVATE_EXPONENT ;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );        
+
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 1 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+
+        /* CKA_PRIVATE_EXPONENT case */
+        /* Success path */
+        xTemplates[ 0 ].type = CKA_PRIVATE_EXPONENT ;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );
+        
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_rsa_export_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+/* -------------------------------------------------------------------------------------------------------------------- */   
+
+        /* CKA_PRIVATE_EXPONENT case */
+        /* Failure path */
+        xTemplates[ 0 ].type = CKA_PRIVATE_EXPONENT ;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );        
+
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 1 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+
+        /* CKA_PRIVATE_EXPONENT case */
+        /* Success path */
+        xTemplates[ 0 ].type = CKA_PRIVATE_EXPONENT ;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );
+        
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_rsa_export_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+/* -------------------------------------------------------------------------------------------------------------------- */   
+
+        /* CKA_EXPONENT_1 case */
+        /* Failure path */
+        xTemplates[ 0 ].type = CKA_EXPONENT_1;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );        
+
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 1 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+
+        /* CKA_EXPONENT_1 case */
+        /* Success path */
+        xTemplates[ 0 ].type = CKA_EXPONENT_1;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );
+        
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_rsa_export_crt_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+/* -------------------------------------------------------------------------------------------------------------------- */
+
+        /* CKA_EXPONENT_2 case */
+        /* Failure path */
+        xTemplates[ 0 ].type = CKA_EXPONENT_2;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );        
+
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 1 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+
+        /* CKA_EXPONENT_2 case */
+        /* Success path */
+        xTemplates[ 0 ].type = CKA_EXPONENT_2;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );
+        
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_rsa_export_crt_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+/* -------------------------------------------------------------------------------------------------------------------- */
+
+        /* CKA_COEFFICIENT case */
+        /* Failure path */
+        xTemplates[ 0 ].type = CKA_COEFFICIENT;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );        
+
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 1 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+
+        /* CKA_COEFFICIENT case */
+        /* Success path */
+        xTemplates[ 0 ].type = CKA_COEFFICIENT;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );
+        
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_mpi_grow_ExpectAnyArgsAndReturn( 0 );
+        mbedtls_rsa_export_crt_ExpectAnyArgsAndReturn( 0 );
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+/* -------------------------------------------------------------------------------------------------------------------- */
+
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+/*!
+ * @brief C_GetAttributeValue paths.
+ *
+ */
+void test_pkcs11_C_GetAttributeValueModulusNullRsaContext( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_ULONG ulCount = 1;
+    CK_ATTRIBUTE xTemplates[ 1 ] = { 0 };
+    mbedtls_pk_context xKeyContext = { NULL, NULL };
+    CK_BYTE ulPoint[ pkcs11EC_POINT_LENGTH ] = { 0 };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateEcPriv( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_pk_init_ExpectAnyArgs();
+        mbedtls_pk_init_ReturnThruPtr_ctx( &xKeyContext );
+        mbedtls_x509_crt_init_CMockIgnore();
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        mbedtls_pk_free_CMockIgnore();
+        mbedtls_x509_crt_free_CMockIgnore();
+
+        /* MODULUS case*/
+        xTemplates[ 0 ].type = CKA_MODULUS;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) );
+
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_FUNCTION_FAILED, xResult );
+        TEST_ASSERT_EQUAL( CK_UNAVAILABLE_INFORMATION, xTemplates[ 0 ].ulValueLen );
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+
+/*!
+ * @brief C_GetAttributeValue paths.
+ *
+ */
+void test_pkcs11_C_GetAttributeValueModulusBadPath( void )
+{
+    CK_RV xResult = CKR_OK;
+    CK_SESSION_HANDLE xSession = 0;
+    CK_OBJECT_HANDLE xObject = 0;
+    CK_ULONG ulCount = 1;
+    CK_ATTRIBUTE xTemplates[ 1 ] = { 0 };
+    mbedtls_pk_context xKeyContext = { NULL, NULL };
+    CK_BYTE ulPoint[ pkcs11EC_POINT_LENGTH ] = { 0 };
+
+    prvCommonInitStubs( &xSession );
+
+    if( TEST_PROTECT() )
+    {
+        xResult = prvCreateEcPriv( &xSession, &xObject );
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+
+        mbedtls_pk_init_CMockIgnore();
+        mbedtls_x509_crt_init_CMockIgnore();
+        PKCS11_PAL_GetObjectValueCleanup_CMockIgnore();
+        mbedtls_pk_free_CMockIgnore();
+        mbedtls_x509_crt_free_CMockIgnore();
+
+        /* MODULUS case*/
+        xTemplates[ 0 ].type = CKA_MODULUS;
+        xTemplates[ 0 ].pValue = NULL;
+        xTemplates[ 0 ].ulValueLen = 0;
+
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_OK, xResult );
+        TEST_ASSERT_EQUAL( sizeof( mbedtls_mpi ), xTemplates[ 0 ].ulValueLen );
+        
+/* -------------------------------------------------------------------------------------------------------------------- */   
+
+        /* MODULUS case*/
+        /* CKR_BUFFER_TOO_SMALL should be returned when mbedtls return buffer too small. */
+        xTemplates[ 0 ].type = CKA_MODULUS;
+        xTemplates[ 0 ].pValue = &ulPoint;
+        xTemplates[ 0 ].ulValueLen = ( sizeof( mbedtls_mpi ) - 1 );
+
+        xResult = C_GetAttributeValue( xSession, xObject, ( CK_ATTRIBUTE_PTR ) &xTemplates, ulCount );
+
+        TEST_ASSERT_EQUAL( CKR_BUFFER_TOO_SMALL, xResult );
+
+/* -------------------------------------------------------------------------------------------------------------------- */
+
+    }
+
+    if( TEST_PROTECT() )
+    {
+        prvCommonDeinitStubs( &xSession );
+    }
+}
+
+
+
+/*!
+ * @brief C_GetAttributeValue paths.
+ *
+ */
 void test_pkcs11_C_GetAttributeValuePrivKey( void )
 {
     CK_RV xResult = CKR_OK;
