@@ -1,6 +1,6 @@
 # Static code analysis for corePKCS11 library
 This directory is made for the purpose of statically testing the MISRA C:2012 compliance of corePKCS11 using
-[Synopsys Coverity](https://www.synopsys.com/software-integrity/security-testing/static-analysis-sast.html) static analysis tool.
+[Synopsys Coverity](https://www.blackduck.com/static-analysis-tools-sast/coverity.html) static analysis tool.
 To that end, this directory provides a [configuration file](https://github.com/FreeRTOS/corePKCS11/blob/main/tools/coverity/misra.config) to use when
 building a binary for the tool to analyze.
 

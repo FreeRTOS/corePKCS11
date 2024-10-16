@@ -954,7 +954,7 @@ static void commonValidateCredentialStorageRSA( const char * pPrivateKeyLabel,
     TEST_ASSERT_EQUAL_MEMORY_MESSAGE( expectedCertInDer, template.pValue, template.ulValueLen, "GetAttributeValue returned incorrect data for RSA certificate" );
 
     /* Check that the private key cannot be retrieved. */
-    template.type = CKA_PRIVATE_EXPONENT;
+    template.type = CKA_VALUE;
     template.pValue = keyComponent;
     template.ulValueLen = sizeof( keyComponent );
     result = globalFunctionList->C_GetAttributeValue( globalSession, privateKeyHandle, &template, 1 );

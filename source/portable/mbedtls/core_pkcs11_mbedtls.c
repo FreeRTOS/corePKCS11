@@ -780,6 +780,156 @@ static CK_RV prvRsaContextParse( const CK_ATTRIBUTE * pxAttribute,
 }
 
 /**
+ * @brief Populates attribute values for an RSA key from the mbed TLS context.
+ */
+static CK_RV prvGetAttributesFromRsaContext( CK_ATTRIBUTE * pxAttribute,
+                                             const mbedtls_rsa_context * pxRsaContext )
+{
+    CK_RV xResult = CKR_OK;
+    int32_t lMbedTLSResult = 0;
+    mbedtls_mpi * pxMpi = ( mbedtls_mpi * ) pxAttribute->pValue;
+
+    mbedtls_mpi_init( pxMpi );
+
+    switch( pxAttribute->type )
+    {
+        case ( CKA_MODULUS ):
+
+            lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->N.n );
+
+            if( lMbedTLSResult == 0 )
+            {
+                lMbedTLSResult = mbedtls_rsa_export( pxRsaContext,
+                                                     pxMpi,  /* N */
+                                                     NULL,   /* P */
+                                                     NULL,   /* Q */
+                                                     NULL,   /* D */
+                                                     NULL ); /* E */
+            }
+
+            break;
+
+        case ( CKA_PUBLIC_EXPONENT ):
+
+            lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->E.n );
+
+            if( lMbedTLSResult == 0 )
+            {
+                lMbedTLSResult = mbedtls_rsa_export( pxRsaContext,
+                                                     NULL,    /* N */
+                                                     NULL,    /* P */
+                                                     NULL,    /* Q */
+                                                     NULL,    /* D */
+                                                     pxMpi ); /* E */
+            }
+
+            break;
+
+        case ( CKA_PRIME_1 ):
+
+            lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->P.n );
+
+            if( lMbedTLSResult == 0 )
+            {
+                lMbedTLSResult = mbedtls_rsa_export( pxRsaContext,
+                                                     NULL,   /* N */
+                                                     pxMpi,  /* P */
+                                                     NULL,   /* Q */
+                                                     NULL,   /* D */
+                                                     NULL ); /* E */
+            }
+
+            break;
+
+        case ( CKA_PRIME_2 ):
+
+            lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->Q.n );
+
+            if( lMbedTLSResult == 0 )
+            {
+                lMbedTLSResult = mbedtls_rsa_export( pxRsaContext,
+                                                     NULL,   /* N */
+                                                     NULL,   /* P */
+                                                     pxMpi,  /* Q */
+                                                     NULL,   /* D */
+                                                     NULL ); /* E */
+            }
+
+            break;
+
+        case ( CKA_PRIVATE_EXPONENT ):
+
+            lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->D.n );
+
+            if( lMbedTLSResult == 0 )
+            {
+                lMbedTLSResult = mbedtls_rsa_export( pxRsaContext,
+                                                     NULL,   /* N */
+                                                     NULL,   /* P */
+                                                     NULL,   /* Q */
+                                                     pxMpi,  /* D */
+                                                     NULL ); /* E */
+            }
+
+            break;
+
+        case ( CKA_EXPONENT_1 ):
+
+            lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->DP.n );
+
+            if( lMbedTLSResult == 0 )
+            {
+                lMbedTLSResult = mbedtls_rsa_export_crt( pxRsaContext,
+                                                         pxMpi,  /* DP */
+                                                         NULL,   /* DQ */
+                                                         NULL ); /* QP */
+            }
+
+            break;
+
+        case ( CKA_EXPONENT_2 ):
+
+            lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->DQ.n );
+
+            if( lMbedTLSResult == 0 )
+            {
+                lMbedTLSResult = mbedtls_rsa_export_crt( pxRsaContext,
+                                                         NULL,   /* DP */
+                                                         pxMpi,  /* DQ */
+                                                         NULL ); /* QP */
+            }
+
+            break;
+
+        default:
+
+            /* This is the CKA_COEFFICIENT case. The type is checked in
+             * C_GetAttributeValue. */
+            lMbedTLSResult = mbedtls_mpi_grow( pxMpi, pxRsaContext->QP.n );
+
+            if( lMbedTLSResult == 0 )
+            {
+                lMbedTLSResult = mbedtls_rsa_export_crt( pxRsaContext,
+                                                         NULL,    /* DP */
+                                                         NULL,    /* DQ */
+                                                         pxMpi ); /* QP */
+            }
+
+            break;
+    }
+
+    if( lMbedTLSResult != 0 )
+    {
+        LogError( ( "Failed to parse RSA private key attributes: mbed TLS error = %s : %s.",
+                    mbedtlsHighLevelCodeOrDefault( lMbedTLSResult ),
+                    mbedtlsLowLevelCodeOrDefault( lMbedTLSResult ) ) );
+        xResult = CKR_FUNCTION_FAILED;
+    }
+
+    return xResult;
+}
+
+/**
  * @brief Parses attribute values for a RSA Key.
  */
 static CK_RV prvRsaKeyAttParse( const CK_ATTRIBUTE * pxAttribute,
@@ -3076,6 +3226,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
     mbedtls_x509_crt xMbedX509Context = { 0 };
     mbedtls_pk_type_t xKeyType;
     const mbedtls_ecp_keypair * pxKeyPair;
+    const mbedtls_rsa_context * pxRsaContext;
     CK_KEY_TYPE xPkcsKeyType = ( CK_KEY_TYPE ) ~0UL;
     CK_OBJECT_CLASS xClass = ~0UL;
     CK_BYTE_PTR pxObjectValue = NULL;
@@ -3294,15 +3445,6 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
 
                     break;
 
-                case CKA_PRIVATE_EXPONENT:
-
-                    LogError( ( "Failed to parse attribute. "
-                                "CKA_PRIVATE_EXPONENT is private data." ) );
-                    xResult = CKR_ATTRIBUTE_SENSITIVE;
-                    pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
-
-                    break;
-
                 case CKA_EC_PARAMS:
 
                     if( pTemplate[ iAttrib ].pValue == NULL )
@@ -3379,6 +3521,44 @@ CK_DECLARE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE hSession,
                         {
                             xResult = CKR_BUFFER_TOO_SMALL;
                             pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
+                        }
+                    }
+
+                    break;
+
+                case CKA_MODULUS:
+                case CKA_PUBLIC_EXPONENT:
+                case CKA_PRIME_1:
+                case CKA_PRIME_2:
+                case CKA_PRIVATE_EXPONENT:
+                case CKA_EXPONENT_1:
+                case CKA_EXPONENT_2:
+                case CKA_COEFFICIENT:
+
+                    if( pTemplate[ iAttrib ].pValue == NULL )
+                    {
+                        pTemplate[ iAttrib ].ulValueLen = sizeof( mbedtls_mpi );
+                    }
+                    else
+                    {
+                        if( pTemplate[ iAttrib ].ulValueLen == sizeof( mbedtls_mpi ) )
+                        {
+                            pxRsaContext = ( mbedtls_rsa_context * ) xKeyContext.pk_ctx;
+
+                            if( pxRsaContext != NULL )
+                            {
+                                xResult = prvGetAttributesFromRsaContext( &( pTemplate[ iAttrib ] ),
+                                                                          pxRsaContext );
+                            }
+                            else
+                            {
+                                xResult = CKR_FUNCTION_FAILED;
+                                pTemplate[ iAttrib ].ulValueLen = CK_UNAVAILABLE_INFORMATION;
+                            }
+                        }
+                        else
+                        {
+                            xResult = CKR_BUFFER_TOO_SMALL;
                         }
                     }
 
