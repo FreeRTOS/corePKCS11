@@ -47,8 +47,8 @@ safety through the
 See memory requirements for this library
 [here](./docs/doxygen/include/size_table.md).
 
-**corePKCS11 v3.6.1
-[source code](https://github.com/FreeRTOS/corePKCS11/tree/v3.6.1/source) is part
+**corePKCS11 v3.6.2
+[source code](https://github.com/FreeRTOS/corePKCS11/tree/v3.6.2/source) is part
 of the
 [FreeRTOS 202406.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202406.00-LTS)
 release.**
