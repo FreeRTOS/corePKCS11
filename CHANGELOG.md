@@ -1,5 +1,8 @@
 # Change Log for corePKCS11 Library
 
+## v3.6.2 (October 2024)
+* [#202](https://github.com/FreeRTOS/corePKCS11/pull/202) Export RSA key attributes from mbedtls context to support TLSv1.3
+
 ## v3.6.1 (June 2024)
 * Fix doxygen deployment on Github.
 

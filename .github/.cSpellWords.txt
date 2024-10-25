@@ -37,6 +37,7 @@ DUNITTEST
 DUNITY
 ecdh
 ecjpake
+EABNVYL
 ECKEY
 FAAOCAQE
 Fithb
@@ -51,6 +52,7 @@ HKDF
 isystem
 JITP
 JITR
+JLATES
 Karthikeyan
 lcov
 LPDWORD
@@ -103,11 +105,14 @@ utest
 vect
 Vect
 VECT
+VEIQ
+VQIDAQAB
 Wunused
 xfindobjectwithlabelandclass
 xgetslotlist
 xinitializepkcs
 xtea
 XTEA
+yfiv
 zeroize
 ZEROIZE
