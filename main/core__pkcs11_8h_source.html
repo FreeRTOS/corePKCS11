@@ -184,8 +184,8 @@ $(document).ready(function(){initNavTree('core__pkcs11_8h_source.html',''); init
 <div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span><span class="comment">/* Bring in the public header. */</span></div>
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span> </div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span><span class="comment">/* Undefine the macro for Keil Compiler to avoid conflict */</span></div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="preprocessor">#if defined( __PASTE ) &amp;&amp; defined( __CC_ARM )</span></div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span><span class="comment">/* Undefine the macro for Keil and ARMClang Compilers to avoid conflict */</span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span><span class="preprocessor">#if defined( __PASTE ) &amp;&amp; ( defined( __CC_ARM ) || defined( __ARMCC_VERSION ) )</span></div>
 <div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <span class="comment">/* ARM RCVT stdint.h has a duplicate definition with PKCS #11. */</span></div>
 <div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span><span class="preprocessor">    #undef __PASTE</span></div>
 <div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="preprocessor">#endif</span></div>
