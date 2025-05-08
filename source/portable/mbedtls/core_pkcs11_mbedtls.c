@@ -93,12 +93,6 @@
  */
     static const char * pNoLowLevelMbedTlsCodeStr = "<No-Low-Level-Code>";
 
-#if defined(MBEDTLS_PSA_CRYPTO_C)
-extern mbedtls_threading_mutex_t mbedtls_threading_key_slot_mutex;
-extern mbedtls_threading_mutex_t mbedtls_threading_psa_globaldata_mutex;
-extern mbedtls_threading_mutex_t mbedtls_threading_psa_rngdata_mutex;
-#endif
-
 /**
  * @brief Utility for converting the high-level code in an mbedTLS error to string,
  * if the code-contains a high-level code; otherwise, using a default string.
@@ -116,6 +110,16 @@ extern mbedtls_threading_mutex_t mbedtls_threading_psa_rngdata_mutex;
     mbedtls_low_level_strerr( mbedTlsCode ) : pNoLowLevelMbedTlsCodeStr
 
 #endif /* ifndef DISABLE_LOGGING */
+
+/**
+ * @brief Global mutexes used for threading in PSA APIs. These are defined by the 
+ * mbedtls library, we just need to initialise them.
+ */
+ #if defined(MBEDTLS_PSA_CRYPTO_C)
+    extern mbedtls_threading_mutex_t mbedtls_threading_key_slot_mutex;
+    extern mbedtls_threading_mutex_t mbedtls_threading_psa_globaldata_mutex;
+    extern mbedtls_threading_mutex_t mbedtls_threading_psa_rngdata_mutex;
+ #endif
 
 /**
  * @ingroup pkcs11_macros
@@ -481,6 +485,7 @@ static CK_RV prvMbedTLS_Initialize( void )
     mbedtls_entropy_init( &xP11Context.xMbedEntropyContext );
     mbedtls_ctr_drbg_init( &xP11Context.xMbedDrbgCtx );
 
+    /* Initialise the global mutexes for the PSA API's */
     #if defined(MBEDTLS_PSA_CRYPTO_C)
     mbedtls_mutex_init(&mbedtls_threading_key_slot_mutex);
     mbedtls_mutex_init(&mbedtls_threading_psa_globaldata_mutex);
