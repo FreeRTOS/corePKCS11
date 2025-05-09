@@ -112,16 +112,6 @@
 #endif /* ifndef DISABLE_LOGGING */
 
 /**
- * @brief Global mutexes used for threading in PSA APIs. These are defined by the
- * mbedtls library, we just need to initialise them.
- */
-#if defined( MBEDTLS_PSA_CRYPTO_C )
-    extern mbedtls_threading_mutex_t mbedtls_threading_key_slot_mutex;
-    extern mbedtls_threading_mutex_t mbedtls_threading_psa_globaldata_mutex;
-    extern mbedtls_threading_mutex_t mbedtls_threading_psa_rngdata_mutex;
-#endif
-
-/**
  * @ingroup pkcs11_macros
  * @brief Delay to wait on acquiring a mutex, in ms.
  */
