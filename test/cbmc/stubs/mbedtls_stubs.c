@@ -31,6 +31,13 @@
 #include "mbedtls/entropy.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/threading.h"
+#include "mbedtls/bignum.h"
+#include "mbedtls/cipher.h"
+#include "mbedtls/cmac.h"
+#include "mbedtls/ecp.h"
+#include "mbedtls/md.h"
+#include "mbedtls/sha256.h"
+#include "mbedtls/x509_crt.h"
 
 
 void mbedtls_entropy_init( mbedtls_entropy_context * ctx )
@@ -178,3 +185,206 @@ void (* mbedtls_mutex_init)( mbedtls_threading_mutex_t * ) = threading_mutex_ini
 void (* mbedtls_mutex_free)( mbedtls_threading_mutex_t * ) = threading_mutex_free;
 int (* mbedtls_mutex_lock)( mbedtls_threading_mutex_t * ) = threading_mutex_lock;
 int (* mbedtls_mutex_unlock)( mbedtls_threading_mutex_t * ) = threading_mutex_unlock;
+
+int mbedtls_cipher_cmac_finish( mbedtls_cipher_context_t * ctx,
+                                unsigned char * output )
+{
+    int result;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( output != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_havoc_object( output );
+
+    return result;
+}
+
+int mbedtls_cipher_cmac_starts( mbedtls_cipher_context_t * ctx,
+                                const unsigned char * key,
+                                size_t keybits )
+{
+    int result;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( key != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+int mbedtls_cipher_cmac_update( mbedtls_cipher_context_t * ctx,
+                                const unsigned char * input,
+                                size_t ilen )
+{
+    int result;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( input != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+void mbedtls_cipher_free( mbedtls_cipher_context_t * ctx )
+{
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+}
+
+const mbedtls_cipher_info_t * mbedtls_cipher_info_from_type( const mbedtls_cipher_type_t cipher_type )
+{
+    mbedtls_cipher_info_t * r = malloc( sizeof( mbedtls_cipher_info_t ) );
+
+    return r;
+}
+
+int mbedtls_cipher_setup( mbedtls_cipher_context_t * ctx,
+                          const mbedtls_cipher_info_t * cipher_info )
+{
+    int result;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( cipher_info != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+int mbedtls_ecp_point_read_binary( const mbedtls_ecp_group * grp,
+                                   mbedtls_ecp_point * P,
+                                   const unsigned char * buf,
+                                   size_t ilen )
+{
+    int result;
+
+    __CPROVER_assert( grp != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( P != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( buf != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+int mbedtls_ecp_tls_write_point( const mbedtls_ecp_group * grp,
+                                 const mbedtls_ecp_point * pt,
+                                 int format,
+                                 size_t * olen,
+                                 unsigned char * buf,
+                                 size_t blen )
+{
+    int result;
+
+    __CPROVER_assert( grp != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( pt != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( olen != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( buf != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+void mbedtls_md_free( mbedtls_md_context_t * ctx )
+{
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+}
+
+int mbedtls_md_hmac_finish( mbedtls_md_context_t * ctx,
+                            unsigned char * output )
+{
+    int result;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( output != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+int mbedtls_md_hmac_update( mbedtls_md_context_t * ctx,
+                            const unsigned char * input,
+                            size_t ilen )
+{
+    int result;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( input != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+int mbedtls_mpi_read_binary( mbedtls_mpi * X,
+                             const unsigned char * buf,
+                             size_t buflen )
+{
+    int result;
+
+    __CPROVER_assert( X != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( buf != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_havoc_object( X );
+
+    return result;
+}
+
+void mbedtls_pk_free( mbedtls_pk_context * ctx )
+{
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+}
+
+int mbedtls_pk_write_key_der( mbedtls_pk_context * ctx,
+                              unsigned char * buf,
+                              size_t size )
+{
+    int result;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( buf != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+mbedtls_pk_type_t mbedtls_pk_get_type( const mbedtls_pk_context * ctx )
+{
+    mbedtls_pk_type_t result;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+int mbedtls_pk_write_pubkey_der( mbedtls_pk_context * ctx,
+                                 unsigned char * buf,
+                                 size_t size )
+{
+    int result;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( buf != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+void mbedtls_sha256_free( mbedtls_sha256_context * ctx )
+{
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+}
+
+int mbedtls_sha256_update_ret( mbedtls_sha256_context * ctx,
+                               const unsigned char * input,
+                               size_t ilen )
+{
+    int result;
+
+    __CPROVER_assert( ctx != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( input != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
+
+void mbedtls_x509_crt_free( mbedtls_x509_crt * crt )
+{
+    __CPROVER_assert( crt != NULL, "Received an unexpected NULL pointer." );
+}
+
+int mbedtls_x509_crt_parse( mbedtls_x509_crt * chain,
+                            const unsigned char * buf,
+                            size_t buflen )
+{
+    int result;
+
+    __CPROVER_assert( chain != NULL, "Received an unexpected NULL pointer." );
+    __CPROVER_assert( buf != NULL, "Received an unexpected NULL pointer." );
+
+    return result;
+}
