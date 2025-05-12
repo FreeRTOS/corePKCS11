@@ -1,5 +1,8 @@
 # Change Log for corePKCS11 Library
 
+## v3.6.3 (May 2025)
+* [#206](https://github.com/FreeRTOS/corePKCS11/pull/206) Update mbedtls version to v3.6.3 and fix build errors
+
 ## v3.6.2 (October 2024)
 * [#202](https://github.com/FreeRTOS/corePKCS11/pull/202) Export RSA key attributes from mbedtls context to support TLSv1.3
 

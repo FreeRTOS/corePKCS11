@@ -1,5 +1,5 @@
 /*
- * corePKCS11 v3.6.2
+ * corePKCS11 v3.6.3
  * Copyright (C) 2024 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
