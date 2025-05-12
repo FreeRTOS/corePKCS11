@@ -475,6 +475,13 @@ static CK_RV prvMbedTLS_Initialize( void )
     mbedtls_entropy_init( &xP11Context.xMbedEntropyContext );
     mbedtls_ctr_drbg_init( &xP11Context.xMbedDrbgCtx );
 
+    /* Initialise the global mutexes for the PSA API's */
+    #if defined( MBEDTLS_PSA_CRYPTO_C )
+        mbedtls_mutex_init( &mbedtls_threading_key_slot_mutex );
+        mbedtls_mutex_init( &mbedtls_threading_psa_globaldata_mutex );
+        mbedtls_mutex_init( &mbedtls_threading_psa_rngdata_mutex );
+    #endif
+
     lMbedTLSResult = mbedtls_ctr_drbg_seed( &xP11Context.xMbedDrbgCtx,
                                             mbedtls_entropy_func,
                                             &xP11Context.xMbedEntropyContext,
