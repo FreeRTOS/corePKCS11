@@ -50,7 +50,7 @@ See memory requirements for this library
 **corePKCS11 v3.6.3
 [source code](https://github.com/FreeRTOS/corePKCS11/tree/v3.6.3/source) is part
 of the
-[FreeRTOS 202406.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202406.00-LTS)
+[FreeRTOS 202406.02 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202406.02-LTS)
 release.**
 
 # Purpose
