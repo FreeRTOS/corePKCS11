@@ -1,6 +1,7 @@
 {
   "name": "corePKCS11 Library",
   "releases": [
+    "v3.6.3",
     "v3.6.2",
     "v3.6.1",
     "v3.6.0",
