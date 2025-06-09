@@ -8,3 +8,13 @@
 # Use this file to give project-specific targets, including targets
 # that may depend on targets defined in Makefile.common.
 ################################################################
+
+$(PROJECT_SOURCES): $(SRCDIR)/test/build/_deps/mbedtls_2-src/include/mbedtls/pk.h
+
+$(SRCDIR)/test/build/_deps/mbedtls_2-src/include/mbedtls/pk.h:
+	if [ ! -f $@ ] ; then cd $(SRCDIR)/test && cmake -B build ; fi
+
+clean: clean_mbedtls
+
+clean_mbedtls:
+	$(RM) -r $(SRCDIR)/test/build

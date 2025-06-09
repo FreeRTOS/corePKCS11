@@ -11,8 +11,8 @@ PROOF_UID = C_FindObjectsInit
 TEMPLATE_SIZE=10
 
 DEFINES += -DTEMPLATE_SIZE=$(TEMPLATE_SIZE)
-INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 
 REMOVE_FUNCTION_BODY +=
 UNWINDSET += C_FindObjectsInit.0:$(TEMPLATE_SIZE)
