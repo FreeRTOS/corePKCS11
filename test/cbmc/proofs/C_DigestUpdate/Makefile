@@ -9,8 +9,8 @@ HARNESS_FILE = C_DigestUpdate_harness
 PROOF_UID = C_DigestUpdate
 
 DEFINES +=
-INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 
 REMOVE_FUNCTION_BODY +=
 UNWINDSET +=
