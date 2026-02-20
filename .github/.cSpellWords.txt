@@ -61,6 +61,7 @@ mbed
 MBED
 mbedcrypto
 MBEDTLSSL
+mbedx
 Merkle
 misra
 Misra
