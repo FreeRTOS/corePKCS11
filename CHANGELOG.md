@@ -1,5 +1,8 @@
 # Change Log for corePKCS11 Library
 
+## v3.6.4 (February 2026)
+* [#214](https://github.com/FreeRTOS/corePKCS11/pull/214) Add CMakeLists.txt to the repository for basic test build
+
 ## v3.6.3 (May 2025)
 * [#206](https://github.com/FreeRTOS/corePKCS11/pull/206) Update mbedtls version to v3.6.3 and fix build errors
 
