@@ -44,3 +44,11 @@ _Ref 11.5.1_
 
 - MISRA C-2012 Rule 11.5 Allow casts from `void *`. Fields such as publish
     payloads are passed as `void *` and must be cast to the correct data type before use.
+
+#### Rule 21.3
+
+_Ref 21.3.1_
+
+- MISRA C:2012 Rule 21.3: MISRA warns against the use of dynamic memory allocation as it might lead to
+    undefined behavior if not used properly. Proper care is taken in the code to not use free'd pointers
+    and to check the validity of malloc'd memory before it is dereferenced or used.

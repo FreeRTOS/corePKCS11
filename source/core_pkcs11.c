@@ -83,7 +83,9 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
         {
             /* MISRA Ref 11.5.1 [Void pointer assignment] */
             /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-115 */
+            /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-213 */
             /* coverity[misra_c_2012_rule_11_5_violation] */
+            /* coverity[misra_c_2012_rule_21_3_violation] */
             pxSlotId = pkcs11configPKCS11_MALLOC( sizeof( CK_SLOT_ID ) * ( *pxSlotCount ) );
 
             if( pxSlotId == NULL )
@@ -108,6 +110,8 @@ CK_RV xGetSlotList( CK_SLOT_ID ** ppxSlotId,
 
     if( ( xResult != CKR_OK ) && ( pxSlotId != NULL ) )
     {
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-213 */
+        /* coverity[misra_c_2012_rule_21_3_violation] */
         pkcs11configPKCS11_FREE( pxSlotId );
         *ppxSlotId = NULL;
     }
@@ -189,7 +193,9 @@ CK_RV xInitializePkcs11Token( void )
         /* Check if the token requires further initialization. */
         /* MISRA Ref 11.5.1 [Void pointer assignment] */
         /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-115 */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-213 */
         /* coverity[misra_c_2012_rule_11_5_violation] */
+        /* coverity[misra_c_2012_rule_21_3_violation] */
         pxTokenInfo = pkcs11configPKCS11_MALLOC( sizeof( CK_TOKEN_INFO ) );
 
         if( pxTokenInfo != NULL )
@@ -222,11 +228,15 @@ CK_RV xInitializePkcs11Token( void )
 
     if( pxTokenInfo != NULL )
     {
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-213 */
+        /* coverity[misra_c_2012_rule_21_3_violation] */
         pkcs11configPKCS11_FREE( pxTokenInfo );
     }
 
     if( pxSlotId != NULL )
     {
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-213 */
+        /* coverity[misra_c_2012_rule_21_3_violation] */
         pkcs11configPKCS11_FREE( pxSlotId );
     }
 
@@ -295,6 +305,8 @@ CK_RV xInitializePkcs11Session( CK_SESSION_HANDLE * pxSession )
         }
 
         /* Free the memory allocated by xGetSlotList. */
+        /* More details at: https://github.com/FreeRTOS/corePKCS11/blob/main/MISRA.md#rule-213 */
+        /* coverity[misra_c_2012_rule_21_3_violation] */
         pkcs11configPKCS11_FREE( pxSlotId );
     }
 
