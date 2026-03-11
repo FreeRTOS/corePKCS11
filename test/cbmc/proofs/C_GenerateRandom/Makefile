@@ -9,8 +9,8 @@ HARNESS_FILE = C_GenerateRandom_harness
 PROOF_UID = C_GenerateRandom
 
 DEFINES +=
-INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 INCLUDES += -I$(SRCDIR)/source/dependency/3rdparty/mbedtls_utils
+INCLUDES += -I$(SRCDIR)/test/build/_deps/mbedtls_2-src/include
 
 REMOVE_FUNCTION_BODY += C_Initialize
 REMOVE_FUNCTION_BODY += __CPROVER_file_local_core_pkcs11_mbedtls_c_prvMbedTLS_Initialize
