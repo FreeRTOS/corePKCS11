@@ -97,11 +97,12 @@ void test_PKI_mbedTLSSignatureToPkcs11Signature( void )
 
     uint8_t pucConversionBuffer[ sizeof( pucExpectedSignature ) ] = { 0 };
 
-    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, pucKnownSignature );
+    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, sizeof( pucConversionBuffer ), pucKnownSignature, sizeof( pucKnownSignature ) );
     TEST_ASSERT_EQUAL( 0, xResult );
     TEST_ASSERT_EQUAL_MEMORY( pucExpectedSignature, pucConversionBuffer,
                               sizeof( pucExpectedSignature ) );
 }
+
 
 /*!
  * @brief PKI_mbedTLSSignatureToPkcs11Signature R size too big.
@@ -129,7 +130,7 @@ void test_PKI_mbedTLSSignatureToPkcs11SignatureBigR( void )
 
     uint8_t pucConversionBuffer[ sizeof( pucKnownSignature ) ] = { 0 };
 
-    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, pucKnownSignature );
+    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, sizeof( pucConversionBuffer ), pucKnownSignature, sizeof( pucKnownSignature ) );
     TEST_ASSERT_EQUAL( -1, xResult );
 }
 
@@ -159,7 +160,7 @@ void test_PKI_mbedTLSSignatureToPkcs11SignatureBigS( void )
 
     uint8_t pucConversionBuffer[ sizeof( pucKnownSignature ) ] = { 0 };
 
-    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, pucKnownSignature );
+    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, sizeof( pucConversionBuffer ), pucKnownSignature, sizeof( pucKnownSignature ) );
     TEST_ASSERT_EQUAL( -1, xResult );
 }
 
@@ -173,19 +174,22 @@ void test_PKI_mbedTLSSignatureToPkcs11SignatureBigS( void )
 void test_PKI_mbedTLSSignatureToPkcs11SignatureRConversion( void )
 {
     int32_t xResult = 0;
+
+    /* R component has length 0x21 (33) with a leading 0x00 sign pad,
+     * followed by 32 bytes of actual R value starting with 0x88 (high bit set). */
     uint8_t pucKnownSignature[] =
     {
-        0x30, 0x45, 0x2,  0x21, 0x5a, 0x88, 0x7f,
+        0x30, 0x46, 0x02, 0x21, 0x00, 0x88, 0x7f,
         0x8c, 0x15, 0xea, 0xe6, 0x41, 0x26, 0xe5,
         0x65, 0x28, 0xc5, 0xb7, 0x7c, 0x3a, 0x8d,
         0xf3, 0x2c, 0x2e, 0xb3, 0x5c, 0xbc, 0xfd,
         0xd5, 0xdb, 0x32, 0x20, 0x88, 0xb4, 0x5b,
-        0x54, 0x2,  0x21, 0x0,  0xf9, 0xf7, 0xaf,
-        0x21, 0x36, 0x1e, 0x5c, 0xa3, 0xa6, 0x88,
-        0x43, 0x19, 0xa7, 0x3e, 0xbe, 0xfb, 0x4d,
-        0x26, 0xb6, 0x91, 0xe0, 0xc,  0x50, 0xe8,
-        0x1f, 0x97, 0xe1, 0xaf, 0x3c, 0xab, 0x85,
-        0xfd, 0x0,  0x0,  0x0
+        0x54, 0x02, 0x02, 0x21, 0x00, 0xf9, 0xf7,
+        0xaf, 0x21, 0x36, 0x1e, 0x5c, 0xa3, 0xa6,
+        0x88, 0x43, 0x19, 0xa7, 0x3e, 0xbe, 0xfb,
+        0x4d, 0x26, 0xb6, 0x91, 0xe0, 0x0c, 0x50,
+        0xe8, 0x1f, 0x97, 0xe1, 0xaf, 0x3c, 0xab,
+        0x85, 0xfd
     };
 
 
@@ -195,17 +199,18 @@ void test_PKI_mbedTLSSignatureToPkcs11SignatureRConversion( void )
         0x26, 0xe5, 0x65, 0x28, 0xc5, 0xb7, 0x7c,
         0x3a, 0x8d, 0xf3, 0x2c, 0x2e, 0xb3, 0x5c,
         0xbc, 0xfd, 0xd5, 0xdb, 0x32, 0x20, 0x88,
-        0xb4, 0x5b, 0x54, 0x2,  0x0,  0x0,  0x0, 0x0,
-        0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0,
-        0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0,
-        0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0,
-        0x0,  0x0,  0x0,  0x0
+        0xb4, 0x5b, 0x54, 0x02, 0xf9, 0xf7, 0xaf,
+        0x21, 0x36, 0x1e, 0x5c, 0xa3, 0xa6, 0x88,
+        0x43, 0x19, 0xa7, 0x3e, 0xbe, 0xfb, 0x4d,
+        0x26, 0xb6, 0x91, 0xe0, 0x0c, 0x50, 0xe8,
+        0x1f, 0x97, 0xe1, 0xaf, 0x3c, 0xab, 0x85,
+        0xfd
     };
 
 
     uint8_t pucConversionBuffer[ sizeof( pucExpectedSignature ) ] = { 0 };
 
-    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, pucKnownSignature );
+    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, sizeof( pucConversionBuffer ), pucKnownSignature, sizeof( pucKnownSignature ) );
     TEST_ASSERT_EQUAL( 0, xResult );
     TEST_ASSERT_EQUAL_MEMORY( pucExpectedSignature, pucConversionBuffer,
                               sizeof( pucExpectedSignature ) );
@@ -221,19 +226,22 @@ void test_PKI_mbedTLSSignatureToPkcs11SignatureRConversion( void )
 void test_PKI_mbedTLSSignatureToPkcs11SignatureSConversion( void )
 {
     int32_t xResult = 0;
+
+    /* R component has length 0x21 (33) with a leading 0x00 sign pad,
+     * S component has length 0x21 (33) with a leading 0x00 sign pad. */
     uint8_t pucKnownSignature[] =
     {
-        0x30, 0x45, 0x2,  0x21, 0x5a, 0x88, 0x7f,
+        0x30, 0x46, 0x02, 0x21, 0x00, 0x88, 0x7f,
         0x8c, 0x15, 0xea, 0xe6, 0x41, 0x26, 0xe5,
         0x65, 0x28, 0xc5, 0xb7, 0x7c, 0x3a, 0x8d,
         0xf3, 0x2c, 0x2e, 0xb3, 0x5c, 0xbc, 0xfd,
-        0xd5, 0xdb, 0x32, 0x1F, 0x88, 0xb4, 0x5b,
-        0x54, 0x2,  0x21, 0x0,  0xf9, 0xf7, 0xaf,
-        0x21, 0x36, 0x1e, 0x5c, 0xa3, 0xa6, 0x88,
-        0x43, 0x19, 0xa7, 0x3e, 0xbe, 0xfb, 0x4d,
-        0x26, 0xb6, 0x91, 0xe0, 0xc,  0x50, 0xe8,
-        0x1f, 0x97, 0xe1, 0xaf, 0x3c, 0xab, 0x85,
-        0xfd, 0x0,  0x0,  0x0
+        0xd5, 0xdb, 0x32, 0x1f, 0x88, 0xb4, 0x5b,
+        0x54, 0x02, 0x02, 0x21, 0x00, 0xf9, 0xf7,
+        0xaf, 0x21, 0x36, 0x1e, 0x5c, 0xa3, 0xa6,
+        0x88, 0x43, 0x19, 0xa7, 0x3e, 0xbe, 0xfb,
+        0x4d, 0x26, 0xb6, 0x91, 0xe0, 0x0c, 0x50,
+        0xe8, 0x1f, 0x97, 0xe1, 0xaf, 0x3c, 0xab,
+        0x85, 0xfd
     };
 
 
@@ -243,17 +251,18 @@ void test_PKI_mbedTLSSignatureToPkcs11SignatureSConversion( void )
         0x26, 0xe5, 0x65, 0x28, 0xc5, 0xb7, 0x7c,
         0x3a, 0x8d, 0xf3, 0x2c, 0x2e, 0xb3, 0x5c,
         0xbc, 0xfd, 0xd5, 0xdb, 0x32, 0x1f, 0x88,
-        0xb4, 0x5b, 0x54, 0x2,  0x0,  0x0,  0x0, 0x0,
-        0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0,
-        0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0,
-        0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0,
-        0x0,  0x0,  0x0,  0x0
+        0xb4, 0x5b, 0x54, 0x02, 0xf9, 0xf7, 0xaf,
+        0x21, 0x36, 0x1e, 0x5c, 0xa3, 0xa6, 0x88,
+        0x43, 0x19, 0xa7, 0x3e, 0xbe, 0xfb, 0x4d,
+        0x26, 0xb6, 0x91, 0xe0, 0x0c, 0x50, 0xe8,
+        0x1f, 0x97, 0xe1, 0xaf, 0x3c, 0xab, 0x85,
+        0xfd
     };
 
 
     uint8_t pucConversionBuffer[ sizeof( pucExpectedSignature ) ] = { 0 };
 
-    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, pucKnownSignature );
+    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, sizeof( pucConversionBuffer ), pucKnownSignature, sizeof( pucKnownSignature ) );
     TEST_ASSERT_EQUAL( 0, xResult );
     TEST_ASSERT_EQUAL_MEMORY( pucExpectedSignature, pucConversionBuffer,
                               sizeof( pucExpectedSignature ) );
@@ -268,13 +277,33 @@ void test_PKI_mbedTLSSignatureToPkcs11SignatureNull( void )
     int32_t xResult = 0;
     uint8_t pucKnownSignature[] = { 0xAA };
 
-    xResult = PKI_mbedTLSSignatureToPkcs11Signature( NULL, pucKnownSignature );
+    xResult = PKI_mbedTLSSignatureToPkcs11Signature( NULL, 64, pucKnownSignature, sizeof( pucKnownSignature ) );
     TEST_ASSERT_EQUAL( -1, xResult );
 
-    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucKnownSignature, NULL );
+    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucKnownSignature, sizeof( pucKnownSignature ), NULL, 0 );
     TEST_ASSERT_EQUAL( -1, xResult );
 
-    xResult = PKI_mbedTLSSignatureToPkcs11Signature( NULL, NULL );
+    xResult = PKI_mbedTLSSignatureToPkcs11Signature( NULL, 0, NULL, 0 );
+    TEST_ASSERT_EQUAL( -1, xResult );
+}
+
+/*!
+ * @brief PKI_mbedTLSSignatureToPkcs11Signature truncated input.
+ *
+ * Reproduces the reported heap over-read: an 8-byte buffer with
+ * R-component length claiming 11 bytes. The function must reject
+ * this without reading past the buffer.
+ */
+void test_PKI_mbedTLSSignatureToPkcs11SignatureTruncated( void )
+{
+    int32_t xResult = 0;
+
+    /* PoC from the security report: SEQUENCE tag, length, INTEGER tag,
+     * R-length = 0x0b (11), but only 4 data bytes follow. */
+    uint8_t pucTruncated[] = { 0x30, 0x06, 0x02, 0x0b, 0xAA, 0xBB, 0xCC, 0xDD };
+    uint8_t pucConversionBuffer[ 64 ] = { 0 };
+
+    xResult = PKI_mbedTLSSignatureToPkcs11Signature( pucConversionBuffer, sizeof( pucConversionBuffer ), pucTruncated, sizeof( pucTruncated ) );
     TEST_ASSERT_EQUAL( -1, xResult );
 }
 
@@ -318,7 +347,7 @@ void test_PKI_pkcs11SignatureTombedTLSSignature( void )
     };
     size_t ulSignLen = 0;
 
-    xResult = PKI_pkcs11SignatureTombedTLSSignature( pucBeforeSignature, &ulSignLen );
+    xResult = PKI_pkcs11SignatureTombedTLSSignature( pucBeforeSignature, sizeof( pucBeforeSignature ), &ulSignLen );
     TEST_ASSERT_EQUAL( 0, xResult );
     TEST_ASSERT_EQUAL_MEMORY( pucBeforeSignature, pucAfterSignature,
                               ulSignLen );
@@ -363,7 +392,7 @@ void test_PKI_pkcs11SignatureTombedTLSSignatureRComponent0( void )
     };
     size_t ulSignLen = 0;
 
-    xResult = PKI_pkcs11SignatureTombedTLSSignature( pucBeforeSignature, &ulSignLen );
+    xResult = PKI_pkcs11SignatureTombedTLSSignature( pucBeforeSignature, sizeof( pucBeforeSignature ), &ulSignLen );
     TEST_ASSERT_EQUAL( 0, xResult );
     TEST_ASSERT_EQUAL_MEMORY( pucBeforeSignature, pucAfterSignature,
                               ulSignLen );
@@ -407,7 +436,7 @@ void test_PKI_pkcs11SignatureTombedTLSSignatureSComponent0( void )
     };
     size_t ulSignLen = 0;
 
-    xResult = PKI_pkcs11SignatureTombedTLSSignature( pucBeforeSignature, &ulSignLen );
+    xResult = PKI_pkcs11SignatureTombedTLSSignature( pucBeforeSignature, sizeof( pucBeforeSignature ), &ulSignLen );
     TEST_ASSERT_EQUAL( 0, xResult );
     TEST_ASSERT_EQUAL_MEMORY( pucBeforeSignature, pucAfterSignature,
                               ulSignLen );
@@ -423,12 +452,28 @@ void test_PKI_pkcs11SignatureTombedTLSSignatureNull( void )
     size_t xLen = 0;
     uint8_t pucKnownSignature[] = { 0xAA };
 
-    xResult = PKI_pkcs11SignatureTombedTLSSignature( NULL, &xLen );
+    xResult = PKI_pkcs11SignatureTombedTLSSignature( NULL, 0, &xLen );
     TEST_ASSERT_EQUAL( -1, xResult );
 
-    xResult = PKI_pkcs11SignatureTombedTLSSignature( pucKnownSignature, NULL );
+    xResult = PKI_pkcs11SignatureTombedTLSSignature( pucKnownSignature, sizeof( pucKnownSignature ), NULL );
     TEST_ASSERT_EQUAL( -1, xResult );
 
-    xResult = PKI_pkcs11SignatureTombedTLSSignature( NULL, NULL );
+    xResult = PKI_pkcs11SignatureTombedTLSSignature( NULL, 0, NULL );
+    TEST_ASSERT_EQUAL( -1, xResult );
+}
+
+/*!
+ * @brief PKI_pkcs11SignatureTombedTLSSignature buffer too small.
+ *
+ * A 32-byte buffer is too small for the 64-byte PKCS #11 input read.
+ * The function must reject this without reading past the buffer.
+ */
+void test_PKI_pkcs11SignatureTombedTLSSignatureBufferTooSmall( void )
+{
+    int32_t xResult = 0;
+    size_t xLen = 0;
+    uint8_t pucSmallBuffer[ 32 ] = { 0 };
+
+    xResult = PKI_pkcs11SignatureTombedTLSSignature( pucSmallBuffer, sizeof( pucSmallBuffer ), &xLen );
     TEST_ASSERT_EQUAL( -1, xResult );
 }
