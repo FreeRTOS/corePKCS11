@@ -152,16 +152,6 @@ int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
     if( xReturn == 0 )
     {
         xOffset++;
-
-        /* Read S component length. */
-        if( xOffset >= xMbedSignatureLen )
-        {
-            xReturn = FAILURE;
-        }
-    }
-
-    if( xReturn == 0 )
-    {
         xComponentLen = ( size_t ) pxMbedSignature[ xOffset ];
         xOffset++;
         xDataOffset = xOffset;

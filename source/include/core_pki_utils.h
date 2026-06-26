@@ -61,6 +61,7 @@
  *
  * \return 0 on success, -1 on failure.
  */
+
 /* TODO: Remove this function and replace with mbedtls_ecdsa_der_to_raw()
  * from psa_util.h when migrating to mbedTLS 4.x. */
 /* @[declare_pkcs11_utils_pkimbedtlssignaturetopkcs11signature] */
@@ -96,6 +97,7 @@ int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
  * \return 0 if successful, -1 on failure.
  *
  */
+
 /* TODO: Remove this function and replace with mbedtls_ecdsa_raw_to_der()
  * from psa_util.h when migrating to mbedTLS 4.x. */
 /* @[declare_pkcs11_utils_pkipkcs11signaturetombedtlssignature] */
