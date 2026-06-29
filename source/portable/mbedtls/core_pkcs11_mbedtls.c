@@ -4814,7 +4814,7 @@ CK_DECLARE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE hSession,
         if( ( pxSessionObj->xOperationSignMechanism == CKM_ECDSA ) && ( xSignatureGenerated == ( CK_BBOOL ) CK_TRUE ) )
         {
             /* If this an EC signature, reformat from ASN.1 encoded to 64-byte R & S components */
-            lMbedTLSResult = PKI_mbedTLSSignatureToPkcs11Signature( pSignature, ecSignature );
+            lMbedTLSResult = PKI_mbedTLSSignatureToPkcs11Signature( pSignature, *pulSignatureLen, ecSignature, xSignatureBufferLength );
 
             if( lMbedTLSResult != 0 )
             {

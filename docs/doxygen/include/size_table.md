@@ -14,7 +14,7 @@
     </tr>
     <tr>
         <td>core_pki_utils.c</td>
-        <td><center>0.5K</center></td>
+        <td><center>0.4K</center></td>
         <td><center>0.3K</center></td>
     </tr>
     <tr>
@@ -24,7 +24,7 @@
     </tr>
     <tr>
         <td><b>Total estimates</b></td>
-        <td><b><center>10.7K</center></b></td>
+        <td><b><center>10.6K</center></b></td>
         <td><b><center>8.7K</center></b></td>
     </tr>
 </table>

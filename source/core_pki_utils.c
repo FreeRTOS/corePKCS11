@@ -43,13 +43,23 @@
 /* Convert the EC signature from DER encoded to PKCS #11 format. */
 /* @[declare pkcs11_utils_pkipkcs11signaturetombedtlssignature] */
 int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
-                                              const uint8_t * pxMbedSignature )
+                                              size_t xSignaturePKCSLen,
+                                              const uint8_t * pxMbedSignature,
+                                              size_t xMbedSignatureLen )
 {
     int8_t xReturn = 0;
-    const uint8_t * pxNextLength = NULL;
-    uint8_t ucSigComponentLength;
+    size_t xOffset = 0;
+    size_t xComponentLen;
+    size_t xDataOffset;
 
-    if( ( pxSignaturePKCS == NULL ) || ( pxMbedSignature == NULL ) )
+    if( ( pxSignaturePKCS == NULL ) || ( pxMbedSignature == NULL ) ||
+        ( xMbedSignatureLen == 0 ) )
+    {
+        xReturn = FAILURE;
+    }
+
+    /* Need at least 64 bytes in the output buffer for the PKCS #11 signature. */
+    if( ( xReturn == 0 ) && ( xSignaturePKCSLen < 64U ) )
     {
         xReturn = FAILURE;
     }
@@ -62,64 +72,113 @@ int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
          *      INTEGER LENGTH  (of S component)
          */
 
-        /* The 4th byte contains the length of the R component */
-        ucSigComponentLength = pxMbedSignature[ 3 ];
+        /* Validate SEQUENCE tag (0x30) and that we have at least the
+         * SEQUENCE tag, length, INTEGER tag, length, and R/S bytes. */
+        if( ( xMbedSignatureLen < 68U ) ||
+            ( pxMbedSignature[ 0 ] != 0x30U ) )
+        {
+            xReturn = FAILURE;
+        }
+    }
 
-        /* The new signature will be 64 bytes long (32 bytes for R, 32 bytes for S).
-         * Zero this buffer out in case a component is shorter than 32 bytes. */
+    /* The new signature will be 64 bytes long (32 bytes for R, 32 bytes for S).
+     * Zero this buffer out in case a component is shorter than 32 bytes. */
+    if( xReturn == 0 )
+    {
         ( void ) memset( pxSignaturePKCS, 0, 64 );
+    }
+
+    if( xReturn == 0 )
+    {
+        /* Skip SEQUENCE tag and length to reach the R INTEGER. */
+        xOffset = 2;
 
         /********* R Component. *********/
 
-        /* R components are represented by mbedTLS as 33 bytes when the first bit is zero to avoid any sign confusion. */
-        if( ucSigComponentLength == 33UL )
-        {
-            /* Chop off the leading zero.  The first 4 bytes were SEQUENCE, LENGTH, INTEGER, LENGTH, 0x00 padding.  */
-            ( void ) memcpy( pxSignaturePKCS, &( pxMbedSignature[ 5 ] ), 32 );
-            /* SEQUENCE, LENGTH, INTEGER, LENGTH, leading zero, R, S's integer tag */
-            pxNextLength = &( pxMbedSignature[ 5U + 32U + 1U ] );
-        }
-        else if( ucSigComponentLength <= 32UL )
-        {
-            /* The R component is 32 bytes or less.  Copy so that it is properly represented as a 32 byte value,
-             * leaving leading 0 pads at beginning if necessary. */
-            ( void ) memcpy( &( pxSignaturePKCS[ 32UL - ucSigComponentLength ] ),  /* If the R component is less than 32 bytes, leave the leading zeros. */
-                             &( pxMbedSignature[ 4 ] ),                            /* SEQUENCE, LENGTH, INTEGER, LENGTH, (R component begins as the 5th byte) */
-                             ucSigComponentLength );
-            pxNextLength = &( pxMbedSignature[ 4U + ucSigComponentLength + 1U ] ); /* Move the pointer to get rid of
-                                                                                    * SEQUENCE, LENGTH, INTEGER, LENGTH, R Component, S integer tag. */
-        }
-        else
+        /* Validate INTEGER tag for R. */
+        if( pxMbedSignature[ xOffset ] != 0x02U )
         {
             xReturn = FAILURE;
         }
 
+        /* And get the R Componenent length. */
+        xOffset++;
+        xComponentLen = ( size_t ) pxMbedSignature[ xOffset ];
+    }
+
+    if( xReturn == 0 )
+    {
+        /* Now read the R Component value. */
+        xOffset++;
+        xDataOffset = xOffset;
+
+        /* Strip leading zero padding (DER sign byte). */
+        if( ( xComponentLen > 0U ) &&
+            ( xDataOffset < xMbedSignatureLen ) &&
+            ( pxMbedSignature[ xDataOffset ] == 0x00U ) )
+        {
+            xDataOffset++;
+            xComponentLen--;
+        }
+
+        /* Validate R component: non-zero, fits in 32 bytes, and within buffer. */
+        if( ( xComponentLen == 0U ) ||
+            ( xComponentLen > 32U ) ||
+            ( ( xDataOffset + xComponentLen ) > xMbedSignatureLen ) )
+        {
+            xReturn = FAILURE;
+        }
+    }
+
+    if( xReturn == 0 )
+    {
+        ( void ) memcpy( &( pxSignaturePKCS[ 32U - xComponentLen ] ),
+                         &( pxMbedSignature[ xDataOffset ] ),
+                         xComponentLen );
+
+        /* Advance past the full R component (including any leading zero). */
+        xOffset += ( size_t ) pxMbedSignature[ xOffset - 1U ];
+
         /********** S Component. ***********/
 
-        if( xReturn != FAILURE )
+        /* Validate INTEGER tag for S. */
+        if( ( xOffset >= xMbedSignatureLen ) ||
+            ( pxMbedSignature[ xOffset ] != 0x02U ) )
         {
-            /* Now pxNextLength is pointing to the length of the S component. */
-            ucSigComponentLength = pxNextLength[ 0 ];
-
-            if( ucSigComponentLength == 33UL )
-            {
-                ( void ) memcpy( &( pxSignaturePKCS[ 32 ] ),
-                                 &( pxNextLength[ 2 ] ), /*LENGTH (of S component), 0x00 padding, S component is 3rd byte - we want to skip the leading zero. */
-                                 32 );
-            }
-            else if( ucSigComponentLength <= 32UL )
-            {
-                /* The S component is 32 bytes or less.  Copy so that it is properly represented as a 32 byte value,
-                 * leaving leading 0 pads at beginning if necessary. */
-                ( void ) memcpy( &( pxSignaturePKCS[ 64UL - ucSigComponentLength ] ),
-                                 &( pxNextLength[ 1 ] ),
-                                 ucSigComponentLength );
-            }
-            else
-            {
-                xReturn = FAILURE;
-            }
+            xReturn = FAILURE;
         }
+    }
+
+    if( xReturn == 0 )
+    {
+        xOffset++;
+        xComponentLen = ( size_t ) pxMbedSignature[ xOffset ];
+        xOffset++;
+        xDataOffset = xOffset;
+
+        /* Strip leading zero padding (DER sign byte). */
+        if( ( xComponentLen > 0U ) &&
+            ( xDataOffset < xMbedSignatureLen ) &&
+            ( pxMbedSignature[ xDataOffset ] == 0x00U ) )
+        {
+            xDataOffset++;
+            xComponentLen--;
+        }
+
+        /* Validate S component: non-zero, fits in 32 bytes, and within buffer. */
+        if( ( xComponentLen == 0U ) ||
+            ( xComponentLen > 32U ) ||
+            ( ( xDataOffset + xComponentLen ) > xMbedSignatureLen ) )
+        {
+            xReturn = FAILURE;
+        }
+    }
+
+    if( xReturn == 0 )
+    {
+        ( void ) memcpy( &( pxSignaturePKCS[ 64U - xComponentLen ] ),
+                         &( pxMbedSignature[ xDataOffset ] ),
+                         xComponentLen );
     }
 
     return xReturn;
@@ -131,13 +190,24 @@ int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
 /* Convert an EC signature from PKCS #11 format to DER encoded. */
 /* @[declare pkcs11_utils_pkimbedtlssignaturetopkcs11signature] */
 int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
+                                              size_t xSigBufLen,
                                               size_t * pxSigLen )
 {
     int8_t xReturn = 0;
-    uint8_t * pucSigPtr = NULL;
-    uint8_t ucTemp[ 64 ] = { 0 }; /* A temporary buffer for the pre-formatted signature. */
+    uint8_t ucTemp[ 64 ] = { 0 };
+    size_t xOutLen;
+    size_t xOffset;
+    uint8_t ucRPad;
+    uint8_t ucSPad;
 
     if( ( pucSig == NULL ) || ( pxSigLen == NULL ) )
+    {
+        xReturn = FAILURE;
+    }
+
+    /* Need at least 64 bytes to read the PKCS #11 input,
+     * 72 bytes for largest ECDSA output. */
+    if( ( xReturn == 0 ) && ( xSigBufLen < 72U ) )
     {
         xReturn = FAILURE;
     }
@@ -146,66 +216,46 @@ int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
     {
         ( void ) memcpy( ucTemp, pucSig, 64 );
 
+        /* Determine if R and S need a leading 0x00 pad to avoid being
+         * interpreted as negative in ASN.1. */
+        ucRPad = ( ( ucTemp[ 0 ] & 0x80U ) != 0U ) ? 1U : 0U;
+        ucSPad = ( ( ucTemp[ 32 ] & 0x80U ) != 0U ) ? 1U : 0U;
 
-        /* The ASN.1 encoded signature has the format
-         * SEQUENCE LENGTH (of entire rest of signature)
-         *      INTEGER LENGTH  (of R component)
-         *      INTEGER LENGTH  (of S component)
-         *
-         * and a signature coming out of PKCS #11 C_Sign will have the format
-         * R[32] + S[32]
-         */
+        /* Total DER output: SEQUENCE(1) + LENGTH(1) +
+         *   R component INTEGER(1) + LENGTH(1) + pad + 32 +
+         *   S component INTEGER(1) + LENGTH(1) + pad + 32 */
+        xOutLen = 2U + 2U + ucRPad + 32U + 2U + ucSPad + 32U;
 
-        pucSig[ 0 ] = 0x30; /* Sequence. */
-        pucSig[ 1 ] = 0x44; /* The minimum length the signature could be. */
-        pucSig[ 2 ] = 0x02; /* Integer. */
+        xOffset = 0;
 
-        /*************** R Component. *******************/
+        /* SEQUENCE tag and length. */
+        pucSig[ xOffset++ ] = 0x30;
+        pucSig[ xOffset++ ] = ( uint8_t ) ( xOutLen - 2U );
 
-        /* If the first bit is one, pre-append a 00 byte.
-         * This prevents the number from being interpreted as negative. */
-        if( ( ucTemp[ 0 ] & 0x80UL ) == 0x80UL )
+        /* R INTEGER. */
+        pucSig[ xOffset++ ] = 0x02;
+        pucSig[ xOffset++ ] = ( uint8_t ) ( 32U + ucRPad );
+
+        if( ucRPad != 0U )
         {
-            pucSig[ 1 ]++;                                   /* Increment the length of the structure to account for the 0x00 pad. */
-            pucSig[ 3 ] = 0x21;                              /* Increment the length of the R value to account for the 0x00 pad. */
-            pucSig[ 4 ] = 0x0;                               /* Write the 0x00 pad. */
-            ( void ) memcpy( &( pucSig[ 5 ] ), ucTemp, 32 ); /* Copy the 32-byte R value. */
-            pucSigPtr = &( pucSig[ 33 ] );                   /* Increment the pointer to compensate for padded R length.    */
-        }
-        else
-        {
-            pucSig[ 3 ] = 0x20;                              /* R length with be 32 bytes. */
-            ( void ) memcpy( &( pucSig[ 4 ] ), ucTemp, 32 ); /* Copy 32 bytes of R into the signature buffer. */
-            pucSigPtr = &( pucSig[ 32 ] );                   /* Increment the pointer for 32 byte R length. */
+            pucSig[ xOffset++ ] = 0x00;
         }
 
-        pucSigPtr = &( pucSigPtr[ 4 ] ); /* Increment the pointer to offset the SEQUENCE, LENGTH, R-INTEGER, LENGTH. */
-        pucSigPtr[ 0 ] = 0x02;           /* INTEGER tag for S. */
-        pucSigPtr = &( pucSigPtr[ 1 ] ); /* Increment over S INTEGER tag. */
+        ( void ) memcpy( &( pucSig[ xOffset ] ), ucTemp, 32 );
+        xOffset += 32U;
 
-        /******************* S Component. ****************/
+        /* S INTEGER. */
+        pucSig[ xOffset++ ] = 0x02;
+        pucSig[ xOffset++ ] = ( uint8_t ) ( 32U + ucSPad );
 
-        /* If the first bit is one, pre-append a 00 byte.
-         * This prevents the number from being interpreted as negative. */
-        if( ( ucTemp[ 32 ] & 0x80UL ) == 0x80UL )
+        if( ucSPad != 0U )
         {
-            pucSig[ 1 ]++;                                       /* Increment the length of the structure to account for the 0x00 pad. */
-            pucSigPtr[ 0 ] = 0x21;                               /* Increment the length of the S value to account for the 0x00 pad. */
-            pucSigPtr[ 1 ] = 0x00;                               /* Write the 0x00 pad. */
-            pucSigPtr = &( pucSigPtr[ 2 ] );                     /* pucSigPtr was pointing at the S-length.  Increment by 2 to hop over length and 0 padding. */
-
-            ( void ) memcpy( pucSigPtr, &( ucTemp[ 32 ] ), 32 ); /* Copy the S value. */
-        }
-        else
-        {
-            pucSigPtr[ 0 ] = 0x20;                               /* S length will be 32 bytes. */
-            pucSigPtr++;                                         /* Hop pointer over the length byte. */
-            ( void ) memcpy( pucSigPtr, &( ucTemp[ 32 ] ), 32 ); /* Copy the S value. */
+            pucSig[ xOffset++ ] = 0x00;
         }
 
-        /* The total signature length is the length of the R and S integers plus 2 bytes for
-         * the SEQUENCE and LENGTH wrapping the entire struct. */
-        *pxSigLen = pucSig[ 1 ] + 2UL;
+        ( void ) memcpy( &( pucSig[ xOffset ] ), &( ucTemp[ 32 ] ), 32 );
+
+        *pxSigLen = xOutLen;
     }
 
     return xReturn;

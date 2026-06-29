@@ -52,14 +52,23 @@
  *                                        where PKCS #11 formatted signature
  *                                        will be placed.  Caller must
  *                                        allocate 64 bytes of memory.
+ * @param[in] xSignaturePKCSLen           Length of the pxSignaturePKCS buffer
+ *                                        in bytes. Must be at least 64.
  * @param[in] pxMbedSignature             Pointer to DER encoded ECDSA
- *                                        signature. Buffer size is expected to be 72 bytes.
+ *                                        signature.
+ * @param[in] xMbedSignatureLen           Length of the DER encoded signature
+ *                                        buffer in bytes.
  *
  * \return 0 on success, -1 on failure.
  */
+
+/* TODO: Remove this function and replace with mbedtls_ecdsa_der_to_raw()
+ * from psa_util.h when migrating to mbedTLS 4.x. */
 /* @[declare_pkcs11_utils_pkimbedtlssignaturetopkcs11signature] */
 int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
-                                              const uint8_t * pxMbedSignature );
+                                              size_t xSignaturePKCSLen,
+                                              const uint8_t * pxMbedSignature,
+                                              size_t xMbedSignatureLen );
 /* @[declare_pkcs11_utils_pkimbedtlssignaturetopkcs11signature] */
 
 
@@ -81,13 +90,19 @@ int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
  *                           72 bytes).  It is the responsibility of the caller
  *                           to guarantee that this pointer is large enough to
  *                           hold the (longer) formatted signature.
+ * @param[in] xSigBufLen     Length of the pucSig buffer in bytes. Must be
+ *                           at least 72 to hold the worst-case DER output.
  *@param[out] pxSigLen       Pointer to the length of the ASN.1 formatted signature.
  *
  * \return 0 if successful, -1 on failure.
  *
  */
+
+/* TODO: Remove this function and replace with mbedtls_ecdsa_raw_to_der()
+ * from psa_util.h when migrating to mbedTLS 4.x. */
 /* @[declare_pkcs11_utils_pkipkcs11signaturetombedtlssignature] */
 int8_t PKI_pkcs11SignatureTombedTLSSignature( uint8_t * pucSig,
+                                              size_t xSigBufLen,
                                               size_t * pxSigLen );
 /* @[declare_pkcs11_utils_pkipkcs11signaturetombedtlssignature] */
 

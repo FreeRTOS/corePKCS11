@@ -43,5 +43,5 @@ void harness()
     pucSig = malloc( ulSigLen * sizeof( uint8_t ) );
     pucMbedSig = malloc( ulMbedSigLen * sizeof( uint8_t ) );
 
-    PKI_mbedTLSSignatureToPkcs11Signature( pucSig, pucMbedSig );
+    PKI_mbedTLSSignatureToPkcs11Signature( pucSig, ulSigLen, pucMbedSig, ulMbedSigLen );
 }

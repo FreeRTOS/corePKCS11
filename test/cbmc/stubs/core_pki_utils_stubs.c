@@ -29,9 +29,13 @@
 #include "core_pki_utils.h"
 
 int8_t PKI_mbedTLSSignatureToPkcs11Signature( uint8_t * pxSignaturePKCS,
-                                              const uint8_t * pxMbedSignature )
+                                              size_t xSignaturePKCSLen,
+                                              const uint8_t * pxMbedSignature,
+                                              size_t xMbedSignatureLen )
 {
-    __CPROVER_assert( __CPROVER_OBJECT_SIZE( pxSignaturePKCS ) >= 64, "Signature was an incorrect size." );
-    __CPROVER_assert( __CPROVER_OBJECT_SIZE( pxMbedSignature ) >= 72, "mbed return buffer was an incorrect size." );
+    __CPROVER_assert( pxSignaturePKCS != NULL, "Signature pointer was NULL." );
+    __CPROVER_assert( xSignaturePKCSLen >= 64, "Signature buffer was an incorrect size." );
+    __CPROVER_assert( pxMbedSignature != NULL, "mbed signature pointer was NULL." );
+    __CPROVER_assert( xMbedSignatureLen <= __CPROVER_OBJECT_SIZE( pxMbedSignature ), "Length exceeds buffer size." );
     return nondet_bool() ? 0 : -1;
 }

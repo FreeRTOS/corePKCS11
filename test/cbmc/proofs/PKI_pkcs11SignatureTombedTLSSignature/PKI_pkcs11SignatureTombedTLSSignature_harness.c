@@ -41,7 +41,7 @@ void harness()
     __CPROVER_assume( ulSigLen >= mbedtlsEncodedBufferLen );
     pucSig = malloc( ulSigLen * sizeof( uint8_t ) );
 
-    ucReturn = PKI_pkcs11SignatureTombedTLSSignature( pucSig, &ulReturnLen );
+    ucReturn = PKI_pkcs11SignatureTombedTLSSignature( pucSig, ulSigLen, &ulReturnLen );
 
     if( ucReturn != -1 )
     {

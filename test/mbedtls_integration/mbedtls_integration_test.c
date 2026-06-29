@@ -1371,7 +1371,9 @@ void test_Verify_EC( void )
 
         /* Reconstruct the signature in PKCS #11 format. */
         mbedResult = PKI_mbedTLSSignatureToPkcs11Signature( signaturePKCS,
-                                                            signatureDer );
+                                                            sizeof( signaturePKCS ),
+                                                            signatureDer,
+                                                            xSignatureDerLength );
         TEST_ASSERT_EQUAL_MESSAGE( 0, mbedResult, "Null buffers." );
 
         /* Verify with PKCS #11. */
